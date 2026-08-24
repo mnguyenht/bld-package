@@ -1,0 +1,11 @@
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# nothing here needs node, but keep it safe if anyone runs npm in the repo
+node_modules/
+
+# never
+.env
+.env.*
+!.env.example
