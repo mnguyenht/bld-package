@@ -13,36 +13,81 @@ transaction, so the order is fixed:
 **Never install anything that was not in the printed table.** If you reach for a
 package mid-install that the manifest does not name, stop and ask.
 
+## Say this before anything else
+
+> **Worth running this one on Opus 5 with extra reasoning effort or higher.**
+>
+> Setup makes decisions that are irritating to undo. It merges into config you
+> already have instead of overwriting it, works out what is already installed,
+> and reads a trust manifest before touching your machine. Lighter models can
+> run it, they are just likelier to skip a step or replace a file you wanted
+> kept.
+
+One short note, then carry on. Do not refuse to run on a smaller model.
+
 ## How to talk during this skill
 
-The audience is often new to Claude Code. That means **explain the unfamiliar**,
-not everything.
+Most people running this are new to Claude Code. **Explain what you are doing.**
+Just do it briefly, and format it so it can be scanned.
 
-- **No preamble.** Do not announce what you are about to do before doing it.
-  Run the thing, show the result.
-- **Explain a command the first time it appears**, in one short block, then stop
-  re-explaining it.
-- **Tables and short lines, not paragraphs.** A wall of prose is where a beginner
-  stops reading, and this skill is mostly lists.
-- **Say the trade-off, not the reassurance.** "Adds a global command" beats "this
-  is completely safe and won't affect anything else."
-- One idea per line. If a sentence joins two clauses with "and", it is probably
-  two lines.
+- **A line or two before an action, then act.** Say what you are running and why
+  it matters to them. That is context, not padding, and skipping it leaves a
+  beginner watching commands they do not understand.
+- **Explain a command the first time it appears**, then stop re-explaining it.
+- **Format for scanning.** Tables, short bullets, bold on the words carrying the
+  meaning. A dense paragraph is where a beginner stops reading.
+- **Say the trade-off, not the reassurance.** "Adds a command you can run from
+  anywhere" tells them more than "this is completely safe."
+- **Name a risk once, clearly, then move on.** Repeating a caveat three times
+  reads as nervousness, not care.
 
 ## Phase 0 — preflight (always first, even on a resume)
 
+### 0a. Find the package, and never show a placeholder
+
+Locate the folder holding `skills/` and `README.md`. Usually the current
+directory, or the one they just cloned or unzipped. **Resolve it to a real
+absolute path and use that in every command you show them.** A beginner cannot
+substitute `<BLD>` and should never be asked to.
+
+### 0b. Confirm Python exists BEFORE running a Python script
+
+`preflight.py` is written in Python. If Python is missing, the script whose whole
+job is reporting what is missing cannot run, and their first experience of BLD is
+a raw `'python' is not recognized`. **Windows does not ship Python**, so this is
+common, not an edge case.
+
 ```bash
-python <BLD>/skills/bld-setup/scripts/preflight.py
+python --version || python3 --version || py --version
 ```
 
-`<BLD>` is the folder holding `skills/`. Read-only: it installs nothing.
+If none work, check the rest by hand so they only install once:
+
+```bash
+node --version; npm --version; git --version
+```
+
+Then give them the fix and stop:
+
+> **Python is missing.** BLD's setup check and two of its helper scripts need it.
+> Get it from [python.org/downloads](https://python.org/downloads), and **tick
+> "Add python.exe to PATH" on the first screen** — it is off by default and
+> everything fails confusingly without it. Restart your terminal, then run
+> `/bld-setup` again.
+
+Note which of `python` / `python3` / `py` worked, and use that name from then on.
+
+### 0c. Run preflight
+
+Read-only: it installs nothing.
 
 It prints prerequisites, deploy tooling, what BLD already installed, and a
 **verdict**. Route on the verdict:
 
 | Verdict | Do |
 |---|---|
-| `BLOCKED` | Stop. Give the install links it printed. Nothing works without node, npm and git. |
+| `BLOCKED` | Stop. Only node and npm are truly required. Give the links it printed. |
+| `LIMITED` | **Keep going.** git is missing, which removes only deploy, gstack and impeccable. Say what is unavailable, do not treat it as a failure, and skip those groups in Phase 3. |
 | `FIRST RUN` | Full flow, Phase 1 onward. |
 | `RESUMING` | **Skip Phases 1-3.** Pick up at the first item in "Still to do". Do not re-ask what they already chose. |
 | `RETURNING USER` | Skip to **Phase 6**. Do not re-run the flow. |
@@ -108,27 +153,51 @@ is not a signed-in CLI**, and `--version` passes on both.
 
 ## Phase 3 — pick what to install
 
-One `AskUserQuestion`, multi-select. Offer **"Everything recommended"** as the
-first option so nobody ticks six boxes, then the individual groups.
+⚠️ **`AskUserQuestion` allows a maximum of 4 options per question.** Eight
+checkboxes in one question is not possible. Offer bundles first, and only fall
+through to a group-by-group picker if they ask for it. Most people take the
+first option and never see the second question.
 
-Fire a `PushNotification` alongside it. This blocks, and they may have walked off
-during preflight.
+Fire a `PushNotification` alongside the question. It blocks, and they may have
+walked off during preflight.
 
-Use these descriptions. They name what it does and what it costs:
+**Question 1**, single select:
+
+| Option | Installs |
+|---|---|
+| **Everything recommended** | Core skills, BLD, plugins, React tools. The usual answer. |
+| **Everything, extras included** | The above plus token monitor, code search servers, gstack and impeccable. |
+| **Just the essentials** | BLD and the plugins. The smallest setup that still works. |
+| **Let me choose** | Falls through to the two questions below. |
+
+If they pick "Let me choose", ask these two, both multi-select, four options each:
+
+**Question 2 — the core four.** Core skills · BLD · Plugins · React tools.
+
+**Question 3 — the extras.** Token monitor · Code search servers · gstack +
+impeccable · Nothing else.
+
+**Skip any group git would block** if preflight said `LIMITED`, and say why
+rather than silently dropping it.
+
+### What each group actually is
+
+Use these when describing the options. They name what it does and what it costs,
+not just a category.
 
 | Group | What you get |
 |---|---|
-| **Everything recommended** | The four ✅ groups below. The usual answer. |
-| ✅ **Core skills** (11) | Design taste from a working design engineer, animation craft, marketing copy, WCAG accessibility audits, and draft terms/privacy pages. All markdown, so they can only suggest, never execute. |
-| ✅ **BLD** (21 commands) | What you cloned this for. Also adds a hook that blocks AI image generation. |
-| ✅ **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Both run code. ui-ux-pro-max also ships image generation, which BLD blocks. |
-| ✅ **React tools** (2 CLIs) | react-doctor and react-scan find real bugs, hook misuse, and needless re-renders. They power `/bld-optimize-react`. Adds two global commands. |
-| **Token monitor** | `/bld-runtime-tokens` shows how much Claude usage is left before a long session. Needs `uv`, one more installer. Skip if you would rather not add it. |
-| **Code search** (3 MCP servers) | Cheaper exploration of large codebases. Only pays off past roughly fifty files. **context-mode runs shell commands with your logged-in CLIs**, making it the highest-trust item here. Easy to add later. |
-| **gstack + impeccable** | Two large opinionated suites: engineering specs, security review, deep design audits. Both ship code, both are big. Nothing depends on them, so adding them later costs nothing. |
+| **Core skills** (11) | Design taste from a working design engineer, animation craft, marketing copy, WCAG accessibility audits, and draft terms/privacy pages. All markdown, so they can only suggest, never execute. |
+| **BLD** (21 commands) | What you cloned this for. Also adds a hook that blocks AI image generation. |
+| **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Both run code. ui-ux-pro-max also ships image generation, which BLD blocks. |
+| **React tools** (2 CLIs) | react-doctor and react-scan find real bugs, hook misuse, and needless re-renders. They power `/bld-optimize-react`. Adds two commands you can run from anywhere. |
+| **Token monitor** | `/bld-runtime-tokens` shows how much Claude usage is left before a long session. Needs `uv`, one more installer. Skip it and you lose only that one command. |
+| **Code search** (3 MCP servers) | Cheaper exploration of large codebases. Only pays off past roughly fifty files. **context-mode runs shell commands with your logged-in CLIs**, which makes it the highest-trust item on this list. Easy to add later. |
+| **gstack + impeccable** | Two large opinionated suites: engineering specs, security review, deep design audits. Both ship code, both are big, and both need git. Nothing depends on them, so adding them later costs nothing. |
 
 Record the answer in the state file (Phase 5) **before** installing, so an
 interrupted run knows what they wanted.
+
 
 ## Phase 4 — install
 
@@ -192,9 +261,13 @@ has no project yet, so asking them to choose is asking about something they
 cannot evaluate.
 
 ```bash
-cp -r <BLD>/skills/*  ~/.claude/skills/
-cp -r <BLD>/agents/*  ~/.claude/agents/
+cp -r <resolved path>/skills/*  ~/.claude/skills/
+cp -r <resolved path>/agents/*  ~/.claude/agents/
 ```
+
+Run this through the Bash tool, which has `cp` on every platform. If the user
+runs it themselves in PowerShell, `cp` is an alias for `Copy-Item` and needs
+`-Recurse` instead of `-r`. Give them that form rather than watching it fail.
 
 Project-scoped (`<project>/.claude/skills/`) also works and wins on a name clash.
 One line about it; do not turn it into a decision.
@@ -377,7 +450,7 @@ setup looks broken.
 After restarting:
 
 ```bash
-python <BLD>/skills/bld-setup/scripts/preflight.py
+python <resolved path>/skills/bld-setup/scripts/preflight.py
 ```
 
 Then have them type `/bld-` and confirm the commands appear. A skill on disk but
@@ -390,6 +463,14 @@ Set `completed: true` in the state file.
 
 ## Pitfalls
 
+- **Reaching for `preflight.py` before confirming Python exists.** It is a Python
+  script. On a machine without Python the first thing a new user sees is a raw
+  interpreter error from the tool meant to diagnose them.
+- **Treating a missing `git` as fatal.** It only gates deploy, gstack and
+  impeccable. Everything else installs without it.
+- **Trying to fit every group into one `AskUserQuestion`.** The cap is 4 options.
+  Offer bundles, then fall through.
+- **Showing a `<BLD>` placeholder to the user.** Resolve the real path first.
 - **Installing before printing the manifest.** Even when told "just install
   everything" — printing costs one message and is their only chance to object.
 - **Skipping preflight on a resume.** It is what tells you where you are.

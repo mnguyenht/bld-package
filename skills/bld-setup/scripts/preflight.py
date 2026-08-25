@@ -73,10 +73,17 @@ def main():
 
     blockers = []
     for cmd, why in [("node", "runs the skill installer"),
-                     ("npm", "installs the CLI tools"),
-                     ("git", "clones repos, and BLD's deploy skill needs it")]:
+                     ("npm", "installs the CLI tools")]:
         if not row(cmd, bool(have(cmd)), why if not have(cmd) else ""):
             blockers.append(cmd)
+
+    # git is NOT a hard blocker. Core skills, plugins, BLD itself and the React
+    # tools all install without it. It only gates deploy and the two suites that
+    # arrive by clone. Treating it as fatal turned an optional feature into a
+    # wall, and anyone hitting it got the package some other way (a ZIP), which
+    # already proves they got this far without git.
+    has_git = bool(have("git"))
+    row("git", has_git, "" if has_git else "OPTIONAL - only gates deploy, gstack and impeccable")
 
     # python is obviously present (it is running this), note it for completeness
     row("python", True, "")
@@ -164,8 +171,13 @@ def main():
     if blockers:
         print("  BLOCKED: install " + ", ".join(blockers) + " first, then re-run.")
         print("    node + npm : nodejs.org (npm ships with node)")
-        print("    git        : git-scm.com")
         sys.exit(1)
+
+    if not has_git:
+        print("  LIMITED: git is missing, so these are unavailable for now:")
+        print("    /bld-util-deploy, gstack, impeccable")
+        print("    Everything else installs fine. Add git later: git-scm.com")
+        print("")
 
     if not state:
         print("  FIRST RUN. No prior setup recorded.")
