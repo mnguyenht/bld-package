@@ -130,7 +130,8 @@ Then, briefly:
 - Nothing is installed yet.
 - **`Runs code?`** is the column that matters. `md` rows are text and can only
   suggest things. `code` rows execute on their machine.
-- Section 7 is not installed. Those cost money.
+- Section 7 is not installed. Codex needs a paid ChatGPT plan; Gemini has a free
+  tier, so "they cost money" is only true of one of them.
 - Uninstalling is deleting files in `~/.claude/`. Nothing touches their projects.
 
 Four lines, not four paragraphs.

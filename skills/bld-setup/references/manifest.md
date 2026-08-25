@@ -117,11 +117,11 @@ the server is connected for your whole session rather than for one batch.
 
 | Piece | What it does | Runs code? |
 |---|---|---|
-| **22 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. Free, with one exception: /bld-runtime-agents drives an external coding agent and needs either a paid ChatGPT subscription for Codex or Gemini's free tier. Every other command costs nothing beyond your own Claude usage. | md, except **four helper scripts**: `bld-setup/scripts/preflight.py` (reads your machine, installs nothing), `bld-professional-settings/scripts/switch-mode.py` (renames BLD's own files), `bld-runtime-activate-mcps/run.py` (spawns an MCP server, then kills it), and `bld-optimize-app/scripts/lh-report.mjs` (node, reads a Lighthouse JSON report). All four are ours and short enough to read. |
+| **22 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. Free, with one exception: /bld-runtime-agents drives an external coding agent and needs either a paid ChatGPT subscription for Codex or Gemini's free tier. Every other command costs nothing beyond your own Claude usage. | md, except **five helper scripts**: `bld-setup/scripts/preflight.py` (reads your machine, installs nothing), `bld-professional-settings/scripts/switch-mode.py` (renames BLD's own files), `bld-mcp-settings/scripts/mcp-settings.py` (edits your `.mcp.json`, and refuses to remove entries it did not write), `bld-runtime-activate-mcps/run.py` (spawns an MCP server, then kills it), and `bld-optimize-app/scripts/lh-report.mjs` (node, reads a Lighthouse JSON report). All five are ours and short enough to read. |
 | **`bld-executor` agent** | The worker the orchestrator skills fan out to. | md |
 | **`block-image-skills.py` hook** | PreToolUse hook that **blocks** `ui-ux-pro-max:design` and `banner-design`. BLD never generates images with AI; it finds existing assets. Claude Code's own top-level `design` skill is not blocked: it lays out HTML artboards and generates nothing. | code (yours, ~40 lines, read it) |
 | **`CLAUDE.md` templates** | The global + workspace rule layers. Sanitised, no personal data. | md |
-| **7 vendored ECC checklists** | Security checklists inside `/bld-optimize-security`, copied from a third party rather than written here. Markdown only, they execute nothing. Source and full MIT license ship beside them in `references/ecc/`. | md, third-party ([affaan-m/ECC](https://github.com/affaan-m/ECC)) |
+| **6 vendored ECC checklists** | Security checklists inside `/bld-optimize-security`, copied from a third party rather than written here. Markdown only, they execute nothing. Source and full MIT license ship beside them in `references/ecc/`. | md, third-party ([affaan-m/ECC](https://github.com/affaan-m/ECC)) |
 
 ---
 
@@ -134,7 +134,7 @@ Listed so you know they exist and know BLD did not put them on your machine.
 | Tool | Why it's separate | Verify at |
 |---|---|---|
 | **codex** (OpenAI CLI) | The delegation executor for `/bld-runtime-agents`. Needs a ChatGPT Plus login. Only worth it if you already pay for one. | https://github.com/openai/codex |
-| **gemini-cli** | Delegation fallback. Free tier is 20 requests/day. | https://github.com/google-gemini/gemini-cli |
+| **gemini-cli** | Delegation fallback. Has a free tier, small enough to exhaust in a single handoff. Check the current quota for your auth method rather than trusting a number here. | https://github.com/google-gemini/gemini-cli |
 
 ---
 
