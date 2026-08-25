@@ -55,7 +55,6 @@ file holds only what's specific to this workspace.
 | "Why is my site slow?" / pre-ship perf check | `/bld-app-optimize` — Lighthouse against the **shipped** app, 3 runs, median, then triage |
 | App is live but invisible on Google | `/bld-seo-indexing` — audit the LIVE site with curl, add the crawl plumbing, hand over the account steps |
 | Securing an app before shipping something serious | `/bld-security` — final-boss STATIC pass over all 13 layers. Free + local |
-| Want a live/dynamic pentest against a running app | `/bld-strix` — opt-in runtime attack pass. Needs Docker + a paid key the user sets |
 | App needs a user guide / docs / help page | `/bld-documentation` — survey the app → write a `/docs` subpage in Simplified Technical English |
 | Bulky / repetitive / long generation | `/bld-agents` — Claude specs + reviews, an external agent writes the code |
 | A brain-dump of several independent pieces at once | `/bld-fable-orchestrator` — Claude plans + judges, `bld-executor` workers build in parallel |

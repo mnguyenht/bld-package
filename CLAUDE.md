@@ -1,7 +1,7 @@
 # bld-package — the BLD skillset, packaged for other people
 
 This repo is **not an app.** It is the distributable copy of the `bld-*` skillset:
-21 skills, one agent, one hook, two CLAUDE.md templates. Nothing here runs; it is
+20 skills, one agent, one hook, two CLAUDE.md templates. Nothing here runs; it is
 read by Claude Code on someone else's machine.
 
 - **Users:** people who want the BLD workflow without rebuilding it. Installed via
@@ -51,6 +51,6 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 
 ## Status
 
-All 21 skills present. `bld-setup`, `bld-app-optimize` and `bld-planning` are new
+All 20 skills present. `bld-setup`, `bld-app-optimize` and `bld-planning` are new
 and have not been run end to end by a real user yet. `lh-report.mjs` is verified
 against a live Lighthouse v13.4.1 report. No LICENSE file yet.

@@ -2,7 +2,7 @@
 
 **A lightweight agent skillset for every step of the building process.**
 
-21 skills for [Claude Code](https://claude.com/claude-code) that carry an idea from
+20 skills for [Claude Code](https://claude.com/claude-code) that carry an idea from
 "I think I want to build this" to a deployed, audited, documented app. Type a slash
 command, get the part of the process you asked for. That's the whole interface.
 
@@ -77,7 +77,6 @@ maintain, less to go wrong.
 | **`/bld-app-optimize`** | Runs Google Lighthouse against the shipped app, then triages. Three runs and a median, because one run is a sample and not a measurement. Knows the difference between a real regression and a cold edge cache. |
 | **`/bld-react-optimize`** | Static scan of the source with react-doctor plus your own eslint. Findings are hypotheses, so it triages before it fixes. |
 | **`/bld-security`** | The static security pass, 13 layers deep. Combines Claude's built-in review, the gstack security skills and vendored checklists. Free, local, and it reports rather than auto-fixing. |
-| **`/bld-strix`** | Opt-in dynamic pentest against a running app you own. Separate on purpose: it needs Docker and a paid API key that you supply. |
 | **`/bld-seo-indexing`** | Gets an app found on Google. Audits the live site with curl instead of trusting the source, adds the crawl plumbing, then hands you the account steps only a human can do. |
 | **`/bld-documentation`** | Surveys the whole app and writes a `/docs` page inside it, in Simplified Technical English. Documents what the code actually does. Half-built features go under Known limits. |
 | **`/bld-deploy`** | Private GitHub repo plus Vercel, auto-deploy on push. First run is full setup; after that, shipping is a commit and a push. |
@@ -175,14 +174,13 @@ On-demand only. Spawned, queried, killed. Never in a `.mcp.json`.
 |---|---|---|
 | **codex** | Delegation executor for `/bld-agents`. Needs a ChatGPT Plus login. | [openai/codex](https://github.com/openai/codex) |
 | **gemini-cli** | Delegation fallback. Free tier is 20 requests a day. | [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli) |
-| **strix** | Autonomous pentester for `/bld-strix`. Needs Docker and a paid API key you supply. | [usestrix/strix](https://github.com/usestrix/strix) |
 
 ---
 
 ## Repo layout
 
 ```
-skills/       21 bld-* skills
+skills/       20 bld-* skills
 agents/       bld-executor, the worker the orchestrators fan out to
 hooks/        block-image-skills.py
 templates/    the CLAUDE.md rule layers, sanitised

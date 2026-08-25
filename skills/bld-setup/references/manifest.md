@@ -101,7 +101,7 @@ so none of them ever ambiently sees your codebase.
 
 | Piece | What it does | Runs code? |
 |---|---|---|
-| **21 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. | md, except two python helpers |
+| **20 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. All free. | md, except two python helpers |
 | **`bld-executor` agent** | The worker the orchestrator skills fan out to. | md |
 | **`block-image-skills.py` hook** | PreToolUse hook that **blocks** `design` and `banner-design`. BLD never generates images with AI; it finds existing assets. | code (yours, ~30 lines, read it) |
 | **`CLAUDE.md` templates** | The global + workspace rule layers. Sanitised, no personal data. | md |
@@ -116,7 +116,6 @@ Listed so you know they exist and know BLD did not put them on your machine.
 |---|---|---|
 | **codex** (OpenAI CLI) | The delegation executor for `/bld-agents`. Needs a ChatGPT Plus login. Only worth it if you already pay for one. | https://github.com/openai/codex |
 | **gemini-cli** | Delegation fallback. Free tier is 20 requests/day. | https://github.com/google-gemini/gemini-cli |
-| **strix** | Autonomous AI pentester for `/bld-strix`. Needs Docker **and a paid Anthropic API key** you supply. Claude Pro/Max subscription tokens do not work and must never be forwarded to it. | https://github.com/usestrix/strix |
 
 ---
 

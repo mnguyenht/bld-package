@@ -1,6 +1,6 @@
 ---
 name: bld-security
-description: The final-boss STATIC security pass for an app in this workspace. Runs a full audit across 13 layers (front-end → APIs → DB → auth → hosting → cloud → CI/CD → RLS → rate limiting → caching/CDN → scaling → logging → recovery) by combining the built-in /security-review, the gstack security skills (cso, review, careful, investigate), vendored ECC checklists (security-review, cloud-infra, production-audit, bounty-hunter, and — for AI apps — agent-architecture-audit), and an AgentShield config checklist. Use when the user says /bld-security, "secure this app", "full security audit", "harden this", or "final security pass" before shipping something serious. For DYNAMIC runtime pentesting of a running target, that's the separate opt-in /bld-strix skill.
+description: The final-boss STATIC security pass for an app in this workspace. Runs a full audit across 13 layers (front-end → APIs → DB → auth → hosting → cloud → CI/CD → RLS → rate limiting → caching/CDN → scaling → logging → recovery) by combining the built-in /security-review, the gstack security skills (cso, review, careful, investigate), vendored ECC checklists (security-review, cloud-infra, production-audit, bounty-hunter, and — for AI apps — agent-architecture-audit), and an AgentShield config checklist. Use when the user says /bld-security, "secure this app", "full security audit", "harden this", or "final security pass" before shipping something serious. Static only: it reads code and config and never attacks a running target.
 ---
 
 # bld-security — the final-boss security pass
@@ -9,8 +9,8 @@ One skill that runs every *static* security tool we have against one app and
 returns a single triaged report. It **orchestrates** — it invokes other skills and
 checklists rather than re-deriving them. Detail lives in `references/`; this file
 is the conductor. Everything here is free and local. Dynamic runtime pentesting
-(Strix) lives in the separate, opt-in **`/bld-strix`** skill so you choose whether
-to spend on it.
+(actually attacking a live target) is deliberately **out of scope** — the tooling
+for it costs money, and BLD is free.
 
 ## What it combines
 
@@ -28,8 +28,8 @@ to spend on it.
 | `agentshield-checklist.md` | Audits our own `.claude/` harness config | free (markdown-only) |
 
 All vendored ECC content is MIT, copied verbatim (except AgentShield, stripped to
-checklist-only). See `references/ecc/SOURCES.md`. Dynamic pentesting is **not** here
-— it's the separate `/bld-strix` skill (needs Docker + a paid/OpenRouter key).
+checklist-only). See `references/ecc/SOURCES.md`. Dynamic pentesting is **not**
+here: this pass reads code and config, it never sends traffic at a live target.
 
 ## Before you start — scope & safety
 
@@ -38,8 +38,8 @@ checklist-only). See `references/ecc/SOURCES.md`. Dynamic pentesting is **not** 
 2. **Read the whole flow first** (ponytail: comprehension is not the lazy part).
    Trace the app's real request paths before checking boxes.
 3. **Fully local, no exfiltration.** This audit reads code and config only — it does
-   not upload the repo anywhere or make external calls. (Runtime pentesting that
-   sends traffic is `/bld-strix`, deliberately separate.)
+   not upload the repo anywhere or make external calls. (Nothing here sends traffic at a
+   running target.)
 4. **Any destructive command → run it past the `gstack-careful` mindset first**
    (resetting state, deleting generated files). Confirm before, not after.
 
@@ -149,7 +149,7 @@ in sync with origin), say so and move on instead of invoking it.
 - Stack: ...
 - Layers audited: <list applies> · N/A: <list>
 - AI-agent audit: <ran / N/A>
-- Dynamic pentest: not part of this pass — see /bld-strix if a live run is wanted
+- Dynamic pentest: not part of this pass (static review only)
 
 ## Findings by severity
 ### Critical
@@ -177,9 +177,10 @@ in sync with origin), say so and move on instead of invoking it.
 
 ## Notes
 
-- **Entirely free.** Every phase here runs on free/local tooling. Paid dynamic
-  pentesting is the separate `/bld-strix` skill — run it after this if you want a
-  live attack pass against a deployed target.
+- **Entirely free.** Every phase here runs on free/local tooling, which is why
+  dynamic runtime pentesting is not part of BLD — the tools for it need a paid
+  API key. If you run one yourself against a target you own, fold its findings
+  back into this report rather than keeping two.
 - **Stay in scope.** This skill *reports*; it doesn't refactor. Proposing fixes is
   in scope; applying them (or retuning unrelated values) is not, unless asked.
 - **Refresh vendored checklists** from the commit pinned in `references/ecc/SOURCES.md`.

@@ -29,5 +29,5 @@ skipping one that *applies* is a miss — say which you skipped and why.
 ## Cross-cutting (not a numbered layer)
 
 - **Layer 0 — the harness itself:** our `.claude/` config → `agentshield-checklist.md`.
-- **Dynamic testing:** everything above is static/code review. To exercise layers 1–4 and 9 against a *running* target at runtime, run the separate `/bld-strix` skill after this pass.
+- **Dynamic testing:** everything above is static/code review. Exercising layers 1–4 and 9 against a *running* target needs a live pentest, which is out of scope for BLD because that tooling is paid. Name the gap in the report rather than letting it read as though those layers were tested at runtime.
 - **AI-feature apps only:** if the app embeds an LLM/agent, add `agent-architecture-audit.md` on top of the 13 layers.
