@@ -34,12 +34,18 @@ compact search results once, then work from them.
 > `python3 --version || python --version || py --version` and use whichever
 > answered.
 
+
+> **`<BLD>` is wherever BLD is installed.** `/bld-setup` recommends global, which
+> is `~/.claude/skills/`; a project-scoped install is `<project>/.claude/skills/`.
+> Resolve it once before running anything below. A hardcoded `.claude/skills/...`
+> is the project-scoped path, and it does not exist on a default install.
+
 The runner spawns the server, runs a batch of tool calls, prints results with
 token counts, then terminates. Feed it a JSON array of calls on stdin:
 
 ```bash
 cd <project-root>
-python .claude/skills/bld-runtime-activate-mcps/run.py jcodemunch <<'EOF'
+python <BLD>/bld-runtime-activate-mcps/run.py jcodemunch <<'EOF'
 [
   {"name": "list_repos", "arguments": {}},
   {"name": "search_text", "arguments": {"repo": "REPO", "query": "var("}}
@@ -80,7 +86,7 @@ when building/adding shadcn components so you pull real registry data instead of
 guessing. Pass `shadcn` as the server arg:
 
 ```bash
-python .claude/skills/bld-runtime-activate-mcps/run.py shadcn <<'EOF'
+python <BLD>/bld-runtime-activate-mcps/run.py shadcn <<'EOF'
 [{"name":"search_items_in_registries","arguments":{"registries":["@shadcn"],"query":"dialog"}},
  {"name":"get_item_examples_from_registries","arguments":{"registries":["@shadcn"],"query":"dialog"}}]
 EOF

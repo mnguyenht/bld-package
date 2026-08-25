@@ -68,7 +68,8 @@ printed list.
 
 Every skillset claims to be lightweight. Here is what BLD does to earn it.
 
-**Nothing runs in the background.** There is deliberately no `.mcp.json`. Code
+**Nothing runs in the background by default.** No `.mcp.json` is created unless
+you ask for one with `/bld-mcp-settings`. Code
 search servers get spawned for one batch of queries and killed. No third-party
 process sits idle with a view of your codebase.
 
@@ -304,7 +305,9 @@ pinned in `references/ecc/SOURCES.md`.
 
 ### MCP servers
 
-On-demand only. Spawned, queried, killed. Never in a `.mcp.json`.
+On-demand by default: spawned, queried, killed, with no `.mcp.json` involved.
+`/bld-mcp-settings` switches any of them to always-on if you want that, per server
+and reversibly.
 
 | Server | What it does | Source |
 |---|---|---|

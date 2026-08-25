@@ -48,12 +48,24 @@ because it is shorter.
 > interpreter as `python3` only. Check with
 > `python3 --version || python --version || py --version` and use what answered.
 
+**Two different directories are involved, and confusing them is the easy mistake
+here.** The *script* lives wherever BLD is installed: `~/.claude/skills/` on a
+default global install, `<project>/.claude/skills/` if it was scoped. The *file it
+edits* is `.mcp.json` in the project being configured. Resolve the script to an
+absolute path, and name the project with `--root`:
+
 ```bash
-python3 skills/bld-mcp-settings/scripts/mcp-settings.py status
-python3 skills/bld-mcp-settings/scripts/mcp-settings.py on  jcodemunch shadcn
-python3 skills/bld-mcp-settings/scripts/mcp-settings.py off jcodemunch
-python3 skills/bld-mcp-settings/scripts/mcp-settings.py off --all
+PY=~/.claude/skills/bld-mcp-settings/scripts/mcp-settings.py   # or the scoped path
+
+python3 "$PY" status                          --root <project>
+python3 "$PY" on  jcodemunch shadcn           --root <project>
+python3 "$PY" off jcodemunch                  --root <project>
+python3 "$PY" off --all                       --root <project>
 ```
+
+`--root` defaults to the current directory, so it can be omitted when you are
+already in the project. Omitting it while sitting somewhere else writes
+`.mcp.json` into the wrong repo, which is why it is spelled out above.
 
 `status` is read-only and changes nothing. **Run it first, every time**, and show
 the user the output. It is the only way to know whether a `.mcp.json` already

@@ -386,7 +386,15 @@ Say that plainly rather than pushing.
 ### gstack (only if chosen) — install, then immediately prune
 
 ```bash
-git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+# git clone into an existing directory fails outright, and this skill is built to
+# be re-run. Three states to handle, not two: a real clone (pull it), a leftover
+# directory from a clone that died partway (clear it), or nothing (clone).
+if [ -d ~/.claude/skills/gstack/.git ]; then
+  git -C ~/.claude/skills/gstack pull --ff-only
+else
+  rm -rf ~/.claude/skills/gstack
+  git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+fi
 bash ~/.claude/skills/gstack/setup
 ```
 
@@ -416,10 +424,22 @@ quietly triple.
 ### impeccable (only if chosen) — skill files only
 
 ```bash
+rm -rf /tmp/impeccable ~/.claude/skills/impeccable
 git clone --depth 1 https://github.com/pbakaus/impeccable.git /tmp/impeccable
 cp -r /tmp/impeccable/skills/impeccable ~/.claude/skills/impeccable
 rm -rf /tmp/impeccable
 ```
+
+**Both `rm -rf`s on the first line are load-bearing on a re-run**, and this skill
+is built to be re-run. The trailing cleanup only happens when the block succeeds,
+so an interrupted setup leaves `/tmp/impeccable` behind and the retry dies on
+`destination path already exists`. Worse, `cp -r src dest` copies *into* `dest`
+when `dest` already exists, so a second pass produces
+`~/.claude/skills/impeccable/impeccable/SKILL.md`. That path never registers as a
+skill, and nothing reports an error: impeccable simply is not there.
+
+Clearing the target first also means any local edits to the installed copy are
+discarded. Say so if they might have made some; this is a reinstall, not a merge.
 
 🚩 **Never run `npx impeccable install` or `update`** — both wire hooks into
 their settings. And **never `/impeccable live`**: it forwards

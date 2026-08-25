@@ -1,17 +1,21 @@
 # bld-package — the BLD skillset, packaged for other people
 
 This repo is **not an app.** It is the distributable copy of the `bld-*` skillset:
-22 skills, one agent, one hook, two CLAUDE.md templates. Nothing here runs; it is
-read by Claude Code on someone else's machine.
+22 skills, one agent, one hook, two CLAUDE.md templates. Almost all of it is
+markdown read by Claude Code on someone else's machine. The exceptions are the
+five helper scripts below, which do execute, and the manifest lists them as such
+because that column is the one users decide on.
 
 - **Users:** people who want the BLD workflow without rebuilding it. Installed via
   `/bld-setup`.
 - **Monetization:** none. Public, free, credit-the-sources.
-- **Stack:** markdown, plus four helper scripts where the work must be deterministic:
+- **Stack:** markdown, plus five helper scripts where the work must be deterministic:
   `bld-setup/scripts/preflight.py` (environment + resume state),
   `bld-professional-settings/scripts/switch-mode.py` (renames every command),
+  `bld-mcp-settings/scripts/mcp-settings.py` (edits `.mcp.json` without clobbering it),
   `bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader),
-  `bld-runtime-activate-mcps/run.py` (MCP runner).
+  `bld-runtime-activate-mcps/run.py` (MCP runner),
+  plus `hooks/block-image-skills.py`, which is a hook rather than a helper.
 
 ## The rule that matters here
 
@@ -86,4 +90,4 @@ switches to short names and the round trip is verified byte-identical.
 Verified: `lh-report.mjs` against a live Lighthouse v13.4.1 report, `preflight.py`
 on a real machine, `switch-mode.py` across two full round trips.
 
-Not yet run end to end by a real new user: `/bld-setup`. No LICENSE file.
+Not yet run end to end by a real new user: `/bld-setup`. MIT licensed.

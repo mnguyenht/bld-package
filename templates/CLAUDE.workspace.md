@@ -121,7 +121,9 @@ write, and editing around it loses that protection.
   Adjacent ≠ in scope. If the ask truly can't work without a second change, **say so
   first and wait**. Spot something else wrong? Report it, don't fix it.
 - 🚫 **No AI image generation** — `design` / `banner-design` are blocked by the
-  PreToolUse hook `.claude/hooks/block-image-skills.py` (loads at startup).
+  PreToolUse hook at `~/.claude/hooks/block-image-skills.py` (loads at startup).
+  `/bld-setup` copies it there deliberately, out of the cloned package, so deleting
+  the clone cannot silently disable it.
 - 🔒 **MCP defaults to on-demand.** Always-on is a deliberate choice made through
   `/bld-mcp-settings`, never by hand-editing `.mcp.json`. **`context-mode` gets
   enabled on its own or not at all** — its `ctx_execute` runs shell commands with
@@ -186,7 +188,8 @@ interchangeable:
 
 ## Key files & conventions
 
-- `.mcp.json` — **intentionally absent** (on-demand MCP only).
+- `.mcp.json` — **absent by default** (on-demand MCP). `/bld-mcp-settings` writes
+  it if you opt into always-on, and is the only thing that should.
 - `.claude/agents/` — subagent definitions. Holds `bld-executor`, the worker the two
   orchestrator skills fan out. Project-level beats `~/.claude/agents/` on a name clash.
 - `.gitignore` — ignores `.code-index/` (jcodemunch cache) and `handoff.md`.

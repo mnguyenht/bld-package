@@ -53,7 +53,8 @@ Skip this step only for workstreams whose files are already read this session.
 
 ## Step 3 — Spec each workstream
 
-One spec per workstream, using the template in `.claude/skills/bld-runtime-agents/SKILL.md`
+One spec per workstream, using the template in `bld-runtime-agents/SKILL.md`
+(under `~/.claude/skills/` on a global install, `<project>/.claude/skills/` if scoped)
 (Step 3) — same headings, same discipline. A spec that survives judging:
 
 - names the **exact files** the worker may touch, and forbids every other file,
