@@ -32,7 +32,7 @@ Three valid targets, best first:
 | Target | Command | What the number means |
 |---|---|---|
 | **Live production URL** | already up | The real thing, including your CDN and edge cache. This is the number that counts. |
-| **Local production build** | `npm run build && npm run start` | Honest about your code, silent about your hosting. Best for before/after on a fix. |
+| **Local production build** | `npm run build && npm run preview` (Vite) or `npm run start` (Next). **Read `package.json` first** — running the wrong one either fails or silently serves the dev build, which is the one measurement this skill says never to take. | Honest about your code, silent about your hosting. Best for before/after on a fix. |
 | ~~Dev server~~ | — | **Nothing.** Do not do it. |
 
 ## Phase 0 — settle the target before you measure anything

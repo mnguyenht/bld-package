@@ -33,9 +33,14 @@ Hard rules (full rationale + the 939k-token incident that produced them is in th
 - Order of preference when work needs handing off: **main window → Codex →
   Gemini → (last resort) 2–3 Claude subagents.**
 
-**Executor: Codex first.** The user's Codex is signed in as `<your-chatgpt-account>`
-on a **ChatGPT Plus** plan (since 2026-07-29) — it is the default for everything.
-There is no credit balance to draw down; Plus bills against a weekly window.
+**Executor: Codex first.** It is the default for everything.
+
+**Check, do not assume.** Whether Codex is installed, which account it is signed
+in as, and what plan that account has are all facts about *this* machine. Run
+`codex --version` and confirm it is authenticated before planning around it. A
+paid ChatGPT plan bills against a weekly window with no credit balance to draw
+down; other tiers behave differently, so read the real state rather than
+assuming a tier.
 **Gemini is the fallback** — only when Codex is unavailable or errors out (see
 Fallback below). If Codex starts refusing on quota, read the actual remaining
 allowance (command in `~/.claude/CLAUDE.md`) before assuming the spec was bad.
@@ -220,8 +225,10 @@ cat spec.md | gemini -m gemini-3.6-flash --approval-mode auto_edit --skip-trust 
 # PowerShell: swap `cat` for `Get-Content spec.md -Raw`
 ```
 
-⚠️ Gemini's free tier is **20 requests/day** on `gemini-api-key` auth — it ran dry
-after a single handoff on 2026-07-26. If Gemini also fails, **build it yourself**
+⚠️ Gemini's free tier on `gemini-api-key` auth is small enough to run dry after a
+single handoff, observed 2026-07-26. **Do not plan around a specific number** —
+the published quota changes and differs by auth method, so check the current one
+for the auth actually in use rather than trusting a figure written here. If Gemini also fails, **build it yourself**
 rather than stalling, and tell the user which pieces Claude wrote instead.
 
 ## Notes

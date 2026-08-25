@@ -5,8 +5,13 @@ description: Post-sprint learning checkpoint — size the sprint Claude just bui
 
 # bld-quiz — turn the sprint just built into a learning checkpoint
 
-The user is a first-year CS student learning by building, and Claude just wrote
-code they now need to actually understand. Turn this sprint's diff into a
+The user is learning by building, and Claude just wrote code they now need to
+actually understand. **Do not assume how much they already know.** Read it off
+the conversation: what they have asked, what they corrected, what they clearly
+already use without explanation. If the sprint touched something where the right
+depth is genuinely unclear, ask once, in one line, and then stay at that level.
+A quiz pitched at the wrong level teaches nobody: too low is patronising, too
+high just produces wrong answers and no learning. Turn this sprint's diff into a
 checkpoint sized to what changed. **Quiz only what Claude changed this sprint**
 — never pre-existing code, unrelated files, or another session's work.
 

@@ -114,7 +114,14 @@ Location:
 | Stack | Path | Guard |
 |---|---|---|
 | Next App Router | `app/tune/page.tsx` | `if (process.env.NODE_ENV === 'production') notFound()` |
-| Vite | `src/tune/Panel.tsx`, mounted in `main.tsx` when `location.search.includes('tune')` | the query-param check is the guard |
+| Vite | `src/tune/Panel.tsx`, mounted in `main.tsx` when `import.meta.env.DEV && location.search.includes('tune')` | `import.meta.env.DEV` is the guard; the query param only keeps it out of the way |
+
+⚠️ **The query param is not a guard.** `location.search.includes('tune')` is a
+runtime check, so the panel still ships in the production bundle and anyone who
+adds `?tune` to the live URL gets your tuning controls. `import.meta.env.DEV` is
+a build-time constant that Vite replaces with `false` in a production build, so
+the whole panel tree-shakes out and never reaches users at all. Keep both: the
+first decides whether it exists, the second whether it is showing.
 
 Next.js note: don't use `app/_tune/` — an underscore prefix is a *private folder*
 and opts the route out of routing entirely, so the page would 404.
@@ -143,8 +150,18 @@ and **no scroll-jacking** — if the panel scrolls, it scrolls natively.
 
 ## Step 4 — hand it over
 
-Start the dev server, then **end the response with the localhost link** —
-`http://localhost:3000/tune`. Do not open a browser; it steals window focus.
+Start the dev server, then **end the response with the localhost link**. Read the
+port the dev server actually printed and build the URL for the stack you used —
+they differ, and handing over a link that 404s wastes the handover:
+
+| Stack | Typical URL |
+|---|---|
+| Next | `http://localhost:3000/tune` |
+| Vite | `http://localhost:5173/?tune` |
+
+Never paste a remembered port. Vite moves to 5174 and up when 5173 is taken, and
+the panel is only reachable on the one it actually bound. Do not open a browser;
+it steals window focus.
 Claude's preview pane is for Claude's verification only and never counts as showing
 the user anything.
 

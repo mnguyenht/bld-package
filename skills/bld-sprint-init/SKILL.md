@@ -41,9 +41,13 @@ regardless of tier.
 3. **Then run the engine with those answers** and persist a source of truth:
    ```bash
    cd <app-folder>
-   python <ui-ux-pro-max skill>/scripts/search.py "<product type> <the user's vibe words>" \
+   python3 <ui-ux-pro-max skill>/scripts/search.py "<product type> <the user's vibe words>" \
      --design-system --persist -p "App Name"
    ```
+   Use whichever of `python3` / `python` / `py` actually exists on this machine.
+   macOS and most Linux distros ship no bare `python` at all, so hardcoding it
+   fails the design step before a single screen gets built.
+
    This writes `design-system/MASTER.md` — the palette/type/style/rules every screen
    follows. Everything downstream reads this instead of re-running the engine.
 

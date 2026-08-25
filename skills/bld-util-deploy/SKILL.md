@@ -24,8 +24,12 @@ Then verify the new build actually went live (the production alias sometimes lag
 
 ```bash
 vercel ls <app> --cwd <app>            # newest deployment should be ● Ready
-# Confirm the live bundle is current; if the alias is stale, force-promote:
-vercel --prod --yes --cwd <app>                 # promotes current code to production
+# If the alias is stale, promote the deployment that is ALREADY built:
+vercel promote <deployment-url> --yes --cwd <app>
+
+# `vercel --prod` is NOT a promote. It uploads and builds whatever is on disk
+# right now, which is only the same thing if the working tree matches the commit
+# that was pushed. Reach for it to deploy, never to fix a stale alias.
 ```
 
 That's the entire job for an established app. The rest of this file is **first-time
@@ -43,7 +47,10 @@ setup only**.
 - Explain each approval-required command in beginner terms before running it
   (what it does, part by part, read-only vs. modifies).
 - Tools live at:
-  - `gh`: `C:\Program Files\GitHub CLI\gh.exe` (call by full path in scripts)
+  - `gh`: **use the bare `gh` command.** It is on PATH on every platform after a
+    normal install. Only if that genuinely fails on Windows, fall back to
+    `C:\Program Files\GitHub CLI\gh.exe`, and never hand a macOS or Linux user a
+    Windows path.
   - `vercel`: on PATH (npm global)
 
 ## Pre-flight checks (read-only)
@@ -67,7 +74,7 @@ git -C <app> add -A
 git -C <app> commit -m "Initial commit"
 
 # 2. Private GitHub repo on personal account + push (one command)
-"C:/Program Files/GitHub CLI/gh.exe" repo create <your-github-username>/<app> --private --source=<app> --push
+gh repo create <your-github-username>/<app> --private --source=<app> --push
 
 # 3. Create Vercel project — this also auto-connects the GitHub repo
 vercel link --yes --project <app> --cwd <app>

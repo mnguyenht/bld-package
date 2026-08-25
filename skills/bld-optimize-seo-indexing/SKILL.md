@@ -80,8 +80,11 @@ CMS so publishing never needs a code change.
 ```ts
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const slugs = await getArticleSlugs();
-  const paths = ["", "/bai-viet", "/privacy", "/terms",
-                 ...slugs.map((s) => `/bai-viet/${s}`)];
+  // Replace these with the routes THIS app actually serves. They are an
+  // example shape, not a default: emitting a sitemap full of URLs that 404 is
+  // worse for indexing than having no sitemap at all.
+  const paths = ["", "/blog", "/privacy", "/terms",
+                 ...slugs.map((s) => `/blog/${s}`)];
   return paths.flatMap((path) =>
     locales.map((locale) => ({
       url: `${SITE.url}/${locale}${path}`,
@@ -174,7 +177,11 @@ or persuade a third party to add a link.
 ## Optional — the title & description audit
 
 Only after the above, and only with the ranking-vs-indexing caveat restated.
-Google truncates titles near **60 characters**, descriptions near **160**.
+Google truncates titles near **roughly 60 characters**, descriptions near **160**.
+These are editorial rules of thumb, **not limits Google enforces**. Truncation is
+by rendered pixel width, so it varies with the characters used and the device,
+and Google frequently rewrites the description entirely from page content. Use
+the counts to spot copy that is obviously too long, never as a pass/fail gate.
 
 Write this to a temp `.py` file and run it — do not inline it as a nested
 heredoc inside another heredoc, which is a quoting trap:
