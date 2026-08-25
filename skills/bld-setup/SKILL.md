@@ -234,7 +234,7 @@ not just a category.
 | Group | What you get |
 |---|---|
 | **Core skills** (11) | Design taste from a working design engineer, animation craft, marketing copy, WCAG accessibility audits, and draft terms/privacy pages. **9 are markdown and can only suggest. Two ship scripts that execute:** `a11y-audit` and `webapp-testing`, the latter driving a real browser through Playwright. |
-| **BLD** (21 commands) | What you cloned this for. Also adds a hook that blocks AI image generation. |
+| **BLD** (22 commands) | What you cloned this for. Also adds a hook that blocks AI image generation. |
 | **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Both run code. ui-ux-pro-max also ships image generation, which BLD blocks. |
 | **React tools** (2 CLIs) | react-doctor and react-scan find real bugs, hook misuse, and needless re-renders. They power `/bld-optimize-react`. Adds two commands you can run from anywhere. |
 | **Token monitor** | `/bld-runtime-tokens` shows how much Claude usage is left before a long session. Needs `uv`, one more installer. Skip it and you lose only that one command. |

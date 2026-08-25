@@ -55,10 +55,11 @@ SKILLS = {
     # specials — identical in both modes
     "setup":               (None,           "bld-setup",                      "bld-setup"),
     "quiz":                (None,           "bld-quiz",                       "bld-quiz"),
-    # "-mode" is its own category: package settings you toggle on and off. These
-    # never rename themselves, because a settings switch that changes name
-    # depending on the setting is a trap.
-    "professional-mode":   ("mode",         "bld-professional-mode",          "bld-professional-mode"),
+    # "settings" is its own category: package settings you toggle on and off.
+    # These never rename themselves, because a settings switch that changes name
+    # depending on the setting is a trap. Both are identical in both modes.
+    "professional-settings": ("settings",   "bld-professional-settings",      "bld-professional-settings"),
+    "mcp-settings":          ("settings",   "bld-mcp-settings",               "bld-mcp-settings"),
 }
 
 # Names that existed before this scheme, so an older install still migrates cleanly.
@@ -67,7 +68,8 @@ LEGACY = {
     "bld-find-21st": "21st", "bld-find-spline": "spline",
     "bld-fable-orchestrator": "fable", "bld-opus-orchestrator": "opus",
     "bld-optimize": "activate-mcps", "bld-optimize-sprint": "activate-mcps",
-    "bld-seo": "seo-indexing", "bld-mode": "professional-mode",
+    "bld-seo": "seo-indexing", "bld-mode": "professional-settings",
+    "bld-professional-mode": "professional-settings",
 }
 
 DOC_SUFFIXES = (".md",)
@@ -77,7 +79,7 @@ SKILLS_DIR = os.path.join(ROOT, "skills")
 # This skill's own docs deliberately contain BOTH naming schemes side by side as
 # examples. Rewriting them collapses every contrast into "x becomes x", which is
 # exactly what happened the first time this script ran. Never rewrite ourselves.
-NO_REWRITE = (os.path.join(SKILLS_DIR, "bld-professional-mode"),)
+NO_REWRITE = (os.path.join(SKILLS_DIR, "bld-professional-settings"),)
 
 
 def target_name(key, mode):

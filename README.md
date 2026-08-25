@@ -104,14 +104,14 @@ kind of thing it is before you have learned the set.
 ```
 
 Once you know the set, that middle segment is confirmation you are paying for in
-keystrokes. `/bld-professional-mode on` drops it, so commands become prefix plus
+keystrokes. `/bld-professional-settings on` drops it, so commands become prefix plus
 skill. `off` puts it back. Same skills either way, and the switch rewrites the
 folders, the frontmatter and every cross-reference together so nothing is left
 pointing at a command that no longer exists.
 
 Three commands never change name, because they are what you reach for when you
 are confused about your own setup: `/bld-setup`, `/bld-quiz`, and
-`/bld-professional-mode` itself.
+`/bld-professional-settings` itself.
 
 ---
 
@@ -185,7 +185,8 @@ Acts on BLD itself. These keep the same name in both naming modes.
 |---|---|
 | `/bld-setup` | Sets BLD up, or adds more of it later. Remembers where it got to. |
 | `/bld-quiz` | A learning checkpoint after a sprint. Sizes what was built, then quizzes you on it at matching depth. Small changes get a walkthrough instead. |
-| `/bld-professional-mode` | Switches the naming scheme. `on` for short commands, `off` for the type-prefixed ones. |
+| `/bld-mcp-settings` | Toggle BLD's MCP servers between on-demand and always-on. Writes them into `.mcp.json` and takes them out again, without ever touching an entry it did not write. |
+| `/bld-professional-settings` | Switches the naming scheme. `on` for short commands, `off` for the type-prefixed ones. |
 
 ---
 
@@ -215,7 +216,7 @@ every app you build with it.
 ```
 bld-package/
 ├── README.md
-├── skills/                         21 commands, one folder each
+├── skills/                         22 commands, one folder each
 │   ├── bld-setup/
 │   │   ├── SKILL.md
 │   │   ├── references/manifest.md  every tool, with source links
@@ -227,7 +228,7 @@ bld-package/
 │   ├── bld-orchestrator-*/         fable · opus
 │   ├── bld-util-*/                 deploy · handoff · documentation · customize-component
 │   ├── bld-quiz/
-│   └── bld-professional-mode/
+│   └── bld-professional-settings/
 │       └── scripts/switch-mode.py  renames every command between modes
 ├── agents/
 │   └── bld-executor.md             the worker the orchestrators fan out to

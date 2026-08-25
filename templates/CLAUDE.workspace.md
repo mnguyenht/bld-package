@@ -63,7 +63,8 @@ file holds only what's specific to this workspace.
 | Long sprint ahead, or "how many tokens left?" | `/bld-runtime-tokens` — one-shot check → one line + what to do |
 | Long session, context rotting | `/bld-util-handoff` → `/clear` → "read handoff.md and continue" |
 | Session starts and `handoff.md` exists | offer to resume from it |
-| These command names are too long to type | `/bld-professional-mode on` — pro mode drops the type segment from all 21 names, so each becomes noticeably shorter. `off` returns to the long ones |
+| Want the MCP servers connected all session instead of per-query | `/bld-mcp-settings on <server>` — writes them into `.mcp.json`. `off` removes them. Enable `context-mode` only on its own, never in a bundle |
+| These command names are too long to type | `/bld-professional-settings on` — pro mode drops the type segment from all 21 names, so each becomes noticeably shorter. `off` returns to the long ones |
 | Change done & user explicitly says ship it | `/bld-util-deploy` (established app = just commit + push) — NOT after every edit |
 | App about to **charge users** | install a Stripe skill |
 | App needs **accounts/DB/backend** | install a Supabase skill |
@@ -96,9 +97,16 @@ style/UX rules; persist once per app to `design-system/MASTER.md`, then referenc
 
 ## MCP servers — ON-DEMAND ONLY
 
-**There is no `.mcp.json` and there must not be one.** Servers run only via
-`/bld-runtime-activate-mcps` (spawn → query → kill). They're unofficial third-party tools — we
-don't route the whole codebase through them.
+**On-demand is the default.** Servers run via `/bld-runtime-activate-mcps`
+(spawn → query → kill), so no `.mcp.json` is needed and none of them ambiently
+sees the codebase. They're unofficial third-party tools and that default is
+deliberate.
+
+**Always-on is opt-in, through `/bld-mcp-settings on`.** It writes them into
+`.mcp.json` so they connect at startup and stay for the session. More convenient,
+and a real change in what a third-party tool observes. Never hand-edit
+`.mcp.json` to achieve this: the skill refuses to remove entries it did not
+write, and editing around it loses that protection.
 
 - `jcodemunch` (pip) — code search. **Blind to CSS**; use `search_text` or read CSS directly.
 - `context-mode` (npx) — heavier; its `ctx_execute` runs shell with logged-in CLIs.
@@ -114,7 +122,10 @@ don't route the whole codebase through them.
   first and wait**. Spot something else wrong? Report it, don't fix it.
 - 🚫 **No AI image generation** — `design` / `banner-design` are blocked by the
   PreToolUse hook `.claude/hooks/block-image-skills.py` (loads at startup).
-- 🔒 **MCP stays on-demand.** Never add servers to `.mcp.json`.
+- 🔒 **MCP defaults to on-demand.** Always-on is a deliberate choice made through
+  `/bld-mcp-settings`, never by hand-editing `.mcp.json`. **`context-mode` gets
+  enabled on its own or not at all** — its `ctx_execute` runs shell commands with
+  logged-in CLIs, so always-on hands that to the whole session.
 - ✅ **Asset lookups have a quality bar** (21st/Spline): only surface what genuinely
   improves the app; **empty-handed is a valid outcome**.
 - 🎨 Every app builds from its `design-system/MASTER.md` — no ad-hoc restyling.

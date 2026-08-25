@@ -1,7 +1,7 @@
 # bld-package — the BLD skillset, packaged for other people
 
 This repo is **not an app.** It is the distributable copy of the `bld-*` skillset:
-21 skills, one agent, one hook, two CLAUDE.md templates. Nothing here runs; it is
+22 skills, one agent, one hook, two CLAUDE.md templates. Nothing here runs; it is
 read by Claude Code on someone else's machine.
 
 - **Users:** people who want the BLD workflow without rebuilding it. Installed via
@@ -9,7 +9,7 @@ read by Claude Code on someone else's machine.
 - **Monetization:** none. Public, free, credit-the-sources.
 - **Stack:** markdown, plus four helper scripts where the work must be deterministic:
   `bld-setup/scripts/preflight.py` (environment + resume state),
-  `bld-professional-mode/scripts/switch-mode.py` (renames every command),
+  `bld-professional-settings/scripts/switch-mode.py` (renames every command),
   `bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader),
   `bld-runtime-activate-mcps/run.py` (MCP runner).
 
@@ -55,12 +55,12 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   bug, not a wording slip. It shipped once: the picker called all 11 core skills
   "all markdown" while `a11y-audit` and `webapp-testing` ship executable scripts.
 - **Adding a skill? Four places.** Its own `SKILL.md`, the `SKILLS` table in
-  `bld-professional-mode/scripts/switch-mode.py` (the canonical taxonomy, and the
+  `bld-professional-settings/scripts/switch-mode.py` (the canonical taxonomy, and the
   rename breaks without it), the type table in `README.md`, and the routing table
   in `templates/CLAUDE.workspace.md`.
 - **Renaming a command?** Add the old name to `LEGACY` in that same script rather
   than editing `SKILLS` in place, so existing installs still migrate.
-- **`bld-professional-mode` is exempt from the rename pass** (`NO_REWRITE`). Its docs
+- **`bld-professional-settings` is exempt from the rename pass** (`NO_REWRITE`). Its docs
   deliberately hold both naming schemes; rewriting them collapsed every example
   into "x becomes x" the first time it ran.
 - **Never write a literal `/bld-*` example of the *other* naming mode in any file
@@ -77,7 +77,7 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 
 ## Status
 
-21 skills. Naming is prefix-type-skill by default; `/bld-professional-mode on`
+22 skills. Naming is prefix-type-skill by default; `/bld-professional-settings on`
 switches to short names and the round trip is verified byte-identical.
 
 Verified: `lh-report.mjs` against a live Lighthouse v13.4.1 report, `preflight.py`

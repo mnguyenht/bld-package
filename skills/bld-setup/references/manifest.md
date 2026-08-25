@@ -95,11 +95,15 @@ Both are large. Both want to wire hooks. BLD installs them **skill-only**.
 
 ---
 
-## 5. MCP servers — on-demand only, never in `.mcp.json`
+## 5. MCP servers — on-demand by default
 
-These are unofficial third-party servers. BLD spawns them over stdio, fires one
-batch of queries, and kills the process. **There is deliberately no `.mcp.json`**,
-so none of them ever ambiently sees your codebase.
+These are unofficial third-party servers. By default BLD spawns them over stdio,
+fires one batch of queries, and kills the process, so **nothing is written to
+`.mcp.json` and none of them ever ambiently sees your codebase**.
+
+`/bld-mcp-settings on` switches any of them to always-on if you want that. It is
+opt-in, per-server, and reversible. Read the trust column first: always-on means
+the server is connected for your whole session rather than for one batch.
 
 | Server | What it does | Trust weight | Verify at |
 |---|---|---|---|
@@ -113,7 +117,7 @@ so none of them ever ambiently sees your codebase.
 
 | Piece | What it does | Runs code? |
 |---|---|---|
-| **21 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. Free, with one exception: /bld-runtime-agents drives an external coding agent and needs either a paid ChatGPT subscription for Codex or Gemini's free tier. Every other command costs nothing beyond your own Claude usage. | md, except **four helper scripts**: `bld-setup/scripts/preflight.py` (reads your machine, installs nothing), `bld-professional-mode/scripts/switch-mode.py` (renames BLD's own files), `bld-runtime-activate-mcps/run.py` (spawns an MCP server, then kills it), and `bld-optimize-app/scripts/lh-report.mjs` (node, reads a Lighthouse JSON report). All four are ours and short enough to read. |
+| **22 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. Free, with one exception: /bld-runtime-agents drives an external coding agent and needs either a paid ChatGPT subscription for Codex or Gemini's free tier. Every other command costs nothing beyond your own Claude usage. | md, except **four helper scripts**: `bld-setup/scripts/preflight.py` (reads your machine, installs nothing), `bld-professional-settings/scripts/switch-mode.py` (renames BLD's own files), `bld-runtime-activate-mcps/run.py` (spawns an MCP server, then kills it), and `bld-optimize-app/scripts/lh-report.mjs` (node, reads a Lighthouse JSON report). All four are ours and short enough to read. |
 | **`bld-executor` agent** | The worker the orchestrator skills fan out to. | md |
 | **`block-image-skills.py` hook** | PreToolUse hook that **blocks** `ui-ux-pro-max:design` and `banner-design`. BLD never generates images with AI; it finds existing assets. Claude Code's own top-level `design` skill is not blocked: it lays out HTML artboards and generates nothing. | code (yours, ~40 lines, read it) |
 | **`CLAUDE.md` templates** | The global + workspace rule layers. Sanitised, no personal data. | md |
