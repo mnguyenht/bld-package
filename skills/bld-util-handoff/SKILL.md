@@ -56,6 +56,14 @@ That's it — the new session reads the file and resumes.
 
 - `handoff.md` is ephemeral session scratch. If the repo is tracked, add it to
   `.gitignore` (don't commit it) unless the user says otherwise.
-- Overwrite any existing `handoff.md` — it's a live snapshot, not a log.
+- Overwrite any existing `handoff.md` — it's a live snapshot, not a log. **But
+  look at it first.** If it describes work unrelated to this session, say so and
+  ask before replacing it: someone may be mid-sprint on something else and about
+  to lose the only record of it. Volunteering "this one is about X from <date>,
+  replace it?" costs one line. This is not hypothetical, it happened on
+  2026-08-25 to a snapshot eight days stale, and only a note left in the
+  replacement recorded that anything had been lost.
+- If you do replace unrelated content, **carry a one-line note at the top saying
+  what was overwritten and when.** It costs nothing and it is the only trace.
 - When a session STARTS by being told to read `handoff.md`: read it, briefly
   confirm the goal and next step back to the user, then continue the work.

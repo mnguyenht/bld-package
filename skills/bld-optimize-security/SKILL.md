@@ -78,12 +78,18 @@ Before invoking either diff-based tool, check the git state yourself:
 `git status --short` and `git diff --stat origin/HEAD` (fix `origin/HEAD` first
 with `git remote set-head origin main` if that errors — safe, local-only).
 
-- **Uncommitted changes exist:** do not invoke `/security-review` or
-  `gstack-review` — they have nothing legitimate to diff and may try to force one.
-  Skip that finding source for this pass, note in the report *"diff-review skipped:
-  uncommitted changes present"*, and rely on the whole-repo checklist pass (step 3
-  below) plus `gstack-cso` instead. Recent-but-uncommitted code still gets covered,
-  just by the non-diff tools.
+- **Uncommitted changes exist:** **review them.** This is the highest-value diff
+  in the whole pass, not a reason to skip one. Uncommitted work is the newest
+  code, the least reviewed, and the most likely to be seconds away from shipping.
+  `/security-review` describes itself as reviewing the *pending* changes on the
+  current branch, and pending includes the working tree, so there is a real diff
+  here and nothing has to be manufactured to get it.
+
+  **Never commit merely to give a tool something to read.** If a tool genuinely
+  refuses a working-tree diff, capture it (`git diff`) and hand it over as
+  content, then note in the report which tool could not take it and why. Falling
+  back to the whole-repo checklist is the last resort, not the first move, and if
+  you do fall back, say plainly that the newest code got the weaker treatment.
 - **Clean tree, real diff against origin/HEAD exists** (unpushed commits): safe to
   run both — there's an actual diff for them to review, nothing to manufacture.
 - **Clean tree, no diff at all** (already in sync with origin): the diff tools have
