@@ -142,6 +142,51 @@ def key_for(declared, folder):
     return None
 
 
+def docs_to_rewrite():
+    """Only BLD's own markdown. Never a blind walk of ROOT.
+
+    In a global install ROOT is ~/.claude, which on a real machine holds 1300+
+    markdown files belonging to other skills, plugin caches and the user's own
+    notes. Walking it would silently rewrite third-party docs, so enumerate what
+    BLD actually owns instead.
+    """
+    owned = set(LEGACY)
+    for _, friendly, pro in SKILLS.values():
+        owned.add(friendly)
+        owned.add(pro)
+
+    out = []
+
+    def collect(directory):
+        for base, _, files in os.walk(directory):
+            if ".git" in base.split(os.sep):
+                continue
+            if any(os.path.abspath(base).startswith(x) for x in NO_REWRITE):
+                continue
+            out.extend(os.path.join(base, fn) for fn in files
+                       if fn.endswith(DOC_SUFFIXES))
+
+    # BLD's own skill folders, matched by name against the table
+    if os.path.isdir(SKILLS_DIR):
+        for folder in os.listdir(SKILLS_DIR):
+            if folder in owned:
+                collect(os.path.join(SKILLS_DIR, folder))
+
+    # sibling folders BLD owns, and the docs at the root. In a global install
+    # the CLAUDE.md picked up here is the user's installed rule file, which
+    # genuinely does reference these commands and should follow a rename.
+    for sub in ("templates", "agents"):
+        d = os.path.join(ROOT, sub)
+        if os.path.isdir(d):
+            collect(d)
+    for name in ("README.md", "CLAUDE.md"):
+        p = os.path.join(ROOT, name)
+        if os.path.isfile(p):
+            out.append(p)
+
+    return out
+
+
 def git(*args):
     try:
         subprocess.run(["git", "-C", ROOT, *args], check=True,
@@ -213,23 +258,15 @@ def main():
     path_pattern = re.compile(r"(?<=skills/)(" + alt + r")(?=[/\\])")
 
     touched = 0
-    for base, _, files in os.walk(ROOT):
-        if ".git" in base.split(os.sep):
-            continue
-        if any(os.path.abspath(base).startswith(x) for x in NO_REWRITE):
-            continue
-        for fn in files:
-            if not fn.endswith(DOC_SUFFIXES):
-                continue
-            path = os.path.join(base, fn)
-            # newline="" both ways: never silently convert CRLF to LF as a
-            # side effect of a rename.
-            s = io.open(path, encoding="utf-8", newline="").read()
-            new = cmd_pattern.sub(lambda m: "/" + lookup[m.group(1)], s)
-            new = path_pattern.sub(lambda m: lookup[m.group(1)], new)
-            if new != s:
-                io.open(path, "w", encoding="utf-8", newline="").write(new)
-                touched += 1
+    for path in docs_to_rewrite():
+        # newline="" both ways: never silently convert CRLF to LF as a
+        # side effect of a rename.
+        s = io.open(path, encoding="utf-8", newline="").read()
+        new = cmd_pattern.sub(lambda m: "/" + lookup[m.group(1)], s)
+        new = path_pattern.sub(lambda m: lookup[m.group(1)], new)
+        if new != s:
+            io.open(path, "w", encoding="utf-8", newline="").write(new)
+            touched += 1
 
     print(f"\n  folders renamed: {len(renames)}")
     print(f"  docs updated:    {touched}")

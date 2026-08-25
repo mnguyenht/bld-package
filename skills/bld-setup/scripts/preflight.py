@@ -123,7 +123,6 @@ def main():
             present |= found
             if any(s.startswith("bld-") for s in found):
                 scopes.append(label)
-    skills_dir = os.path.join(CLAUDE, "skills")
 
     core_have = [s for s in CORE_SKILLS if s in present]
     bld_have = sorted(s for s in present if s.startswith("bld-"))
