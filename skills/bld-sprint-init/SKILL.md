@@ -3,7 +3,7 @@ name: bld-sprint-init
 description: Initial app-building sprint — take an app idea to a good-looking, working, deployed BASE. Orchestrates design direction (ui-ux-pro-max), scaffolding (Vite + React + shadcn/Tailwind), building the core screens, and shipping (deploy skill). Use when the user says /bld-sprint-init, "start a new app", "build me an app", "spin up a new project". Produces a strong base, NOT final polish — that's /bld-sprint-refine.
 ---
 
-# bld-init — idea → good-looking, deployed base
+# bld-sprint-init — idea → good-looking, deployed base
 
 One sprint from an app idea to a live, decent-looking base. This skill
 **orchestrates skills we already have** — don't reimplement them, invoke them.

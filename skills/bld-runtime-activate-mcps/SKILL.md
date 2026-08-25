@@ -3,7 +3,7 @@ name: bld-runtime-activate-mcps
 description: Run the third-party code-optimizer MCP servers (jcodemunch, context-mode) on-demand for a single burst of code search, then shut them down — no persistent connection. Use when the user says /bld-runtime-activate-mcps, "hard optimize", "token-optimize this search", or is about to do a big code sprint across many files and wants compact, cheap code exploration.
 ---
 
-# bld-optimize — burst-use the optimizer MCPs, then dip
+# bld-runtime-activate-mcps — burst-use the optimizer MCPs, then dip
 
 These are **unofficial third-party MCP servers** installed from GitHub
 (`jcodemunch-mcp` via pip, `context-mode` via npx). We deliberately keep them

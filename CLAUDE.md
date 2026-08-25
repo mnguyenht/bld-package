@@ -63,6 +63,17 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 - **`bld-professional-mode` is exempt from the rename pass** (`NO_REWRITE`). Its docs
   deliberately hold both naming schemes; rewriting them collapsed every example
   into "x becomes x" the first time it ran.
+- **Never write a literal `/bld-*` example of the *other* naming mode in any file
+  except that one.** Every other doc gets rewritten, so an example like "becomes
+  the short name `/bld-refine`" is silently converted to `/bld-sprint-refine` on
+  the next mode switch and the sentence ends up contradicting itself. This is not
+  hypothetical: it happened to a line in `templates/CLAUDE.workspace.md` within an
+  hour of it being written. Describe the shape of the change in words instead of
+  naming a command, and the rewriter has nothing to grab.
+- **The rename pass rewrites three shapes**, all in `switch-mode.py`: `/command`,
+  `skills/<name>/` paths, and the `# <name>` H1 title. The H1 pattern was added
+  after 16 of 21 skills were found still carrying their pre-rename titles, since
+  a bare name in a heading has neither a leading slash nor a `skills/` prefix.
 
 ## Status
 

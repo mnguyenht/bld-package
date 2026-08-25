@@ -3,7 +3,7 @@ name: bld-util-customize-component
 description: Build a temporary live control panel — real sliders in the browser — for tuning an effect, animation, or component by hand instead of by prompt. Use when the user says /bld-util-customize-component, "let me tune this", "give me sliders", "control panel", "I want to adjust this myself", or when a motion/visual tweak has gone more than two prompt round-trips without landing. Parametric design: pick the axes, design the ranges, hand over the knobs, commit the values, delete the panel.
 ---
 
-# bld-customize-component — put the knobs in the user's hands
+# bld-util-customize-component — put the knobs in the user's hands
 
 ## Why this exists
 

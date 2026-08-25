@@ -3,7 +3,7 @@ name: bld-optimize-seo-indexing
 description: Make an app in this workspace discoverable on Google — audit what the live site actually serves, add the missing crawl plumbing (sitemap, robots, canonical, hreflang, structured data), ship it, then hand the user the account steps only they can do. Use when the user says /bld-optimize-seo-indexing, /bld-optimize-seo-indexing, "get this on Google", "make it discoverable", "why isn't my site showing up", "index my site", "SEO this", or asks about meta titles and search results. Claude does the code half; the user does the Search Console / Business Profile / backlink half.
 ---
 
-# bld-seo-indexing — get an app found on Google
+# bld-optimize-seo-indexing — get an app found on Google
 
 Two halves that must not be confused: **the code** (Claude, one afternoon) and
 **the accounts** (only the user, and the slow part). This file is the conductor.

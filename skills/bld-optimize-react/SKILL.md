@@ -3,7 +3,7 @@ name: bld-optimize-react
 description: Scan a React/Next app for real defects — bugs, hooks misuse, perf, a11y, security — using the globally-installed react-doctor CLI, the app's own eslint, and (opt-in) react-scan's runtime re-render overlay. Triage findings before fixing. Use when the user says /bld-optimize-react, "scan this app", "what's wrong with my React code", "check for re-renders", "audit this app", or before shipping a screen.
 ---
 
-# bld-react-optimize — find what's actually broken, then triage
+# bld-optimize-react — find what's actually broken, then triage
 
 Three tools, **two of which overlap**. Read this before running anything.
 

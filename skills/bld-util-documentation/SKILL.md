@@ -3,7 +3,7 @@ name: bld-util-documentation
 description: Survey the whole app, then write it up as a documentation subpage inside the app itself, in ASD-STE100 Simplified Technical English. Use when the user says /bld-util-documentation, "write the docs", "add a docs page", "document this app", "user guide", or "help page". Documents only what the code actually does, in controlled English a non-native reader can follow.
 ---
 
-# bld-documentation — the app, explained in Simplified Technical English
+# bld-util-documentation — the app, explained in Simplified Technical English
 
 Two halves, and both matter:
 

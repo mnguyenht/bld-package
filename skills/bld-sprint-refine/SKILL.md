@@ -3,7 +3,7 @@ name: bld-sprint-refine
 description: Refinement sprint — take a working app base and bring it to life with craft, polish, and (optionally) 3D/premade assets. Orchestrates the ui-ux-pro-max steps that /bld-sprint-init skipped, plus emil-design-eng, impeccable, and review-animations, then asks about Spline 3D and 21st.dev. Use when the user says /bld-sprint-refine, "polish this app", "make it feel great", "bring it to life", after a base exists. Runs per-screen once a screen is basically done.
 ---
 
-# bld-refine — working base → feels alive
+# bld-sprint-refine — working base → feels alive
 
 Takes a base (from `/bld-sprint-init` or existing) and layers on craft. This skill
 **orchestrates other skills** — you must actually INVOKE each one (via the Skill tool /

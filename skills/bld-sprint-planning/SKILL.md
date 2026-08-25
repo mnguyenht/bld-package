@@ -3,7 +3,7 @@ name: bld-sprint-planning
 description: Decide what to build before anything gets built — interview the idea, pressure-test the assumption it rests on, cut it to a shippable v1, and write the durable planning artifacts (PRODUCT.md, planning.md, progress.md). Use when the user says /bld-sprint-planning, "help me plan this", "I have an idea", "what should I build", "plan the next feature", or arrives with a vague idea and no shape. Ends by handing off to /bld-sprint-init. Does not write app code.
 ---
 
-# bld-planning — what should exist, and what gets cut
+# bld-sprint-planning — what should exist, and what gets cut
 
 Plan mode already exists and it is good at what it does. Be honest about the
 difference rather than pretending this replaces it:

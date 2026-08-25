@@ -3,7 +3,7 @@ name: bld-runtime-tokens
 description: Check how much of the Claude token window is left by pinging the locally-installed claude-monitor, then say what to do about it — keep going, batch, delegate to Codex, or hand off. Use when the user says /bld-runtime-tokens, "how many tokens left", "am I about to run out", "check my usage", "how much budget do we have", or is about to start a long sprint. Also run it unprompted when a sprint has been running long and the answer would change the plan.
 ---
 
-# bld-tokens — know the budget before spending it
+# bld-runtime-tokens — know the budget before spending it
 
 One command, one line back, then a recommendation. This is a status check, not a
 project: **never turn it into a report**.

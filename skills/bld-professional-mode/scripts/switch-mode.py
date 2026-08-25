@@ -276,6 +276,18 @@ def main():
     cmd_pattern = re.compile(r"(?<![\w-])/(" + alt + r")(?![\w-])")
     path_pattern = re.compile(r"(?<=skills/)(" + alt + r")(?=[/\\])")
 
+    # A third kind: the H1 title, which carries the name with no leading slash
+    # and so slipped past both patterns above. Sixteen of twenty-one skills sat
+    # frozen at their pre-rename titles because of it, which is exactly the
+    # "docs and commands disagree" state this skill exists to prevent.
+    #
+    # Anchored to the start of an H1 on purpose. Rewriting bare names anywhere
+    # would hit prose describing the rename itself and collapse it into
+    # "x becomes x", which is how this script destroyed its own docs once
+    # already. No `$` in the lookahead either: these files are CRLF, and a `$`
+    # anchor never matches with a \r sitting before the newline.
+    h1_pattern = re.compile(r"(?<=^# )(" + alt + r")(?=[\s—-]|\Z)", re.M)
+
     touched = 0
     for path in docs_to_rewrite():
         # newline="" both ways: never silently convert CRLF to LF as a
@@ -283,6 +295,7 @@ def main():
         s = io.open(path, encoding="utf-8", newline="").read()
         new = cmd_pattern.sub(lambda m: "/" + lookup[m.group(1)], s)
         new = path_pattern.sub(lambda m: lookup[m.group(1)], new)
+        new = h1_pattern.sub(lambda m: lookup[m.group(1)], new)
         if new != s:
             io.open(path, "w", encoding="utf-8", newline="").write(new)
             touched += 1

@@ -63,7 +63,7 @@ file holds only what's specific to this workspace.
 | Long sprint ahead, or "how many tokens left?" | `/bld-runtime-tokens` — one-shot check → one line + what to do |
 | Long session, context rotting | `/bld-util-handoff` → `/clear` → "read handoff.md and continue" |
 | Session starts and `handoff.md` exists | offer to resume from it |
-| These command names are too long to type | `/bld-professional-mode on` — pro mode, all 21 become short names (`/bld-refine`). `off` returns to the long ones |
+| These command names are too long to type | `/bld-professional-mode on` — pro mode drops the type segment from all 21 names, so each becomes noticeably shorter. `off` returns to the long ones |
 | Change done & user explicitly says ship it | `/bld-util-deploy` (established app = just commit + push) — NOT after every edit |
 | App about to **charge users** | install a Stripe skill |
 | App needs **accounts/DB/backend** | install a Supabase skill |

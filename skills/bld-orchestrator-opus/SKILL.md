@@ -4,7 +4,7 @@ description: The bld-fable-orchestrator plan → execute → judge loop with Opu
 model: opus
 ---
 
-# bld-opus-orchestrator — the same loop, Opus in the boss seat
+# bld-orchestrator-opus — the same loop, Opus in the boss seat
 
 **Read `.claude/skills/bld-orchestrator-fable/SKILL.md` and run it exactly.** Every
 step, every table, every hard rule applies unchanged. The executor pool already

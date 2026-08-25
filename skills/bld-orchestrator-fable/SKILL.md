@@ -4,7 +4,7 @@ description: Boss mode over Claude subagents — turn a brain-dump into a plan �
 model: fable
 ---
 
-# bld-fable-orchestrator — Claude is the head, the executors are the hands
+# bld-orchestrator-fable — Claude is the head, the executors are the hands
 
 The user's brain-dump comes after `/bld-orchestrator-fable`. **Claude never writes the
 code.** Claude gathers context, writes the specs, fans out workers, and judges what
