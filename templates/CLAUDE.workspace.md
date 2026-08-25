@@ -30,7 +30,7 @@ file holds only what's specific to this workspace.
 | `~/.claude/CLAUDE.md` | machine-wide rules: who I am, security drill, installs, dev loop |
 | this file | workspace mission, routing, toolkit, guardrails, deploy conventions |
 | `<app>/CLAUDE.md` | per-app purpose, stack, status (template below) |
-| `<app>/PRODUCT.md` | per-app register, users, brand, anti-references (`/bld-planning`) |
+| `<app>/PRODUCT.md` | per-app register, users, brand, anti-references (`/bld-sprint-planning`) |
 | `<app>/planning.md` | per-app vision + **required "Working backlog"** section |
 | `<app>/progress.md` | per-app current state: what just landed, what's next, what's blocked |
 | `<app>/design-system/MASTER.md` | per-app design truth (ui-ux-pro-max `--persist`) |
@@ -43,27 +43,27 @@ file holds only what's specific to this workspace.
 | Situation | Do |
 |---|---|
 | Brand-new machine, or nothing installed yet | `/bld-setup` — prints the full tool manifest first, installs nothing without a yes |
-| An idea with no shape, or no idea yet | `/bld-planning` — interview, pressure-test, cut to v1, write PRODUCT/planning/progress |
-| Plan approved, time to build | `/bld-init` (asks time budget ⚡🎯🏗️, then design direction) |
-| A screen is basically done | `/bld-refine` on that screen — never on half-built UI |
-| Tweaking an effect by prompt isn't landing (2+ tries) | `/bld-customize-component` — build sliders, user tunes by hand, commit the values |
-| Need a base shadcn component | `/bld-optimize` → `shadcn` server |
+| An idea with no shape, or no idea yet | `/bld-sprint-planning` — interview, pressure-test, cut to v1, write PRODUCT/planning/progress |
+| Plan approved, time to build | `/bld-sprint-init` (asks time budget ⚡🎯🏗️, then design direction) |
+| A screen is basically done | `/bld-sprint-refine` on that screen — never on half-built UI |
+| Tweaking an effect by prompt isn't landing (2+ tries) | `/bld-util-customize-component` — build sliders, user tunes by hand, commit the values |
+| Need a base shadcn component | `/bld-runtime-activate-mcps` → `shadcn` server |
 | Need a rich premade component | `/bld-find-21st` (quality bar: only if it genuinely improves the app) |
 | Want 3D flair | `/bld-find-spline` (heroes/landing only; heavy — lazy-load + fallback) |
-| Codebase grew, reads getting expensive | `/bld-optimize` → `jcodemunch` |
-| Screen done, or "what's wrong with this app?" | `/bld-react-optimize` — react-doctor scan → triage → fix errors first |
-| "Why is my site slow?" / pre-ship perf check | `/bld-app-optimize` — Lighthouse against the **shipped** app, 3 runs, median, then triage |
-| App is live but invisible on Google | `/bld-seo-indexing` — audit the LIVE site with curl, add the crawl plumbing, hand over the account steps |
-| Securing an app before shipping something serious | `/bld-security` — final-boss STATIC pass over all 13 layers. Free + local |
-| App needs a user guide / docs / help page | `/bld-documentation` — survey the app → write a `/docs` subpage in Simplified Technical English |
-| Bulky / repetitive / long generation | `/bld-agents` — Claude specs + reviews, an external agent writes the code |
-| A brain-dump of several independent pieces at once | `/bld-fable-orchestrator` — Claude plans + judges, `bld-executor` workers build in parallel |
-| Same loop but on Opus | `/bld-opus-orchestrator` |
+| Codebase grew, reads getting expensive | `/bld-runtime-activate-mcps` → `jcodemunch` |
+| Screen done, or "what's wrong with this app?" | `/bld-optimize-react` — react-doctor scan → triage → fix errors first |
+| "Why is my site slow?" / pre-ship perf check | `/bld-optimize-app` — Lighthouse against the **shipped** app, 3 runs, median, then triage |
+| App is live but invisible on Google | `/bld-optimize-seo-indexing` — audit the LIVE site with curl, add the crawl plumbing, hand over the account steps |
+| Securing an app before shipping something serious | `/bld-optimize-security` — final-boss STATIC pass over all 13 layers. Free + local |
+| App needs a user guide / docs / help page | `/bld-util-documentation` — survey the app → write a `/docs` subpage in Simplified Technical English |
+| Bulky / repetitive / long generation | `/bld-runtime-agents` — Claude specs + reviews, an external agent writes the code |
+| A brain-dump of several independent pieces at once | `/bld-orchestrator-fable` — Claude plans + judges, `bld-executor` workers build in parallel |
+| Same loop but on Opus | `/bld-orchestrator-opus` |
 | Sprint wrapped, user wants to understand what was built | `/bld-quiz` — learning checkpoint scaled to sprint size |
-| Long sprint ahead, or "how many tokens left?" | `/bld-tokens` — one-shot check → one line + what to do |
-| Long session, context rotting | `/bld-handoff` → `/clear` → "read handoff.md and continue" |
+| Long sprint ahead, or "how many tokens left?" | `/bld-runtime-tokens` — one-shot check → one line + what to do |
+| Long session, context rotting | `/bld-util-handoff` → `/clear` → "read handoff.md and continue" |
 | Session starts and `handoff.md` exists | offer to resume from it |
-| Change done & user explicitly says ship it | `/bld-deploy` (established app = just commit + push) — NOT after every edit |
+| Change done & user explicitly says ship it | `/bld-util-deploy` (established app = just commit + push) — NOT after every edit |
 | App about to **charge users** | install a Stripe skill |
 | App needs **accounts/DB/backend** | install a Supabase skill |
 
@@ -96,7 +96,7 @@ style/UX rules; persist once per app to `design-system/MASTER.md`, then referenc
 ## MCP servers — ON-DEMAND ONLY
 
 **There is no `.mcp.json` and there must not be one.** Servers run only via
-`/bld-optimize` (spawn → query → kill). They're unofficial third-party tools — we
+`/bld-runtime-activate-mcps` (spawn → query → kill). They're unofficial third-party tools — we
 don't route the whole codebase through them.
 
 - `jcodemunch` (pip) — code search. **Blind to CSS**; use `search_text` or read CSS directly.
@@ -119,14 +119,14 @@ don't route the whole codebase through them.
 - 🎨 Every app builds from its `design-system/MASTER.md` — no ad-hoc restyling.
 - 📝 **Never fabricate** prices, proof, testimonials, or market facts. Unknowns get
   marked `[NEEDS INPUT]` and handed back to a human.
-- 🚀 **Deploy discipline — do NOT deploy after every change.** `/bld-init` deploys once
+- 🚀 **Deploy discipline — do NOT deploy after every change.** `/bld-sprint-init` deploys once
   as part of its flow; after that, **develop and verify locally** and only commit +
   push (= redeploy) **when the user explicitly says to ship**. Don't run
-  `/bld-deploy` unprompted.
+  `/bld-util-deploy` unprompted.
 
 ## Per-app CLAUDE.md (the third layer)
 
-Every app gets its own `CLAUDE.md` at scaffold time (`/bld-init` creates it).
+Every app gets its own `CLAUDE.md` at scaffold time (`/bld-sprint-init` creates it).
 Keep it under ~30 lines; it loads on top of this file when working in that app:
 
 ```markdown
@@ -140,7 +140,7 @@ Keep it under ~30 lines; it loads on top of this file when working in that app:
 
 ## The three planning files
 
-Written by `/bld-planning`, kept current by whoever touches the app. They are not
+Written by `/bld-sprint-planning`, kept current by whoever touches the app. They are not
 interchangeable:
 
 - **`PRODUCT.md`** — what this is, who for, brand, anti-references. Durable.
@@ -151,7 +151,7 @@ interchangeable:
   rewritten as work moves. `planning.md` answers *what is the plan*; `progress.md`
   answers *what is the state*.
 
-## Deploy — use the `/bld-deploy` skill
+## Deploy — use the `/bld-util-deploy` skill
 
 **Only when the user asks to ship.** For an app already deployed once, "deploy" =
 **commit + `git push`** (auto-redeploys in ~30s). Settled decisions:

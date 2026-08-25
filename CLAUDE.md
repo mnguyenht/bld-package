@@ -1,14 +1,14 @@
 # bld-package — the BLD skillset, packaged for other people
 
 This repo is **not an app.** It is the distributable copy of the `bld-*` skillset:
-20 skills, one agent, one hook, two CLAUDE.md templates. Nothing here runs; it is
+21 skills, one agent, one hook, two CLAUDE.md templates. Nothing here runs; it is
 read by Claude Code on someone else's machine.
 
 - **Users:** people who want the BLD workflow without rebuilding it. Installed via
   `/bld-setup`.
 - **Monetization:** none. Public, free, credit-the-sources.
-- **Stack:** markdown, plus `skills/bld-optimize-sprint/run.py` (MCP runner) and
-  `skills/bld-app-optimize/scripts/lh-report.mjs` (Lighthouse report reader).
+- **Stack:** markdown, plus `skills/bld-runtime-activate-mcps/run.py` (MCP runner) and
+  `skills/bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader).
 
 ## The rule that matters here
 
@@ -51,6 +51,6 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 
 ## Status
 
-All 20 skills present. `bld-setup`, `bld-app-optimize` and `bld-planning` are new
+All 21 skills present. `bld-setup`, `bld-app-optimize` and `bld-planning` are new
 and have not been run end to end by a real user yet. `lh-report.mjs` is verified
 against a live Lighthouse v13.4.1 report. No LICENSE file yet.

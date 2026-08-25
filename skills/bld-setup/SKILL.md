@@ -64,7 +64,7 @@ way the manifest does, because the groups have genuinely different trust profile
 |---|---|---|
 | Core skills (§2, markdown) | ✅ recommended | Free, offline, can't do anything but talk. |
 | BLD's own skills + hook + CLAUDE.md (§6) | ✅ recommended | This is the actual point of the package. |
-| Plugins (§1) | ✅ recommended | ponytail and ui-ux-pro-max are load-bearing for `/bld-init` and `/bld-refine`. |
+| Plugins (§1) | ✅ recommended | ponytail and ui-ux-pro-max are load-bearing for `/bld-sprint-init` and `/bld-sprint-refine`. |
 | CLIs (§4) | ask | Global installs. `react-doctor` and `lighthouse` power two BLD skills; the rest are situational. |
 | gstack + impeccable (§3) | ask | Large, opinionated, and both ship code. Fine to skip and add later. |
 | MCP servers (§5) | ask | `context-mode` in particular runs shell with their logged-in CLIs. |
@@ -194,7 +194,7 @@ uv tool install claude-monitor        # or: pipx install claude-monitor
 pip install jcodemunch-mcp            # only if they took the MCP group
 ```
 
-`lighthouse` is deliberately absent — `/bld-app-optimize` runs it through `npx`
+`lighthouse` is deliberately absent — `/bld-optimize-app` runs it through `npx`
 so the version is never stale. `gh` has no npm package; point them at
 https://cli.github.com or `winget install GitHub.cli` and let them do it.
 
@@ -229,7 +229,7 @@ BLD is three layers, each holding only what is true at that level:
 |---|---|---|
 | `~/.claude/CLAUDE.md` | Machine-wide: who you are, security drill, install rules, dev loop, delegation | `templates/CLAUDE.global.md` |
 | `<workspace>/CLAUDE.md` | Mission, skill routing table, guardrails, deploy conventions | `templates/CLAUDE.workspace.md` |
-| `<app>/CLAUDE.md` | Per-app purpose, stack, status. ~30 lines. | `/bld-init` writes it |
+| `<app>/CLAUDE.md` | Per-app purpose, stack, status. ~30 lines. | `/bld-sprint-init` writes it |
 
 **If `~/.claude/CLAUDE.md` already exists, do not overwrite it.** Show them a diff
 of what BLD would add, section by section, and let them choose. Their existing
@@ -240,7 +240,7 @@ Walk the user through the ones that actually change behaviour:
 
 - **Who you're working with** — experience level drives how much gets explained.
 - **Deploy target** — GitHub account, whether repos are private, Vercel or not.
-- **Delegation** — the `/bld-agents` block assumes a Codex login. No Codex? Say so
+- **Delegation** — the `/bld-runtime-agents` block assumes a Codex login. No Codex? Say so
   in the file, so Claude stops offering it.
 - **The dev-loop rules** — never auto-push, always hand back a localhost link,
   keep the server running. These are the ones that change day-to-day behaviour
@@ -264,7 +264,7 @@ present on disk but absent from the picker means the frontmatter didn't parse �
 check `name:` and `description:` are both present and unquoted-safe.
 
 Close with what got installed, what got skipped and why, and the one-line
-reminder that `/bld-init` is where a first app starts.
+reminder that `/bld-sprint-init` is where a first app starts.
 
 ## Pitfalls
 

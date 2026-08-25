@@ -38,7 +38,7 @@ Before running **any approval-required command**, explain in plain language:
 - **Ask last, not first.** Do whatever groundwork doesn't depend on the answer first —
   read the code, explore, plan, build the parts that don't hinge on it — then ask
   remaining clarifying questions at the end, batched, instead of stopping upfront.
-  **Exception: `/bld-init` and `/bld-planning`**, and any skill whose own protocol
+  **Exception: `/bld-sprint-init` and `/bld-sprint-planning`**, and any skill whose own protocol
   calls for direction-setting questions before building (design vibe, light/dark,
   brand colors) — asking upfront there is correct, since nothing should get built
   before that direction is set.
@@ -112,7 +112,7 @@ Before running **any approval-required command**, explain in plain language:
 - **Stay in scope on every sprint/refine pass, no unrequested extras.** Do exactly
   what's asked — don't tack on "while I'm in here" text effects, hover animations,
   extra copy rewrites, or polish nobody requested. Explicitly-invoked polish/refine
-  skills (e.g. `/bld-refine`) are the one exception where broad craft passes are the
+  skills (e.g. `/bld-sprint-refine`) are the one exception where broad craft passes are the
   point; even then, stick to the user's actual list item-by-item rather than
   inventing additional flourishes beyond it. When in doubt, ask before adding
   something the user didn't ask for.

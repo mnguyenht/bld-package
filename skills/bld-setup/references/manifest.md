@@ -70,12 +70,12 @@ Both are large. Both want to wire hooks. BLD installs them **skill-only**.
 
 | Tool | What it does | Install | Verify at |
 |---|---|---|---|
-| **react-doctor** | Static React/Next scanner: bugs, hooks rules, perf, a11y, security, dead code. The engine behind `/bld-react-optimize`. | `npm i -g react-doctor` | https://github.com/millionco/react-doctor |
+| **react-doctor** | Static React/Next scanner: bugs, hooks rules, perf, a11y, security, dead code. The engine behind `/bld-optimize-react`. | `npm i -g react-doctor` | https://github.com/millionco/react-doctor |
 | **react-scan** | Runtime re-render overlay. Shows what re-renders while you use the app. | `npm i -g react-scan` | https://github.com/aidenybai/react-scan |
-| **lighthouse** | Google's page auditor: performance, a11y, best practices, SEO. The engine behind `/bld-app-optimize`. Run via `npx`, never installed. | `npx -y lighthouse@latest` | https://github.com/GoogleChrome/lighthouse |
-| **claude-monitor** | Reads your local Claude Code usage and reports what's left in the window. Powers `/bld-tokens`. Privacy-first: local files only. | `uv tool install claude-monitor` | https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor |
+| **lighthouse** | Google's page auditor: performance, a11y, best practices, SEO. The engine behind `/bld-optimize-app`. Run via `npx`, never installed. | `npx -y lighthouse@latest` | https://github.com/GoogleChrome/lighthouse |
+| **claude-monitor** | Reads your local Claude Code usage and reports what's left in the window. Powers `/bld-runtime-tokens`. Privacy-first: local files only. | `uv tool install claude-monitor` | https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor |
 | **vercel** | Deploy target for every BLD app. | `npm i -g vercel` | https://github.com/vercel/vercel |
-| **gh** | GitHub CLI. Creates the private repo in `/bld-deploy`. | winget / installer | https://github.com/cli/cli |
+| **gh** | GitHub CLI. Creates the private repo in `/bld-util-deploy`. | winget / installer | https://github.com/cli/cli |
 
 > ⚠️ **`react-doctor` phones home by default.** It bundles `@sentry/node` and posts
 > to a score API. BLD passes `--no-telemetry` on **every** run. If you use the tool
@@ -101,7 +101,7 @@ so none of them ever ambiently sees your codebase.
 
 | Piece | What it does | Runs code? |
 |---|---|---|
-| **20 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. All free. | md, except two python helpers |
+| **21 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. All free. | md, except two python helpers |
 | **`bld-executor` agent** | The worker the orchestrator skills fan out to. | md |
 | **`block-image-skills.py` hook** | PreToolUse hook that **blocks** `design` and `banner-design`. BLD never generates images with AI; it finds existing assets. | code (yours, ~30 lines, read it) |
 | **`CLAUDE.md` templates** | The global + workspace rule layers. Sanitised, no personal data. | md |
@@ -114,7 +114,7 @@ Listed so you know they exist and know BLD did not put them on your machine.
 
 | Tool | Why it's separate | Verify at |
 |---|---|---|
-| **codex** (OpenAI CLI) | The delegation executor for `/bld-agents`. Needs a ChatGPT Plus login. Only worth it if you already pay for one. | https://github.com/openai/codex |
+| **codex** (OpenAI CLI) | The delegation executor for `/bld-runtime-agents`. Needs a ChatGPT Plus login. Only worth it if you already pay for one. | https://github.com/openai/codex |
 | **gemini-cli** | Delegation fallback. Free tier is 20 requests/day. | https://github.com/google-gemini/gemini-cli |
 
 ---
