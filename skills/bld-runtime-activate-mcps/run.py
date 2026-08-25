@@ -9,7 +9,7 @@ Usage:
 argv[1] = server key: "jcodemunch" | "context-mode"
 stdin   = JSON array of tool calls: [{"name":..., "arguments":{...}}, ...]
 """
-import json, subprocess, sys, threading, queue, shutil
+import atexit, json, subprocess, sys, threading, queue, shutil
 
 _NPX = shutil.which("npx.cmd") or shutil.which("npx") or "npx"
 SERVERS = {
@@ -27,11 +27,41 @@ def main():
     if not isinstance(calls, list):
         sys.exit("stdin must be a JSON array of {name, arguments}")
 
-    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                            stderr=subprocess.DEVNULL, text=True,
-                            encoding="utf-8", bufsize=1)
+    try:
+        # errors="replace" is not optional on Windows. These servers log through
+        # a console that is cp1252 by default, so a single byte like 0xb7 (a
+        # middot in a progress line) is invalid UTF-8 and raises inside the
+        # reader thread. Observed for real: it killed the stderr reader outright.
+        # On stdout the same byte would kill the only thread reading replies and
+        # turn a working server into a 120-second timeout with no explanation.
+        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, text=True,
+                                encoding="utf-8", errors="replace", bufsize=1)
+    except FileNotFoundError:
+        sys.exit("cannot start %s: %r is not installed or not on PATH.\n"
+                 "jcodemunch installs with pip; the others run through npx."
+                 % (sys.argv[1], cmd[0]))
+
+    # The whole promise of this skill is that nothing outlives the batch, and a
+    # bare terminate() at the end of main() only holds when main() reaches the
+    # end. Any error path left the server running. atexit covers all of them:
+    # normal return, sys.exit from die(), and an unhandled exception.
+    atexit.register(proc.terminate)
+
     q = queue.Queue()
     threading.Thread(target=lambda: [q.put(l) for l in proc.stdout], daemon=True).start()
+
+    # Keep stderr instead of discarding it. A server that starts and then dies
+    # (missing dependency, bad version, no index yet) says why on stderr and
+    # nothing on stdout, so throwing it away turned every startup failure into
+    # an unexplained 120-second timeout.
+    errs = []
+    threading.Thread(target=lambda: [errs.append(l) for l in proc.stderr],
+                     daemon=True).start()
+
+    def die(why):
+        tail = "".join(errs[-15:]).strip()
+        sys.exit("%s\nserver stderr:\n%s" % (why, tail or "(nothing on stderr)"))
 
     _id = 0
     def rpc(method, params=None, notify=False, timeout=120):
@@ -42,8 +72,13 @@ def main():
         if not notify:
             _id += 1
             msg["id"] = _id
-        proc.stdin.write(json.dumps(msg) + "\n")
-        proc.stdin.flush()
+        try:
+            proc.stdin.write(json.dumps(msg) + "\n")
+            proc.stdin.flush()
+        except (BrokenPipeError, OSError):
+            # The server exited. Without this the user gets a BrokenPipeError
+            # traceback instead of the reason, which is sitting in stderr.
+            die("%s died before answering %r." % (sys.argv[1], method))
         if notify:
             return None
         want = _id
@@ -62,8 +97,10 @@ def main():
             if obj.get("id") == want:
                 return obj
 
-    rpc("initialize", {"protocolVersion": "2024-11-05", "capabilities": {},
-                       "clientInfo": {"name": "bld-optimize", "version": "0"}})
+    init = rpc("initialize", {"protocolVersion": "2024-11-05", "capabilities": {},
+                              "clientInfo": {"name": "bld-runtime-activate-mcps", "version": "0"}})
+    if not init or init.get("error"):
+        die("%s never completed the MCP handshake." % sys.argv[1])
     rpc("notifications/initialized", {}, notify=True)
 
     total = 0
@@ -79,7 +116,6 @@ def main():
         print(text or "(empty)")
         print()
     print(f"--- TOTAL: {total} chars  ~{total//4} tokens ---")
-    proc.terminate()
 
 if __name__ == "__main__":
     main()
