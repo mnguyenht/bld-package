@@ -98,13 +98,26 @@ def build_lookup(mode):
 
 
 def detect_mode():
-    """Derive current mode from the declared names on disk. Ties -> unknown."""
+    """Derive current mode from what is on disk. Ties or disagreement -> unknown.
+
+    A skill has TWO names: its folder and its frontmatter. Counting only the
+    frontmatter reported a clean mode on a tree where the folders still said
+    something else, which is exactly the state an interrupted run leaves. That
+    made `toggle`'s mixed-tree guard useless against the one failure it exists
+    to catch, so a skill only votes when both of its names agree.
+    """
     friendly = pro = 0
     for folder in os.listdir(SKILLS_DIR):
         path = os.path.join(SKILLS_DIR, folder, "SKILL.md")
         if not os.path.isfile(path):
             continue
         declared = read_name(path)
+        if declared != folder:
+            # Folder and frontmatter disagree. Vote both ways so the result can
+            # only ever be "mixed", which is the honest answer here.
+            friendly += 1
+            pro += 1
+            continue
         for key, (typ, f, p) in SKILLS.items():
             if f == p:
                 continue          # same name in both modes: casts no vote
@@ -234,19 +247,43 @@ def main():
     renames = []
 
     # ── 1. folders + frontmatter ─────────────────────────────────────────
+    # Plan the whole rename before touching anything. This used to rewrite each
+    # SKILL.md's frontmatter and only THEN check the destination folder, so a
+    # collision exited partway with earlier skills fully renamed and the current
+    # one holding a new name in an old folder. That half-converted tree is the
+    # worst state this script can leave behind, and it left it while reporting
+    # a clean-looking error.
+    plan = []
     for folder in sorted(os.listdir(SKILLS_DIR)):
-        src = os.path.join(SKILLS_DIR, folder)
-        skill_md = os.path.join(src, "SKILL.md")
+        skill_md = os.path.join(SKILLS_DIR, folder, "SKILL.md")
         if not os.path.isfile(skill_md):
             continue
-
         declared = read_name(skill_md)
         key = key_for(declared, folder)
         if key is None:
             print(f"  ?? {folder}: not in the table, left alone")
             continue
+        plan.append((folder, skill_md, declared, target_name(key, mode)))
 
-        want = target_name(key, mode)
+    moving_away = {f for f, _, _, w in plan if f != w}
+    wants = [w for _, _, _, w in plan]
+    problems = []
+    for folder, _, _, want in plan:
+        if folder == want:
+            continue
+        if wants.count(want) > 1:
+            problems.append(f"two skills both want the name {want}")
+        elif os.path.exists(os.path.join(SKILLS_DIR, want)) and want not in moving_away:
+            problems.append(f"{folder} -> {want}, but {want} already exists")
+    if problems:
+        # ponytail: a rename cycle (A wants B's name while B wants A's) would
+        # also need temp names, but the SKILLS table is a fixed bijection with
+        # no such pair, so this validates rather than solves it.
+        sys.exit("refusing to rename anything, nothing has been changed:\n  "
+                 + "\n  ".join(sorted(set(problems))))
+
+    for folder, skill_md, declared, want in plan:
+        src = os.path.join(SKILLS_DIR, folder)
 
         if declared != want:
             s = io.open(skill_md, encoding="utf-8").read()
@@ -255,8 +292,6 @@ def main():
 
         if folder != want:
             dst = os.path.join(SKILLS_DIR, want)
-            if os.path.exists(dst):
-                sys.exit(f"refusing to overwrite existing folder: {want}")
             if not git("mv", f"skills/{folder}", f"skills/{want}"):
                 os.rename(src, dst)
             renames.append((folder, want))
