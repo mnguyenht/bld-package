@@ -114,9 +114,15 @@ def detect_mode():
         if not os.path.isfile(path):
             continue
         declared = read_name(path)
-        if declared != folder:
-            # Folder and frontmatter disagree. Vote both ways so the result can
-            # only ever be "mixed", which is the honest answer here.
+        if declared != folder and key_for(declared, folder) is not None:
+            # A BLD skill whose folder and frontmatter disagree. Vote both ways
+            # so the result can only ever be "mixed", the honest answer here.
+            #
+            # The key_for guard matters: installed globally, this directory also
+            # holds every third-party skill on the machine, and plenty of those
+            # legitimately declare a name that differs from their folder. Voting
+            # on those pinned the mode to "mixed" forever and made `toggle`
+            # permanently refuse for a reason that had nothing to do with BLD.
             friendly += 1
             pro += 1
             continue

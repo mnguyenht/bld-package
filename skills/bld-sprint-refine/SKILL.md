@@ -83,7 +83,8 @@ than moving on silently.
 
 - Per-screen, post-done. Never run strict critique/animation review on a half-built app.
 - Never image-generation skills (`design`, `banner-design`) — blocked.
-- Never `impeccable live`. MCP tools stay on-demand via `bld-optimize`.
+- Never `impeccable live`. MCP tools default to on-demand via
+  `/bld-runtime-activate-mcps`; always-on is opt-in through `/bld-mcp-settings`.
 - Enrichment (Spline/21st) only if it makes the app better; empty-handed is fine.
 - Heavy pass: this is token-intensive by nature. That's expected — don't shortcut the
   invocations to save tokens; if scope is too big, refine fewer screens, not fewer passes.

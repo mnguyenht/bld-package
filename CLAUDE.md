@@ -34,14 +34,17 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 | `skills/bld-*/SKILL.md` | One skill each. Frontmatter `name` + `description` drives invocation |
 | `skills/bld-setup/references/manifest.md` | The operational install table, with the trust column |
 | `agents/bld-executor.md` | The worker the orchestrator skills fan out to |
-| `hooks/block-image-skills.py` | PreToolUse hook blocking `design` / `banner-design` |
+| `hooks/block-image-skills.py` | PreToolUse hook blocking `ui-ux-pro-max:design` and any `banner-design`. Claude Code's own top-level `design` skill is deliberately NOT blocked; it generates no images. `--selftest` asserts both halves |
 | `templates/CLAUDE.*.md` | The global + workspace rule layers, sanitised |
 
 ## Conventions
 
-- **Skill folder names may differ from the invoked name.** `bld-react-review/`
-  declares `name: bld-react-optimize`. The frontmatter wins; don't "fix" the
-  folder to match without checking every cross-reference.
+- **Folder name and frontmatter `name` must match.** They drifted apart
+  historically and the frontmatter won, but every one of the 22 now agrees, and
+  `switch-mode.py` relies on that: `detect_mode` treats a BLD skill whose folder
+  and declared name disagree as evidence of an interrupted rename, and refuses to
+  toggle. Renaming a folder by hand without its frontmatter now jams the mode
+  switch.
 - **House voice:** dense, opinionated, table-first. Every non-obvious rule carries
   its *why*, usually a dated incident. A rule without a reason gets ignored under
   pressure, so the reasons are the point, not padding.

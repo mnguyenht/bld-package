@@ -6,9 +6,8 @@ description: Run the third-party code-optimizer MCP servers (jcodemunch, context
 # bld-runtime-activate-mcps — burst-use the optimizer MCPs, then dip
 
 These are **unofficial third-party MCP servers** installed from GitHub
-(`jcodemunch-mcp` via pip, `context-mode` via npx). We deliberately keep them
-**out of `.mcp.json`** so they never auto-load and never ambiently route the
-codebase. This skill spins one up over stdio, fires the exact queries needed,
+(`jcodemunch-mcp` via pip, `context-mode` via npx). By default they stay **out of
+`.mcp.json`**, so they never auto-load and never ambiently route the codebase. This skill spins one up over stdio, fires the exact queries needed,
 prints compact results, and kills the process — seconds, not a session.
 
 Use it for a **big sprint** where you'd otherwise read many large files: pull the
@@ -16,7 +15,10 @@ compact search results once, then work from them.
 
 ## Ground rules
 
-- **Never** re-add these to `.mcp.json`. On-demand only — that's the whole point.
+- **Do not hand-edit `.mcp.json` to make these permanent.** Always-on is a real
+  option, but it belongs to `/bld-mcp-settings`, which refuses to delete entries
+  it did not write. Editing the file directly loses that protection, and this
+  skill keeps working either way.
 - Prefer **jcodemunch** — it's read-only code search. Reach for **context-mode**
   only if the task genuinely needs its shell/cross-tool features (its `ctx_execute`
   runs real commands with your logged-in `gh`/`aws`/`kubectl` — heavier trust).
@@ -29,7 +31,7 @@ compact search results once, then work from them.
 > **`python` is the Windows spelling.** macOS and most Linux distros ship the
 > interpreter as `python3` and have no bare `python` at all, so every command
 > below fails with `command not found` until you swap the name. Check once with
-> `python --version || python3 --version || py --version` and use whichever
+> `python3 --version || python --version || py --version` and use whichever
 > answered.
 
 The runner spawns the server, runs a batch of tool calls, prints results with
@@ -73,7 +75,7 @@ For context-mode, pass `context-mode` as the server arg; its tools are
 
 ### shadcn/ui component lookup (on-demand)
 
-The shadcn MCP server is also wired in on-demand (never in `.mcp.json`). Use it
+The shadcn MCP server is also wired in on-demand. Use it
 when building/adding shadcn components so you pull real registry data instead of
 guessing. Pass `shadcn` as the server arg:
 

@@ -168,7 +168,16 @@ def main():
     print("")
     row("core skills", len(core_have) == len(CORE_SKILLS),
         "%d of %d" % (len(core_have), len(CORE_SKILLS)))
-    bld_ok = len(bld_have) >= bld_expected if bld_expected else bool(bld_have)
+    # The bld group installs the skills AND the bld-executor agent, so both have
+    # to be there for the group to count as done.
+    # Check both scopes, exactly as the skill inventory above does. A
+    # project-scoped install puts the agent in <project>/.claude/agents/, and
+    # looking only in the home directory reported a working install as broken.
+    agent_have = any(
+        os.path.isfile(os.path.join(d, "agents", "bld-executor.md"))
+        for d in (CLAUDE, os.path.join(os.getcwd(), ".claude")))
+    bld_ok = (len(bld_have) >= bld_expected if bld_expected
+              else bool(bld_have)) and agent_have
     if not bld_have:
         bld_note = "none"
     elif bld_expected:
@@ -200,7 +209,6 @@ def main():
     # Both orchestrator skills fan out to the bld-executor subagent, so a BLD
     # install whose agents/ copy silently failed leaves them broken with nothing
     # reporting why. Cheap to check, and it is the only file that group installs.
-    agent_have = os.path.isfile(os.path.join(CLAUDE, "agents", "bld-executor.md"))
     row("bld-executor agent", agent_have,
         "" if agent_have else "MISSING - /bld-orchestrator-* cannot run without it")
 
@@ -219,7 +227,12 @@ def main():
         "gstack":        gstack_have,
         "impeccable":    impec_have,
         "deploy":        bool(gh_path) and bool(have("vercel")),
-        "agents":        agent_have,
+        # The "agents" group is the EXTERNAL executor CLIs (Codex or Gemini)
+        # that /bld-runtime-agents drives. It is NOT the bundled bld-executor
+        # subagent file, which arrives with the bld group. Checking that file
+        # here made a resume conclude Codex was installed because an unrelated
+        # markdown file had been copied.
+        "agents":        bool(have("codex")) or bool(have("gemini")),
     }
 
     # ── 4. verdict ──────────────────────────────────────────────────────

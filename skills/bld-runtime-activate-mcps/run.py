@@ -9,7 +9,7 @@ Usage:
 argv[1] = server key: "jcodemunch" | "context-mode"
 stdin   = JSON array of tool calls: [{"name":..., "arguments":{...}}, ...]
 """
-import atexit, json, subprocess, sys, threading, queue, shutil
+import atexit, json, subprocess, sys, threading, time, queue, shutil
 
 _NPX = shutil.which("npx.cmd") or shutil.which("npx") or "npx"
 SERVERS = {
@@ -46,7 +46,32 @@ def main():
     # bare terminate() at the end of main() only holds when main() reaches the
     # end. Any error path left the server running. atexit covers all of them:
     # normal return, sys.exit from die(), and an unhandled exception.
-    atexit.register(proc.terminate)
+    #
+    # terminate() alone is not enough. Two of these servers are launched through
+    # npx, which is itself a wrapper that spawns node as a child, so signalling
+    # the wrapper can leave the real server orphaned and still holding the
+    # project open. Wait briefly, then kill, and on Windows fall back to taskkill
+    # with /T so the whole tree goes.
+    def shutdown():
+        if proc.poll() is not None:
+            return
+        proc.terminate()
+        try:
+            proc.wait(timeout=5)
+            return
+        except Exception:
+            pass
+        if sys.platform == "win32":
+            subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                           capture_output=True)
+        else:
+            proc.kill()
+        try:
+            proc.wait(timeout=5)
+        except Exception:
+            pass
+
+    atexit.register(shutdown)
 
     q = queue.Queue()
     threading.Thread(target=lambda: [q.put(l) for l in proc.stdout], daemon=True).start()
@@ -60,6 +85,15 @@ def main():
                      daemon=True).start()
 
     def die(why):
+        # Give the reader thread a moment to drain. Without this, the common
+        # case (server dies, we notice instantly on a broken pipe) reports
+        # "nothing on stderr" while the explanation is still in flight, which
+        # is the exact failure this function exists to prevent.
+        proc.poll()
+        for _ in range(20):
+            if errs:
+                break
+            time.sleep(0.05)
         tail = "".join(errs[-15:]).strip()
         sys.exit("%s\nserver stderr:\n%s" % (why, tail or "(nothing on stderr)"))
 

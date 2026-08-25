@@ -58,7 +58,7 @@ a raw `'python' is not recognized`. **Windows does not ship Python**, so this is
 common, not an edge case.
 
 ```bash
-python --version || python3 --version || py --version
+python3 --version || python --version || py --version
 ```
 
 If none work, check the rest by hand so they only install once:
@@ -80,9 +80,11 @@ wrong on macOS and Linux, where there is no installer and no checkbox:
 
 Then: restart the terminal, run `/bld-setup` again.
 
-**On macOS and Linux, "Python is missing" is usually wrong.** Both ship `python3`
-and neither has a bare `python`. Confirm all three names failed before telling
-anyone to install anything.
+**On macOS and Linux, "Python is missing" is usually wrong.** They typically
+have `python3` and typically have no bare `python`, so a failed `python` proves
+nothing on its own. Typically is not always: a stripped container or a macOS
+without developer tools really can lack it. Confirm all three names failed
+before telling anyone to install anything.
 
 **Check the version too, not just that it runs.** `python --version` succeeds on a
 Python 2 install. `preflight.py` then *parses* fine and dies partway through on

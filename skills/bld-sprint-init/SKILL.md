@@ -44,9 +44,14 @@ regardless of tier.
    python3 <ui-ux-pro-max skill>/scripts/search.py "<product type> <the user's vibe words>" \
      --design-system --persist -p "App Name"
    ```
-   Use whichever of `python3` / `python` / `py` actually exists on this machine.
-   macOS and most Linux distros ship no bare `python` at all, so hardcoding it
-   fails the design step before a single screen gets built.
+   **Probe first, then substitute.** `python3` above is a placeholder, not the
+   command to paste: it is usually absent on Windows, exactly as bare `python`
+   is usually absent on macOS and Linux. Hardcoding either one fails the design
+   step before a single screen gets built.
+
+   ```bash
+   python3 --version || python --version || py --version
+   ```
 
    This writes `design-system/MASTER.md` — the palette/type/style/rules every screen
    follows. Everything downstream reads this instead of re-running the engine.
@@ -65,9 +70,9 @@ regardless of tier.
 
 7. Build the core screens/layout from `design-system/MASTER.md` + the `ui-styling`
    skill (shadcn + Tailwind components). One primary CTA per screen; real content.
-8. Pull real shadcn component data on demand via the **`bld-optimize`** skill
+8. Pull real shadcn component data on demand via **`/bld-runtime-activate-mcps`**
    (`run.py shadcn`) instead of guessing component APIs. As the codebase grows, use
-   `bld-optimize` (`jcodemunch`) for cheap code search.
+   the same skill with `jcodemunch` for cheap code search.
 9. Verify in the browser preview: it renders, no console errors, responsive at 375 /
    768 / 1024. Fix before shipping.
 
@@ -82,5 +87,6 @@ regardless of tier.
   base. But respect the budget: don't silently balloon a Quick job into an hour.
   The exhaustive strict craft passes still belong to `/bld-sprint-refine`.
 - Never invoke image-generation skills (`design`, `banner-design`) — blocked.
-- MCP tools stay on-demand via `bld-optimize`; never add servers to `.mcp.json`.
+- MCP tools default to on-demand via `/bld-runtime-activate-mcps`. Always-on is
+  a deliberate opt-in through `/bld-mcp-settings`, never a hand-edited `.mcp.json`.
 - Explain approval-required commands in beginner terms before running them.
