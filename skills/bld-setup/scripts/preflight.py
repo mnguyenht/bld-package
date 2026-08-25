@@ -197,6 +197,13 @@ def main():
         cli_have[cli] = bool(have(cli))
         row(cli, cli_have[cli], "")
 
+    # Both orchestrator skills fan out to the bld-executor subagent, so a BLD
+    # install whose agents/ copy silently failed leaves them broken with nothing
+    # reporting why. Cheap to check, and it is the only file that group installs.
+    agent_have = os.path.isfile(os.path.join(CLAUDE, "agents", "bld-executor.md"))
+    row("bld-executor agent", agent_have,
+        "" if agent_have else "MISSING - /bld-orchestrator-* cannot run without it")
+
     row("~/.claude/CLAUDE.md", os.path.isfile(os.path.join(CLAUDE, "CLAUDE.md")), "")
 
     # What the disk actually proves, keyed by the group slugs written to
@@ -212,6 +219,7 @@ def main():
         "gstack":        gstack_have,
         "impeccable":    impec_have,
         "deploy":        bool(gh_path) and bool(have("vercel")),
+        "agents":        agent_have,
     }
 
     # ── 4. verdict ──────────────────────────────────────────────────────

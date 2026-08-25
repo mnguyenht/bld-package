@@ -113,10 +113,11 @@ so none of them ever ambiently sees your codebase.
 
 | Piece | What it does | Runs code? |
 |---|---|---|
-| **21 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. All free. | md, except two python helpers |
+| **21 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. Free, with one exception: /bld-runtime-agents drives an external coding agent and needs either a paid ChatGPT subscription for Codex or Gemini's free tier. Every other command costs nothing beyond your own Claude usage. | md, except **four helper scripts**: `bld-setup/scripts/preflight.py` (reads your machine, installs nothing), `bld-professional-mode/scripts/switch-mode.py` (renames BLD's own files), `bld-runtime-activate-mcps/run.py` (spawns an MCP server, then kills it), and `bld-optimize-app/scripts/lh-report.mjs` (node, reads a Lighthouse JSON report). All four are ours and short enough to read. |
 | **`bld-executor` agent** | The worker the orchestrator skills fan out to. | md |
-| **`block-image-skills.py` hook** | PreToolUse hook that **blocks** `design` and `banner-design`. BLD never generates images with AI; it finds existing assets. | code (yours, ~30 lines, read it) |
+| **`block-image-skills.py` hook** | PreToolUse hook that **blocks** `ui-ux-pro-max:design` and `banner-design`. BLD never generates images with AI; it finds existing assets. Claude Code's own top-level `design` skill is not blocked: it lays out HTML artboards and generates nothing. | code (yours, ~40 lines, read it) |
 | **`CLAUDE.md` templates** | The global + workspace rule layers. Sanitised, no personal data. | md |
+| **7 vendored ECC checklists** | Security checklists inside `/bld-optimize-security`, copied from a third party rather than written here. Markdown only, they execute nothing. Source and full MIT license ship beside them in `references/ecc/`. | md, third-party ([affaan-m/ECC](https://github.com/affaan-m/ECC)) |
 
 ---
 
