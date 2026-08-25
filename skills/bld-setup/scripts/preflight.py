@@ -149,14 +149,36 @@ def main():
 
     core_have = [s for s in CORE_SKILLS if s in present]
     bld_have = sorted(s for s in present if s.startswith("bld-"))
+
+    # How many bld-* skills SHOULD be there. Counting the package we are running
+    # from keeps this correct as skills are added, where a hardcoded 21 would
+    # quietly go stale. Only trust it when this really is the package and not an
+    # installed copy: from ~/.claude/skills/bld-setup/scripts/ the same walk
+    # lands on ~/.claude/skills itself, and comparing the install to itself
+    # always passes, which is the exact bug this is here to catch.
+    pkg = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    bld_expected = 0
+    if os.path.isfile(os.path.join(pkg, "README.md")) and \
+       os.path.isdir(os.path.join(pkg, "templates")):
+        bld_expected = len([d for d in os.listdir(os.path.join(pkg, "skills"))
+                            if d.startswith("bld-")])
     gstack_have = "gstack" in present
     impec_have = "impeccable" in present
 
     print("")
     row("core skills", len(core_have) == len(CORE_SKILLS),
         "%d of %d" % (len(core_have), len(CORE_SKILLS)))
-    row("bld-* skills", bool(bld_have),
-        "%d found (%s)" % (len(bld_have), "+".join(scopes)) if bld_have else "none")
+    bld_ok = len(bld_have) >= bld_expected if bld_expected else bool(bld_have)
+    if not bld_have:
+        bld_note = "none"
+    elif bld_expected:
+        bld_note = "%d of %d (%s)" % (len(bld_have), bld_expected, "+".join(scopes))
+        if len(bld_have) < bld_expected:
+            bld_note += "  PARTIAL - copy did not finish"
+    else:
+        bld_note = "%d found (%s), expected count unknown" % (
+            len(bld_have), "+".join(scopes))
+    row("bld-* skills", bld_ok, bld_note)
     row("gstack", gstack_have, "")
     row("impeccable", impec_have, "")
 
@@ -183,7 +205,7 @@ def main():
     # (prereqs, mcp, agents) are deliberately absent rather than guessed at.
     evidence = {
         "core-skills":   len(core_have) == len(CORE_SKILLS),
-        "bld":           bool(bld_have),
+        "bld":           bld_ok,
         "plugins":       len(plug_have) == len(PLUGINS),
         "react-tools":   cli_have["react-doctor"] and cli_have["react-scan"],
         "token-monitor": cli_have["claude-monitor"],

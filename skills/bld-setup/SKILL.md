@@ -110,7 +110,7 @@ It prints prerequisites, deploy tooling, what BLD already installed, and a
 | Verdict | Do |
 |---|---|
 | `BLOCKED` | Stop. Only node and npm are truly required. Give the links it printed. |
-| `LIMITED` | **Keep going.** git is missing, which removes only deploy, gstack and impeccable. Say what is unavailable, do not treat it as a failure, and skip those groups in Phase 3. |
+| `LIMITED` | **Keep going.** git is missing, which removes only deploy, gstack and impeccable. Say what is unavailable, do not treat it as a failure. **Skip Phase 2 entirely**, and skip those groups in Phase 3. |
 | `FIRST RUN` | Full flow, Phase 1 onward. |
 | `RESUMING` | **Skip Phases 1-3.** Pick up at the first item in "Still to do". Do not re-ask what they already chose. |
 | `RETURNING USER` | Skip to **Phase 6**. Do not re-run the flow. |
@@ -148,8 +148,17 @@ Say this once. It is the most common confusion in the whole skill:
 
 ## Phase 2 — deploy accounts, asked early on purpose
 
-Ask before the main install, because these need **human logins** nobody else can
-do, and they are the slow part:
+**Skip this entire phase if preflight said `LIMITED`.** That verdict means git is
+missing, and `/bld-util-deploy` works by pushing a git repo, so there is nothing
+here that can function. Offering it anyway spends five minutes of someone's time
+on two account logins for a feature that cannot run. Say one line instead:
+
+> *"Skipping deploy setup: it needs git, which is not installed yet. Install git
+> from [git-scm.com](https://git-scm.com) and re-run `/bld-setup` when you want
+> it. Everything else works fine without it."*
+
+Otherwise, ask before the main install, because these need **human logins**
+nobody else can do, and they are the slow part:
 
 > *"Do you want `/bld-util-deploy`? It puts an app in a private GitHub repo and
 > on a live URL, redeploying every time you push. It needs a GitHub account and a
