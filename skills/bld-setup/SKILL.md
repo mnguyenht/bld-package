@@ -69,11 +69,31 @@ node --version; npm --version; git --version
 
 Then give them the fix and stop:
 
-> **Python is missing.** BLD's setup check and two of its helper scripts need it.
-> Get it from [python.org/downloads](https://python.org/downloads), and **tick
-> "Add python.exe to PATH" on the first screen** — it is off by default and
-> everything fails confusingly without it. Restart your terminal, then run
-> `/bld-setup` again.
+**Give them the line for their OS only.** The Windows advice below is actively
+wrong on macOS and Linux, where there is no installer and no checkbox:
+
+| OS | What to say |
+|---|---|
+| **Windows** | Get it from [python.org/downloads](https://python.org/downloads), and **tick "Add python.exe to PATH" on the first screen**. It is off by default and everything fails confusingly without it. |
+| **macOS** | `brew install python3`, or [python.org/downloads](https://python.org/downloads) if they have no Homebrew. macOS ships `python3` already on current versions, so check `python3 --version` before sending them anywhere. |
+| **Debian / Ubuntu** | `sudo apt install python3`. Almost always already present, so check `python3 --version` first. |
+
+Then: restart the terminal, run `/bld-setup` again.
+
+**On macOS and Linux, "Python is missing" is usually wrong.** Both ship `python3`
+and neither has a bare `python`. Confirm all three names failed before telling
+anyone to install anything.
+
+**Check the version too, not just that it runs.** `python --version` succeeds on a
+Python 2 install. `preflight.py` then *parses* fine and dies partway through on
+`shutil.which`, which reads to a beginner as "BLD is broken" rather than "my
+Python is too old". Preflight now catches this itself and says so, but catching it
+here means they never see a traceback at all. Anything
+below 3.7 is too old (preflight uses `subprocess.run(capture_output=)`):
+
+```bash
+python3 -c "import sys; print(sys.version_info[:2])"
+```
 
 Note which of `python` / `python3` / `py` worked. That is `<PY>` for the rest of
 this run: **every command below that shows `<PY>` gets the name that actually
@@ -204,7 +224,7 @@ not just a category.
 
 | Group | What you get |
 |---|---|
-| **Core skills** (11) | Design taste from a working design engineer, animation craft, marketing copy, WCAG accessibility audits, and draft terms/privacy pages. All markdown, so they can only suggest, never execute. |
+| **Core skills** (11) | Design taste from a working design engineer, animation craft, marketing copy, WCAG accessibility audits, and draft terms/privacy pages. **9 are markdown and can only suggest. Two ship scripts that execute:** `a11y-audit` and `webapp-testing`, the latter driving a real browser through Playwright. |
 | **BLD** (21 commands) | What you cloned this for. Also adds a hook that blocks AI image generation. |
 | **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Both run code. ui-ux-pro-max also ships image generation, which BLD blocks. |
 | **React tools** (2 CLIs) | react-doctor and react-scan find real bugs, hook misuse, and needless re-renders. They power `/bld-optimize-react`. Adds two commands you can run from anywhere. |
@@ -225,9 +245,9 @@ Cheap and safe first, slow last, so a late failure does not block the rest.
 ### Core skills
 
 ```bash
-npx -y skills add emilkowalski/skill --skill emil-design-eng      -g -a claude-code --copy
-npx -y skills add emilkowalski/skill --skill animation-vocabulary -g -a claude-code --copy
-npx -y skills add emilkowalski/skill --skill review-animations    -g -a claude-code --copy
+npx -y skills add emilkowalski/skills --skill emil-design-eng      -g -a claude-code --copy
+npx -y skills add emilkowalski/skills --skill animation-vocabulary -g -a claude-code --copy
+npx -y skills add emilkowalski/skills --skill review-animations    -g -a claude-code --copy
 npx -y skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines -g -a claude-code --copy
 npx -y skills add vercel-labs/skills --skill find-skills          -g -a claude-code --copy
 npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy
@@ -278,23 +298,50 @@ has no project yet, so asking them to choose is asking about something they
 cannot evaluate.
 
 ```bash
-cp -r <resolved path>/skills/*  ~/.claude/skills/
-cp -r <resolved path>/agents/*  ~/.claude/agents/
+mkdir -p ~/.claude/skills ~/.claude/agents
+cp -r "<resolved path>/skills/"*  ~/.claude/skills/
+cp -r "<resolved path>/agents/"*  ~/.claude/agents/
 ```
 
-Run this through the Bash tool, which has `cp` on every platform. If the user
-runs it themselves in PowerShell, `cp` is an alias for `Copy-Item` and needs
-`-Recurse` instead of `-r`. Give them that form rather than watching it fail.
+**The `mkdir -p` is not optional.** A fresh Claude Code install has no
+`~/.claude/agents/` directory, and `cp` into a missing target fails with
+`No such file or directory`. Every first-time user is in exactly that state,
+which is the one this skill exists for. `-p` also makes it a no-op when the
+directories already exist, so it is safe on a re-run.
+
+**Quote the path, leave the `*` outside the quotes.** The resolved path routinely
+contains a space (`C:\Users\Firstname Lastname\...`), and unquoted it splits into
+two arguments and the copy fails. Quoting the `*` too would stop it expanding.
+
+Run this through the Bash tool, which has `cp` and `mkdir` on every platform. If
+the user runs it themselves in PowerShell, `cp` is an alias for `Copy-Item` and
+needs `-Recurse` instead of `-r`, and `mkdir -p` becomes
+`New-Item -ItemType Directory -Force`. Give them that form rather than watching
+it fail.
 
 Project-scoped (`<project>/.claude/skills/`) also works and wins on a name clash.
 One line about it; do not turn it into a decision.
 
-The hook needs registering in the project's `.claude/settings.local.json`, with
-an **absolute path** (it runs with an unpredictable working directory):
+**Copy the hook out of the package first.** The two `cp` lines above move
+`skills/` and `agents/` but not `hooks/`, so registering the package's own copy
+points the hook at a folder the user is likely to delete once setup "worked".
+Nothing warns them: the hook stays registered, silently fails to run, and image
+generation is quietly unblocked from then on. Give it a home that outlives the
+clone:
+
+```bash
+mkdir -p ~/.claude/hooks
+cp "<resolved path>/hooks/block-image-skills.py"  ~/.claude/hooks/
+```
+
+Then register **that** copy in the project's `.claude/settings.local.json`, with
+an **absolute path** (it runs with an unpredictable working directory). Expand
+`~` yourself: the hook command is not run through a shell, so a literal `~` is
+looked up as a directory named `~` and never resolves.
 
 ```json
 { "hooks": { "PreToolUse": [ { "matcher": "Skill", "hooks": [
-  { "type": "command", "command": "<PY> \"<abs path>/hooks/block-image-skills.py\"" } ] } ] } }
+  { "type": "command", "command": "<PY> \"<home>/.claude/hooks/block-image-skills.py\"" } ] } ] } }
 ```
 
 **`<PY>` here is not optional.** Substitute the interpreter Phase 0b found. A hook

@@ -52,7 +52,8 @@ dispatch + review, not typing:
 
 1. Write the spec to a file in the scratchpad (never inline — it dodges PowerShell
    quote hell and becomes the artifact you review against).
-2. `Get-Content <spec>.md -Raw | codex exec -s workspace-write -C <app-folder>`
+2. `cat <spec>.md | codex exec -s workspace-write -C <app-folder>`
+   (PowerShell: `Get-Content <spec>.md -Raw | codex exec ...`)
    🚩 Never `--dangerously-bypass-approvals-and-sandbox`.
 3. `git diff --stat` — any file outside the allowed list is an instant reject.
 4. Read the diff against the spec's checklist, line by line. Run the real check.

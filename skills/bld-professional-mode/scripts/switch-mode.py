@@ -200,12 +200,31 @@ def main():
     mode = (sys.argv[1] if len(sys.argv) > 1 else "status").lower()
     # "professional mode on/off" is how a person says this out loud, so accept it.
     mode = {"on": "pro", "off": "friendly"}.get(mode, mode)
-    if mode not in ("friendly", "pro", "status"):
-        sys.exit("usage: switch-mode.py on|pro | off|friendly | status")
+    if mode not in ("friendly", "pro", "status", "toggle"):
+        sys.exit("usage: switch-mode.py on|pro | off|friendly | toggle | status")
 
     current = detect_mode()
+
+    # `toggle` flips to whichever mode is not the current one. It resolves here,
+    # before any renaming, so the rest of main() only ever sees a real mode.
+    # A mixed tree has no opposite to flip to, and guessing one would rename
+    # half the tree the wrong way, so it refuses instead.
+    if mode == "toggle":
+        if current not in ("friendly", "pro"):
+            sys.exit(
+                f"cannot toggle: mode is {current}.\n"
+                "Some skills are renamed and some are not, usually an interrupted\n"
+                "run. Name the mode you want explicitly (on/pro or off/friendly)\n"
+                "and it will bring the whole tree to that one."
+            )
+        mode = "friendly" if current == "pro" else "pro"
+
     if mode == "status":
         print(f"current mode: {current}\n")
+        if current in ("friendly", "pro"):
+            other = "friendly" if current == "pro" else "pro"
+            flip = "off" if other == "friendly" else "on"
+            print(f"  toggle -> {other}: switch-mode.py {flip}   (or: toggle)\n")
         for key, (typ, f, p) in SKILLS.items():
             print(f"  {typ or 'special':<13} {f:<32} {p}")
         return

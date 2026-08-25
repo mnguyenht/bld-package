@@ -272,9 +272,9 @@ every one of these is worth a look on its own terms. This is the same table
 
 | Tool | What it does | Source |
 |---|---|---|
-| emil-design-eng | Emil Kowalski on UI polish, component feel, animation. | [emilkowalski/skill](https://github.com/emilkowalski/skill) |
-| animation-vocabulary | Names a motion effect so you can ask for it by its real term. | [emilkowalski/skill](https://github.com/emilkowalski/skill) |
-| review-animations | Strict animation craft gate. | [emilkowalski/skill](https://github.com/emilkowalski/skill) |
+| emil-design-eng | Emil Kowalski on UI polish, component feel, animation. | [emilkowalski/skills](https://github.com/emilkowalski/skills) |
+| animation-vocabulary | Names a motion effect so you can ask for it by its real term. | [emilkowalski/skills](https://github.com/emilkowalski/skills) |
+| review-animations | Strict animation craft gate. | [emilkowalski/skills](https://github.com/emilkowalski/skills) |
 | impeccable | Design craft and audit, 23 sub-commands. | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) |
 | gstack | Garry Tan's engineering framework. BLD keeps 6 of its 54 skills. | [garrytan/gstack](https://github.com/garrytan/gstack) |
 | karpathy-guidelines | Anti-slop rules: ask before coding, surgical changes. | [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) |

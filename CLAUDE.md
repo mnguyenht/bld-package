@@ -47,8 +47,13 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   pressure, so the reasons are the point, not padding.
 - **The README is marketing copy, so no em dashes there.** The SKILL.md files are
   instructions to a model and follow the existing house style instead.
-- **Two things must stay in sync:** the credits table in `README.md` and
-  `skills/bld-setup/references/manifest.md`. Different readers, same facts.
+- **Three things must stay in sync:** the credits table in `README.md`, the
+  manifest at `skills/bld-setup/references/manifest.md`, and the "What each group
+  actually is" table in `bld-setup/SKILL.md` Phase 3. Different readers, same
+  facts. **The Phase 3 table is the one users actually consent against**, so a
+  `code` row in the manifest that reads as markdown in the picker is a consent
+  bug, not a wording slip. It shipped once: the picker called all 11 core skills
+  "all markdown" while `a11y-audit` and `webapp-testing` ship executable scripts.
 - **Adding a skill? Four places.** Its own `SKILL.md`, the `SKILLS` table in
   `bld-professional-mode/scripts/switch-mode.py` (the canonical taxonomy, and the
   rename breaks without it), the type table in `README.md`, and the routing table

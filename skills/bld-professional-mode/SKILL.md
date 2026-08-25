@@ -35,9 +35,26 @@ instead of doing it by hand.
 
 ```bash
 python skills/bld-professional-mode/scripts/switch-mode.py status     # read-only, changes nothing
-python skills/bld-professional-mode/scripts/switch-mode.py pro
-python skills/bld-professional-mode/scripts/switch-mode.py friendly
+python skills/bld-professional-mode/scripts/switch-mode.py on         # pro: short names
+python skills/bld-professional-mode/scripts/switch-mode.py off        # friendly: long names
+python skills/bld-professional-mode/scripts/switch-mode.py toggle     # flip to the other one
 ```
+
+`on`/`off` and `pro`/`friendly` are the same two modes under different spellings.
+Use whichever the user said.
+
+**`on` is the short names.** People say "turn pro mode on" meaning "give me
+`/bld-init` instead of `/bld-sprint-init`", so `on` is pro and `off` is friendly.
+Read it as *professional mode: on*, not *long names: on*.
+
+**Running it with no argument prints status and changes nothing.** That is
+deliberate. This script renames folders across the whole tree, so the bare
+invocation is the safe one and the flip has to be asked for by name.
+
+`toggle` switches to whichever mode is not the current one. It **refuses on a
+mixed tree** rather than guessing, because "the opposite of half-renamed" is not
+a thing and picking wrong renames the wrong half. If it refuses, name the mode
+you want and it will bring everything to it.
 
 Run it from the BLD root (the folder holding `skills/`). If BLD is installed
 globally, that root is `~/.claude/`; if it is project-scoped, it is

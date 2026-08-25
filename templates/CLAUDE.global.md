@@ -236,7 +236,8 @@ output costs more than writing it myself.
 
 - Headless run: **`codex exec "<prompt>"`** (`codex` alone opens the interactive TUI).
 - Feed a spec file — **the preferred form**, no shell-escaping damage:
-  `Get-Content spec.md -Raw | codex exec -s workspace-write -C <app-folder>`
+  `cat spec.md | codex exec -s workspace-write -C <app-folder>`
+  (PowerShell: `Get-Content spec.md -Raw | codex exec ...`)
 - Let it edit files: **`-s workspace-write`**. Other modes: `read-only`,
   `danger-full-access`. 🚩 **Never `--dangerously-bypass-approvals-and-sandbox`** —
   that is the YOLO switch; it drops the sandbox entirely.

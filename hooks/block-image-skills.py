@@ -10,12 +10,37 @@ Exit 2 = block the tool call and show the message to Claude.
 import json, sys
 
 # Skills confirmed to generate images (logo/icon/banner/CIP/social-photo via Gemini).
+# Matched on the full namespaced name only.
 BLOCKED = {
-    "design",              # umbrella: logo, icon, CIP mockups, social photos — all image gen
-    "banner-design",       # AI-generated banner visuals
-    "ui-ux-pro-max:design",
-    "ui-ux-pro-max:banner-design",
+    "ui-ux-pro-max:design",         # umbrella: logo, icon, CIP mockups, social photos
+    "ui-ux-pro-max:banner-design",  # AI-generated banner visuals
 }
+
+# Bare names blocked whatever plugin they came from. `design` is deliberately NOT
+# here: Claude Code ships its own top-level `design` skill that lays out HTML
+# artboards and generates no images, and blocking it refuses a legitimate tool
+# while citing an image-generation policy that does not apply to it. Plugin
+# skills can only be invoked as `plugin:skill`, so a bare `design` is always the
+# built-in one and the namespaced entry above still catches ui-ux-pro-max's.
+BLOCKED_BARE = {
+    "banner-design",
+}
+
+def blocks(skill):
+    """True if this skill name would be denied. The whole policy, in one place."""
+    return skill in BLOCKED or skill.split(":")[-1] in BLOCKED_BARE
+
+
+# `python block-image-skills.py --selftest` proves the matcher still does what it
+# claims. Worth having: this hook fails silently by nature, so a broken matcher
+# looks exactly like a working one until someone checks.
+if "--selftest" in sys.argv:
+    for name in ("ui-ux-pro-max:design", "ui-ux-pro-max:banner-design", "banner-design"):
+        assert blocks(name), "should block: " + name
+    for name in ("design", "ui-ux-pro-max:ui-styling", "slides", "bld-sprint-init"):
+        assert not blocks(name), "should allow: " + name
+    print("selftest ok: 3 blocked, 4 allowed")
+    sys.exit(0)
 
 try:
     data = json.load(sys.stdin)
@@ -26,9 +51,7 @@ if data.get("tool_name") != "Skill":
     sys.exit(0)
 
 skill = (data.get("tool_input") or {}).get("skill", "")
-# normalize: match bare name or plugin:name form
-bare = skill.split(":")[-1]
-if skill in BLOCKED or bare in BLOCKED:
+if blocks(skill):
     sys.stderr.write(
         f"BLOCKED: skill '{skill}' uses AI image generation (Gemini/Imagen), which is "
         "disallowed by policy. Use non-image design skills instead: ui-styling, "

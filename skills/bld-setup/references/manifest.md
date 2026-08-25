@@ -43,9 +43,9 @@ Pure markdown unless noted. These are the cheapest, safest things on the list.
 
 | Tool | What it does | Runs code? | Verify at |
 |---|---|---|---|
-| **emil-design-eng** | Emil Kowalski's philosophy on UI polish, component feel, animation. | md | https://github.com/emilkowalski/skill |
-| **animation-vocabulary** | Reverse-lookup glossary: "the bouncy thing when a popover opens" → *Pop in*. Names an effect so you can prompt for it. | md | https://github.com/emilkowalski/skill |
-| **review-animations** | Strict animation craft gate. Manual-only, run late and per-component. | md | https://github.com/emilkowalski/skill |
+| **emil-design-eng** | Emil Kowalski's philosophy on UI polish, component feel, animation. | md | https://github.com/emilkowalski/skills |
+| **animation-vocabulary** | Reverse-lookup glossary: "the bouncy thing when a popover opens" → *Pop in*. Names an effect so you can prompt for it. | md | https://github.com/emilkowalski/skills |
+| **review-animations** | Strict animation craft gate. Manual-only, run late and per-component. | md | https://github.com/emilkowalski/skills |
 | **karpathy-guidelines** | Anti-LLM-slop rules: ask before coding, surgical changes, verifiable success criteria. | md | https://github.com/multica-ai/andrej-karpathy-skills |
 | **find-skills** | Discovers skills on skills.sh. Use it to find, then vet before installing. | md | https://github.com/vercel-labs/skills |
 | **copywriting** | Marketing copy: headlines, CTAs, value props, landing page text. | md | https://github.com/coreyhaines31/marketingskills |

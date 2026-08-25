@@ -14,12 +14,28 @@ ASCII output only: Windows consoles default to cp1252 and a stray symbol here
 would crash the one command that is supposed to tell you what is wrong.
 """
 
+import sys
+
+# This file parses cleanly on Python 2, so without this guard it gets all the
+# way to `shutil.which` (3.3+) or `subprocess.run(capture_output=)` (3.7+) and
+# dies on an AttributeError that reads like "BLD is broken" rather than "your
+# Python is too old". Plain % formatting and no f-strings, so the message itself
+# survives on any interpreter old enough to hit it.
+if sys.version_info[:2] < (3, 7):
+    sys.stderr.write(
+        "BLD preflight needs Python 3.7 or newer. This is %d.%d (%s).\n"
+        "Nothing is wrong with BLD. Try `python3 preflight.py` instead:\n"
+        "macOS and Linux ship Python 3 as `python3` and often leave `python`\n"
+        "pointing at an old Python 2.\n"
+        % (sys.version_info[0], sys.version_info[1], sys.executable)
+    )
+    sys.exit(1)
+
 import io
 import json
 import os
 import shutil
 import subprocess
-import sys
 
 HOME = os.path.expanduser("~")
 CLAUDE = os.path.join(HOME, ".claude")

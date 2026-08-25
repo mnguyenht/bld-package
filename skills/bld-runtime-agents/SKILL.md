@@ -163,7 +163,8 @@ A checklist Claude can verify from `git diff`. Be literal.
 enforces this for you — it refuses to run outside a git repo. Then hand off:
 
 ```bash
-Get-Content spec.md -Raw | codex exec -s workspace-write -C <app-folder>
+cat spec.md | codex exec -s workspace-write -C <app-folder>
+# PowerShell: Get-Content spec.md -Raw | codex exec -s workspace-write -C <app-folder>
 ```
 
 `-s workspace-write` lets it edit inside the workspace and nothing else.
@@ -215,7 +216,8 @@ what Claude fixed, and anything deliberately left out.
 Switch to Gemini for the affected piece, say so in the status line, and carry on:
 
 ```bash
-Get-Content spec.md -Raw | gemini -m gemini-3.6-flash --approval-mode auto_edit --skip-trust -p "Implement the spec provided on stdin exactly."
+cat spec.md | gemini -m gemini-3.6-flash --approval-mode auto_edit --skip-trust -p "Implement the spec provided on stdin exactly."
+# PowerShell: swap `cat` for `Get-Content spec.md -Raw`
 ```
 
 ⚠️ Gemini's free tier is **20 requests/day** on `gemini-api-key` auth — it ran dry

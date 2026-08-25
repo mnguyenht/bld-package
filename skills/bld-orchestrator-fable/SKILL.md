@@ -111,7 +111,8 @@ rules apply only to running Codex *inside this loop*:
 
 ```bash
 git -C <app> status --short           # must be clean, or the review diff is unreadable
-Get-Content <spec>.md -Raw | codex exec -s workspace-write -C <app>
+cat <spec>.md | codex exec -s workspace-write -C <app>
+# PowerShell: Get-Content <spec>.md -Raw | codex exec -s workspace-write -C <app>
 git -C <app> diff --stat              # any file outside the spec list = instant reject
 ```
 

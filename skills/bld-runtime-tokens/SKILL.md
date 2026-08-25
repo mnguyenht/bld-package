@@ -10,13 +10,25 @@ project: **never turn it into a report**.
 
 ## The command
 
-`claude-monitor` is already installed (`~/.local/bin/claude-monitor`,
-v4.0.0). It reads the local Claude Code transcripts in `~/.claude/projects` — no
-network, no key, no account access.
+`claude-monitor` comes from `/bld-setup`'s optional extras, so it may not be here.
+It reads the local Claude Code transcripts in `~/.claude/projects` — no network,
+no key, no account access.
 
-```powershell
-claude-monitor --once --output json --no-emoji --plan max20 | ConvertFrom-Json
+```bash
+claude-monitor --once --output json --no-emoji --plan <PLAN>
 ```
+
+**Substitute `<PLAN>` with the user's actual plan**: `pro`, `max5`, `max20`,
+`team`, or `custom` (with `--custom-limit-tokens`). Ask them once and remember it;
+guessing is the bug described below, not a shortcut around it.
+
+If the command is not found, say so in one line and stop. It installs with
+`uv tool install claude-monitor`, but that is `/bld-setup`'s job, not this skill's.
+
+Parse the JSON with whatever the environment already has. **Do not pipe it into
+`ConvertFrom-Json`** unless you have confirmed the shell is PowerShell: that
+cmdlet does not exist in bash or zsh, so on macOS and Linux the pipe fails and
+takes the whole reading with it.
 
 🚩 **`--once` is mandatory.** Without it the tool is a live-refreshing TUI that never
 exits — the call hangs until the tool times out. There is no interactive terminal here.
@@ -91,14 +103,20 @@ Not every turn. Not as a habit.
 - **Everything is `confidence: local_estimate`.** These numbers are computed from local
   transcript files, not from Anthropic's official accounting. Treat as a good estimate,
   never as an exact remaining balance.
-- **The plan is auto-detected and can be wrong.** Confirmed twice now (2026-08-05 and
-  2026-08-07): auto-detect reported `pro` (19k/5h, giving a nonsense 400%+ reading) when
-  the real plan is **`max20`** (220k/5h). Always pass `--plan max20` explicitly for this
-  account — don't trust the auto-detected value:
-  ```powershell
-  claude-monitor --once --output json --plan max20
+- **The plan is auto-detected and can be wrong.** Confirmed twice (2026-08-05 and
+  2026-08-07): auto-detect reported `pro` (19k/5h) on an account that was really
+  `max20` (220k/5h), producing a nonsense reading above 400%. **Always pass
+  `--plan` explicitly**, using the plan the user actually has:
+  ```bash
+  claude-monitor --once --output json --plan <PLAN>
   ```
   Valid: `pro`, `max5`, `max20`, `team`, `custom` (with `--custom-limit-tokens`).
+
+  **Guessing wrong is dangerous in both directions**, and the quiet direction is
+  worse. Too small a plan gives an absurd percentage that is obviously broken.
+  Too large a plan gives a *plausible* low percentage that says there is room
+  when there is not, and the session dies mid-sprint with no warning. If the plan
+  is unknown, ask. Do not default to the largest one.
 - **The forecast is a straight-line projection** off the current burn rate. A spike from
   one big file read will make it look far more dire than it is. Sanity-check it against
   `pace.elapsed_percentage` before raising an alarm.
