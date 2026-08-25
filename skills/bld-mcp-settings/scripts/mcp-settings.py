@@ -59,6 +59,8 @@ def config_path(root):
 
 def load(path):
     """Return (data, existed). A broken file is never silently overwritten."""
+    if os.path.isdir(path):
+        sys.exit("%s is a directory, not a file. Nothing was changed." % path)
     if not os.path.isfile(path):
         return {"mcpServers": {}}, False
     try:
@@ -134,8 +136,23 @@ def write(path, data):
             print("  removed %s (nothing left in it)" % path)
         return
     data.setdefault("mcpServers", {})
-    io.open(path, "w", encoding="utf-8", newline="\n").write(
-        json.dumps(data, indent=2) + "\n")
+    # Write to a sibling temp file and rename over the original. Opening the
+    # real path with "w" truncates it before a single byte is written, so a
+    # failure mid-write (disk full, permissions, a killed process) leaves the
+    # user with an empty or half-written .mcp.json. This tool's whole promise is
+    # that it never damages your config, and that promise cannot survive a
+    # truncating write. os.replace is atomic on both Windows and POSIX.
+    tmp = path + ".bld-tmp"
+    try:
+        io.open(tmp, "w", encoding="utf-8", newline="\n").write(
+            json.dumps(data, indent=2) + "\n")
+        os.replace(tmp, path)
+    except OSError as e:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        sys.exit("could not write %s (%s).\nYour original file is untouched." % (path, e))
     print("  wrote %s" % path)
 
 

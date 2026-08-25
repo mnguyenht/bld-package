@@ -55,7 +55,11 @@ dispatch + review, not typing:
 2. `cat <spec>.md | codex exec -s workspace-write -C <app-folder>`
    (PowerShell: `Get-Content <spec>.md -Raw | codex exec ...`)
    🚩 Never `--dangerously-bypass-approvals-and-sandbox`.
-3. `git diff --stat` — any file outside the allowed list is an instant reject.
+3. `git status --short` **and** `git diff --stat` — any file outside the allowed
+   list is an instant reject. **Both commands, not just the diff:** `git diff`
+   only sees tracked files, so a brand new file the agent created is invisible to
+   it. That is the exact shape of an out-of-scope file worth catching, and a
+   review that runs only the diff waves it through.
 4. Read the diff against the spec's checklist, line by line. Run the real check.
 5. Wrong → append concrete fixes (file, line, exact change) to the spec and re-run.
    **Ceiling: 2 failed re-runs**, then write it yourself and say so.

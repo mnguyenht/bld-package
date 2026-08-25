@@ -164,7 +164,11 @@ DO NOT create, modify, or delete any other file.
 A checklist Claude can verify from `git diff`. Be literal.
 ```
 
-**Commit or stash first** so the next `git diff` is only the agent's work. Codex
+**Ask before committing or stashing.** A clean tree makes the next `git diff`
+show only the agent's work, which is worth having, but those are the user's
+uncommitted changes and stashing someone's work-in-progress without asking is
+not a setup step. If they decline, run anyway and read `git status --short`
+first so you know which changes were already there. Codex
 enforces this for you — it refuses to run outside a git repo. Then hand off:
 
 ```bash
@@ -181,7 +185,11 @@ a `<stdin>` block, so the spec arrives verbatim with no shell-escaping damage.
 
 ## Step 4 — Review (this is the job)
 
-1. `git diff --stat` — **any file outside "Files you may touch" is an instant reject.**
+1. `git status --short` **and** `git diff --stat` — **anything outside "Files you
+   may touch" is an instant reject.** **Both commands, not just the diff:** `git diff`
+   only sees tracked files, so a brand new file the agent created is invisible to
+   it. That is the exact shape of an out-of-scope file worth catching, and a
+   review that runs only the diff waves it through.
 2. `git diff` on the changed files. Read the diff, not whole files — cheaper.
 3. Walk the **Done means** checklist literally, item by item.
 4. Run the real check: `tsc --noEmit`, the dev server, or the app's own test.

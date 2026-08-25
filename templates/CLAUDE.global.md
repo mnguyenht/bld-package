@@ -220,8 +220,12 @@ output costs more than writing it myself.
 
 1. **Spec first.** Write the agent a precise brief: **goal · inputs · expected output ·
    constraints · the exact file paths to touch** (and explicitly what NOT to touch).
-   A vague spec buys a wasted round trip. Commit or stash first, so `git diff`
-   afterwards shows exactly the agent's work and nothing else.
+   A vague spec buys a wasted round trip. A clean tree before the handoff is what
+   makes `git diff` afterwards show the agent's work and nothing else, so **ask
+   before committing or stashing** if the tree is dirty. Those are the user's
+   uncommitted changes, and stashing someone's work-in-progress without asking is
+   not a setup step. If they would rather not, run anyway and read
+   `git status --short` first so you know which changes were already there.
 2. **Run it** via the CLI.
 3. **Review against the spec.** Read every file it changed — `git diff` — and check
    it line by line against each item in the spec. A file the agent touched that the
@@ -247,8 +251,12 @@ output costs more than writing it myself.
 - 🐛 **The Windows sandbox helper can be broken**: `-s workspace-write` writes failed
   with `orchestrator_helper_launch_failed ... helper=codex-windows-sandbox-setup.exe
   ... program not found`. Codex self-recovered by chunking patches through
-  `--codex-run-as-apply-patch`, but burned ~128k tokens discovering that. If it
-  recurs, try `-s danger-full-access` first.
+  `--codex-run-as-apply-patch`, but burned ~128k tokens discovering that.
+  **Do not reach for `-s danger-full-access` to get past this.** It removes the
+  sandbox that confines the agent to the workspace, so a tooling glitch becomes
+  a permissions decision about the whole machine. Retry, scope the run smaller
+  with `-C`, or write the piece yourself. If it is genuinely the only way
+  forward, that is the user's call to make explicitly, not a default to try.
 - ❗ The Agent/subagent tool **cannot** run Codex — its model list is Claude-only.
   Delegation is always a shell call to the CLI.
 

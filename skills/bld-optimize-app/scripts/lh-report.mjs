@@ -18,7 +18,56 @@ if (!files.length) {
   process.exit(1);
 }
 
-const runs = files.map((f) => JSON.parse(readFileSync(f, "utf8")));
+const runs = files.map((f) => {
+  let r;
+  try {
+    r = JSON.parse(readFileSync(f, "utf8"));
+  } catch (e) {
+    console.error(`${f}: cannot read as JSON (${e.message})`);
+    process.exit(1);
+  }
+  // Refuse anything that is not a Lighthouse report. Without this, a wrong file
+  // either crashed with a raw Node traceback after already printing a header of
+  // "undefined", or, worse, printed a clean-looking report with no numbers in
+  // it and exited 0. A confident empty report reads as "nothing is wrong".
+  if (!r || typeof r !== "object" || !r.categories || !r.audits || !r.lighthouseVersion) {
+    console.error(
+      `${f}: not a Lighthouse report.\n` +
+      `Expected an object with categories, audits and lighthouseVersion.\n` +
+      `Lighthouse writes this with --output=json; an --output=html file or a\n` +
+      `wrapper that nests the report under another key will not work.`,
+    );
+    process.exit(1);
+  }
+  return r;
+});
+
+// Medianing runs of different pages or form factors produces a number that
+// describes nothing. The header only ever showed run 0, so this was invisible.
+const urlOf = (r) => r.finalDisplayedUrl ?? r.finalUrl;
+for (const [i, r] of runs.entries()) {
+  if (urlOf(r) !== urlOf(runs[0]) ||
+      r.configSettings?.formFactor !== runs[0].configSettings?.formFactor) {
+    console.error(
+      `${files[i]} is not the same measurement as ${files[0]}:\n` +
+      `  ${files[0]}: ${urlOf(runs[0])} (${runs[0].configSettings?.formFactor ?? "?"})\n` +
+      `  ${files[i]}: ${urlOf(r)} (${r.configSettings?.formFactor ?? "?"})\n` +
+      `Median across different pages or form factors is meaningless.`,
+    );
+    process.exit(1);
+  }
+  // Not fatal, but worth saying: the performance score is a weighted sum, and
+  // the weights change between major Lighthouse versions. Scores medianed
+  // across versions are not measuring quite the same thing.
+  if (r.lighthouseVersion.split(".")[0] !== runs[0].lighthouseVersion.split(".")[0]) {
+    console.error(
+      `⚠  ${files[i]} is Lighthouse v${r.lighthouseVersion} but ${files[0]} is ` +
+      `v${runs[0].lighthouseVersion}.\n` +
+      `   Metric weights differ across major versions, so this median blends two ` +
+      `different scoring formulas.`,
+    );
+  }
+}
 const median = (xs) => {
   const s = xs.filter((x) => typeof x === "number" && !Number.isNaN(x)).sort((a, b) => a - b);
   if (!s.length) return null;
@@ -86,13 +135,17 @@ if (lcpPhases?.items?.length) {
 }
 
 // ── ranked opportunities ────────────────────────────────────────────────────
-const opps = Object.values(first.audits)
-  .filter((a) => a.details && (a.details.overallSavingsMs > 0 || a.details.overallSavingsBytes > 0))
-  .map((a) => ({
+// Medianed across runs like everything else above. This used to read run 0
+// only, while the header promised medians, so one unlucky run could put a
+// nonexistent 1000 ms opportunity at the top of the list, or bury a real one.
+const opps = Object.entries(first.audits)
+  .filter(([, a]) => a.details && (a.details.overallSavingsMs > 0 || a.details.overallSavingsBytes > 0))
+  .map(([id, a]) => ({
     title: a.title,
-    savedMs: a.details.overallSavingsMs ?? 0,
-    savedKb: Math.round((a.details.overallSavingsBytes ?? 0) / 1024),
+    savedMs: median(runs.map((r) => r.audits[id]?.details?.overallSavingsMs ?? 0)) ?? 0,
+    savedKb: Math.round((median(runs.map((r) => r.audits[id]?.details?.overallSavingsBytes ?? 0)) ?? 0) / 1024),
   }))
+  .filter((o) => o.savedMs > 0 || o.savedKb > 0)
   .sort((a, b) => b.savedMs - a.savedMs || b.savedKb - a.savedKb);
 
 if (opps.length) {
@@ -130,4 +183,7 @@ console.log(`\n== PAYLOAD FINGERPRINT (compare this before vs after a fix) ==`);
 console.log(`  total weight    ${bytes ? Math.round(bytes / 1024) + " KB" : "-"}`);
 console.log(`  requests        ${reqs ?? "-"}`);
 console.log(`  JS transferred  ${jsBytes ? Math.round(jsBytes / 1024) + " KB" : "-"}`);
-console.log(`  Identical fingerprint + a score swing = network noise, not your code.`);
+console.log(`  Identical fingerprint + a score swing usually means noise, not your code.`);
+console.log(`  Usually, not always: this counts bytes and requests, so it cannot see a change`);
+console.log(`  that kept the payload the same size. A rewritten hot loop, a new render path,`);
+console.log(`  or a same-sized bundle doing different work all move the score silently.`);
