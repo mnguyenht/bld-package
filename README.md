@@ -20,6 +20,7 @@ Decide what is worth building with `/bld-sprint-planning`. Build it with
 - [The commands](#the-commands)
 - [What BLD will not do](#what-bld-will-not-do)
 - [Repo layout](#repo-layout)
+- [License](#license)
 - [Credits](#credits)
 
 ---
@@ -240,6 +241,16 @@ bld-package/
 A skill is a folder with a `SKILL.md`. The `name:` in its frontmatter is the
 command you type. Add `references/` for detail that should not cost context on
 every invocation, and `scripts/` for work that has to be deterministic.
+
+---
+
+## License
+
+MIT. Use it, fork it, ship things with it.
+
+The security checklists in `skills/bld-optimize-security/references/ecc/` are
+vendored from [affaan-m/ECC](https://github.com/affaan-m/ECC) and stay under
+ECC's own MIT license, included in full beside them.
 
 ---
 

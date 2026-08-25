@@ -3,7 +3,8 @@
 These checklist files are copied from the **ECC** project by Affaan Mustafa.
 
 - **Repo:** https://github.com/affaan-m/ECC
-- **License:** MIT — Copyright (c) 2026 Affaan Mustafa
+- **License:** MIT — Copyright (c) 2026 Affaan Mustafa. Full text in `LICENSE`
+  beside this file, as MIT requires.
 - **Vendored from commit:** `591ab5cbd3f2f65860ea91c226e410b1502c8e2e` (main)
 - **Fetched:** 2026-07-29
 

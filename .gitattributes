@@ -1,0 +1,11 @@
+# Normalize line endings in the repository.
+#
+# Without this, files committed from Windows are stored with CRLF, and every
+# clone on macOS or Linux shows whole files as modified before anyone edits a
+# line. Storing LF and letting each checkout use its native endings keeps diffs
+# to the lines that actually changed.
+* text=auto eol=lf
+
+# Shell scripts must keep LF even on a Windows checkout. CRLF breaks the
+# shebang line and the script fails with a confusing "bad interpreter" error.
+*.sh text eol=lf
