@@ -1,9 +1,9 @@
 ---
-name: bld-mode
-description: Switch BLD's command naming between friendly mode (bld-<type>-<skill>, e.g. /bld-sprint-init) and pro mode (bld-<skill>, e.g. /bld-init). Use when the user says /bld-mode, "pro mode", "activate pro mode", "shorter commands", "turn off pro mode", "go back to the long names", or asks which naming mode they are in. Renames the skill folders, the frontmatter, and every cross-reference, then tells the user to restart.
+name: bld-professional-mode
+description: Switch BLD's command naming between friendly mode (bld-<type>-<skill>, e.g. /bld-sprint-init) and pro mode (bld-<skill>, e.g. /bld-init). Use when the user says /bld-professional-mode, "pro mode", "activate pro mode", "shorter commands", "turn off pro mode", "go back to the long names", or asks which naming mode they are in. Renames the skill folders, the frontmatter, and every cross-reference, then tells the user to restart.
 ---
 
-# bld-mode — friendly names or short names
+# bld-professional-mode — friendly names or short names
 
 BLD ships every command in one of two naming schemes. Same skills, same
 behaviour, different thing to type.
@@ -29,9 +29,9 @@ instead of doing it by hand.
 ## How to run it
 
 ```bash
-python skills/bld-mode/scripts/switch-mode.py status     # read-only, changes nothing
-python skills/bld-mode/scripts/switch-mode.py pro
-python skills/bld-mode/scripts/switch-mode.py friendly
+python skills/bld-professional-mode/scripts/switch-mode.py status     # read-only, changes nothing
+python skills/bld-professional-mode/scripts/switch-mode.py pro
+python skills/bld-professional-mode/scripts/switch-mode.py friendly
 ```
 
 Run it from the BLD root (the folder holding `skills/`). If BLD is installed
@@ -81,7 +81,7 @@ the source of truth for the whole taxonomy, not just this skill.
 | **runtime** | Applies to how the session runs, not to what gets built |
 | **orchestrator** | Claude bosses other agents rather than writing code |
 | **util** | Everything in between: not building, not optimizing |
-| *(special)* | Acts on BLD itself. **Identical in both modes** — `bld-setup`, `bld-quiz`, `bld-mode` |
+| *(special)* | Acts on BLD itself. **Identical in both modes** — `bld-setup`, `bld-quiz`, `bld-professional-mode` |
 
 Specials keep one name on purpose. They are the commands you reach for when you
 are confused about your setup, and a command that changes name between modes is

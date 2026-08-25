@@ -2,9 +2,14 @@
 
 **A lightweight agent skillset for every step of the building process.**
 
-21 skills for [Claude Code](https://claude.com/claude-code) that carry an idea from
-"I think I want to build this" to a deployed, audited, documented app. Type a slash
-command, get the part of the process you asked for. That's the whole interface.
+Ask Claude Code to build something and it will. Ask it twice and you get two
+different processes. BLD gives the process a shape: 21 slash commands, one per
+step, each carrying the checklist and the gotchas for that step so you are not
+rediscovering them at midnight.
+
+Decide what is worth building with `/bld-sprint-planning`. Build it with
+`/bld-sprint-init`. Measure it with `/bld-optimize-app`. Ship it with
+`/bld-util-deploy`. You pick the step. The skill brings everything else.
 
 ```bash
 git clone https://github.com/<you>/bld-package.git
@@ -12,34 +17,35 @@ git clone https://github.com/<you>/bld-package.git
 /bld-setup
 ```
 
-`/bld-setup` prints a full table of every tool it would install, with a GitHub link
-for each one, and installs nothing until you say yes.
+`/bld-setup` shows you a table of every tool, plugin and MCP server it would
+install, with a GitHub link for each and a column saying whether it runs code on
+your machine. Then it waits. Nothing is installed until you say yes.
 
 ---
 
-## What "lightweight" means here
+## What "lightweight" actually means
 
-Every skillset calls itself lightweight. Here is what it actually buys you:
+Every skillset claims to be lightweight. Here is what BLD does to earn it.
 
-**No always-on MCP servers.** There is deliberately no `.mcp.json`. Servers get
-spawned for one batch of queries and killed. Nothing third-party sits in the
-background with a view of your codebase.
+**Nothing runs in the background.** There is deliberately no `.mcp.json`. Code
+search servers get spawned for one batch of queries and killed. No third-party
+process sits idle with a view of your codebase.
 
-**Markdown first.** Most of BLD is instructions, not code. Three python and node
-helpers do real work; everything else is text a person can read in an afternoon.
+**You can read the whole thing.** BLD is instructions, not a framework. Three
+small helper scripts do real work; the rest is markdown you could get through in
+an afternoon and disagree with in specific places.
 
-**Pruned, not piled on.** BLD bundles [gstack](https://github.com/garrytan/gstack)
+**It ships less than it could.** BLD bundles [gstack](https://github.com/garrytan/gstack)
 at 6 skills instead of 54. The other 48 were iOS, paid-provider and team-process
-skills that duplicated what BLD already did, and they cost context on every
-session. Trimming them took the load from roughly 1.5k tokens to 160.
+skills that duplicated what BLD already did, and every one of them cost context
+on every session. Cutting them took the load from roughly 1.5k tokens to 160.
 
-**One hook.** It blocks AI image generation. BLD finds existing assets instead.
+**One hook, and you can read it too.** It blocks AI image generation, because
+BLD finds existing assets instead of inventing them.
 
-**Skills that call skills.** `/bld-sprint-init` orchestrates the design engine, the
+**Skills call skills.** `/bld-sprint-init` drives the design engine, the
 scaffolder and the deploy skill rather than reimplementing any of them. Less to
-maintain, less to go wrong.
-
----
+maintain, and fewer places for the three to disagree.
 
 ## How commands are named
 
@@ -53,11 +59,11 @@ kind of thing it is before you have learned the set:
      the prefix
 
 Once you know the set, the type segment is just confirmation you are paying for
-in keystrokes. `/bld-mode pro` drops it, so every command becomes prefix plus
-skill. `/bld-mode friendly` puts it back. Same skills either way.
+in keystrokes. `/bld-professional-mode pro` drops it, so every command becomes prefix plus
+skill. `/bld-professional-mode friendly` puts it back. Same skills either way.
 
 Three commands never change name, because they are the ones you reach for when
-you are confused about your own setup: `/bld-setup`, `/bld-quiz`, `/bld-mode`.
+you are confused about your own setup: `/bld-setup`, `/bld-quiz`, `/bld-professional-mode`.
 
 ## The skills
 
@@ -117,31 +123,32 @@ These keep the same name in both modes.
 |---|---|
 | **`/bld-setup`** | Turns a fresh Claude Code install into this one. Prints every tool, plugin, CLI and MCP server it would install with a GitHub link for each, gets consent, then installs only what is missing and writes the CLAUDE.md rule layers. Idempotent. |
 | **`/bld-quiz`** | A learning checkpoint after a sprint. Sizes what was built, then quizzes you on it at matching depth. Small changes get a walkthrough instead. |
-| **`/bld-mode`** | Switches the naming scheme above. Renames the folders, the frontmatter and every cross-reference together, so nothing ends up pointing at a command that no longer exists. |
+| **`/bld-professional-mode`** | Switches the naming scheme above. Renames the folders, the frontmatter and every cross-reference together, so nothing ends up pointing at a command that no longer exists. |
 
-## House rules BLD builds in
+## What BLD will not do
 
-These are the opinions. They are in the CLAUDE.md templates, so they apply to every
-app you build with it.
+These are the opinions, and they live in the CLAUDE.md templates, so they apply
+to every app you build with it.
 
-- **Local first.** Never commit and push just because a change is done. Shipping is
-  something you ask for.
-- **Stay in scope.** Change only what was asked for, including the neighbouring
-  values nobody named. Something else looks wrong? Report it, do not fix it.
-- **Never hijack scrolling.** Wheel and trackpad motion stays exactly what the OS
-  would do. Clicking a nav link is consent to travel, so that can glide.
-- **Never fabricate.** No invented prices, testimonials, or proof, anywhere.
-  Unknowns get marked and handed back to a human.
-- **Findings are hypotheses.** Every scanner in here hands you a tempting list of
-  things nobody asked you to touch. Read the code before believing any of it.
-
----
+- **It will not push your code.** Finishing a change is not a reason to ship one.
+  Deploying happens when you ask, and not before.
+- **It will not fix what you did not mention.** Not the padding next to the thing
+  you asked about, not the easing curve it had to read on the way past. Spots a
+  real problem? It tells you and leaves it alone.
+- **It will not take over your scrolling.** Wheel and trackpad motion stays
+  exactly what your OS would do. Click a nav link and it can glide, because you
+  asked to go somewhere.
+- **It will not invent a number.** No made-up prices, testimonials, or proof.
+  Gaps get marked and handed back to you, because a plausible fake price ends up
+  quoted to a real customer.
+- **It will not trust a scanner.** Every audit in here returns a tempting list of
+  things nobody asked for. BLD reads the code before believing any of it.
 
 ## Credits
 
-BLD is mostly glue. The heavy lifting belongs to the people below, and every one of
-these is worth a look on its own. This is the same table `/bld-setup` prints before
-it installs anything.
+BLD is mostly glue. The people below wrote the parts that do the hard work, and
+every one of these is worth a look on its own terms. This is the same table
+`/bld-setup` shows you before it installs anything.
 
 ### Claude Code plugins
 

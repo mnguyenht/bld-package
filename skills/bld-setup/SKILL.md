@@ -26,8 +26,9 @@ Then say these four things in your own words:
 2. **Which rows execute code** vs. which are pure markdown. Markdown skills can
    only ever suggest text at you. Anything marked `code` gets to run on their
    machine, and they should read it first.
-3. **§7 is not being installed.** It exists so they know those tools are real,
-   optional, and mostly cost money.
+3. **§7 is not installed by default.** It exists so they know those tools are
+   real, optional, and cost money. Phase 3.5 offers to help set one up if they
+   want `/bld-runtime-agents`.
 4. **How to back out:** every install is a file in `~/.claude/` or a global
    package. Nothing touches their projects. `/bld-setup remove` is not a thing —
    deleting the folder is.
@@ -220,6 +221,86 @@ The hook needs registering in the project's `.claude/settings.local.json`:
 ```
 
 Use an **absolute path** — the hook is invoked with an unpredictable cwd.
+
+## Phase 3.5 — external coding agents (optional, and they cost money)
+
+`/bld-runtime-agents` is the one BLD skill that needs something BLD cannot give
+you: an account with another AI company. Everything else in the package is free.
+**Offer this, do not push it.** Skipping it costs the user exactly one skill.
+
+Ask first, in one line: *"`/bld-runtime-agents` hands bulky work to Codex or
+Gemini so it does not spend your Claude window. Want help setting one up? It
+needs a paid ChatGPT plan for Codex, or a Google account for Gemini's free
+tier."*
+
+If they say no, say which skill will not work and move on.
+
+### The rule that outranks convenience here
+
+> **Claude never touches the credentials.** Not the password, not the API key,
+> not the browser login.
+
+Print the commands. The user runs them, in their own terminal, and logs in
+themselves. If a login flow asks for anything secret, hand it back to them
+rather than helping past it. This is not a formality: these logins hold a paid
+account, and an agent typing them is an agent that has seen them.
+
+### Codex — the default executor
+
+Needs a **paid ChatGPT plan**. There is no useful free tier, so if they do not
+already pay for ChatGPT, Gemini is the better suggestion.
+
+```bash
+# Install: check the repo for the current method on their OS.
+#   https://github.com/openai/codex
+npm install -g @openai/codex        # or the platform installer
+
+codex login                          # opens a browser; THE USER signs in
+codex --version                      # verify it landed
+```
+
+Then prove it works end to end before claiming it does, because a CLI that
+installs fine and cannot authenticate looks identical until you run it:
+
+```bash
+codex exec "reply with the single word: ready"
+```
+
+Three things to tell them once, because each has bitten:
+
+- **Codex refuses to run outside a git repo** ("Not inside a trusted directory").
+  `git init` first. `--skip-git-repo-check` exists but defeats the review step
+  that makes delegation safe.
+- **Every run costs roughly 15k input tokens before it reads your prompt** —
+  system prompt plus repo context. Batch related work into one run; a dozen
+  micro-handoffs are mostly floor.
+- 🚩 **Never `--dangerously-bypass-approvals-and-sandbox`.** That is the YOLO
+  switch and it drops the sandbox entirely. `-s workspace-write` is the flag
+  BLD uses.
+
+### Gemini — the fallback
+
+Free tier, and the better first suggestion for anyone not already paying OpenAI.
+
+```bash
+npm install -g @google/gemini-cli
+gemini                               # first run prompts for auth; THE USER signs in
+```
+
+- Sign in with a **Google account** rather than pasting an API key. The
+  API-key free tier is roughly **20 requests a day** and runs dry after about
+  one handoff; account auth raises it substantially.
+- 🚩 **Never `-y` / `--yolo`.** `--approval-mode auto_edit` approves edit tools
+  only, which is what BLD uses.
+- Quirk worth pre-empting: **gemini exits 255 even on success.** Judge by the
+  response and the diff, not the exit code, or you will chase a failure that
+  did not happen.
+
+### After either one
+
+Update the delegation block in `~/.claude/CLAUDE.md` to name the executor they
+actually installed and the account it uses. If they installed neither, say so in
+that file explicitly, so Claude stops offering delegation it cannot perform.
 
 ## Phase 4 — the CLAUDE.md layers (merge, never overwrite)
 

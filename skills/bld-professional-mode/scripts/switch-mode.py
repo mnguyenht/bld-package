@@ -55,7 +55,10 @@ SKILLS = {
     # specials — identical in both modes
     "setup":               (None,           "bld-setup",                      "bld-setup"),
     "quiz":                (None,           "bld-quiz",                       "bld-quiz"),
-    "mode":                (None,           "bld-mode",                       "bld-mode"),
+    # "-mode" is its own category: package settings you toggle on and off. These
+    # never rename themselves, because a settings switch that changes name
+    # depending on the setting is a trap.
+    "professional-mode":   ("mode",         "bld-professional-mode",          "bld-professional-mode"),
 }
 
 # Names that existed before this scheme, so an older install still migrates cleanly.
@@ -64,7 +67,7 @@ LEGACY = {
     "bld-find-21st": "21st", "bld-find-spline": "spline",
     "bld-fable-orchestrator": "fable", "bld-opus-orchestrator": "opus",
     "bld-optimize": "activate-mcps", "bld-optimize-sprint": "activate-mcps",
-    "bld-seo": "seo-indexing",
+    "bld-seo": "seo-indexing", "bld-mode": "professional-mode",
 }
 
 DOC_SUFFIXES = (".md",)
@@ -74,7 +77,7 @@ SKILLS_DIR = os.path.join(ROOT, "skills")
 # This skill's own docs deliberately contain BOTH naming schemes side by side as
 # examples. Rewriting them collapses every contrast into "x becomes x", which is
 # exactly what happened the first time this script ran. Never rewrite ourselves.
-NO_REWRITE = (os.path.join(SKILLS_DIR, "bld-mode"),)
+NO_REWRITE = (os.path.join(SKILLS_DIR, "bld-professional-mode"),)
 
 
 def target_name(key, mode):
@@ -103,8 +106,8 @@ def detect_mode():
             continue
         declared = read_name(path)
         for key, (typ, f, p) in SKILLS.items():
-            if typ is None:
-                continue          # specials are identical, they cast no vote
+            if f == p:
+                continue          # same name in both modes: casts no vote
             if declared == f:
                 friendly += 1
             elif declared == p:
@@ -150,8 +153,10 @@ def git(*args):
 
 def main():
     mode = (sys.argv[1] if len(sys.argv) > 1 else "status").lower()
+    # "professional mode on/off" is how a person says this out loud, so accept it.
+    mode = {"on": "pro", "off": "friendly"}.get(mode, mode)
     if mode not in ("friendly", "pro", "status"):
-        sys.exit("usage: switch-mode.py friendly|pro|status")
+        sys.exit("usage: switch-mode.py on|pro | off|friendly | status")
 
     current = detect_mode()
     if mode == "status":

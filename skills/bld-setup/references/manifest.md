@@ -111,6 +111,8 @@ so none of them ever ambiently sees your codebase.
 ## 7. NOT installed — opt-in, and most cost money
 
 Listed so you know they exist and know BLD did not put them on your machine.
+`/bld-setup` Phase 3.5 offers to walk you through Codex or Gemini if you want
+`/bld-runtime-agents`. The user does every login themselves.
 
 | Tool | Why it's separate | Verify at |
 |---|---|---|
