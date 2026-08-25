@@ -61,7 +61,10 @@ def load(path):
     """Return (data, existed). A broken file is never silently overwritten."""
     if not os.path.isfile(path):
         return {"mcpServers": {}}, False
-    raw = io.open(path, encoding="utf-8").read()
+    try:
+        raw = io.open(path, encoding="utf-8").read()
+    except (OSError, UnicodeDecodeError) as e:
+        sys.exit("cannot read %s (%s). Nothing was changed." % (path, e))
     try:
         data = json.loads(raw) if raw.strip() else {}
     except ValueError as e:
@@ -70,7 +73,22 @@ def load(path):
             "Refusing to touch it, because rewriting it would destroy whatever\n"
             "is in there. Fix the file by hand, then run this again." % e
         )
-    data.setdefault("mcpServers", {})
+    # Valid JSON of the wrong shape is still someone's file. Refuse it for the
+    # same reason as malformed JSON rather than "fixing" it into the expected
+    # shape, which would silently discard whatever was actually in there.
+    if not isinstance(data, dict):
+        sys.exit(
+            ".mcp.json contains valid JSON, but the top level is %s rather than\n"
+            "an object. That is not a config this tool wrote or understands, so\n"
+            "it has been left exactly as it is." % type(data).__name__
+        )
+    servers = data.setdefault("mcpServers", {})
+    if not isinstance(servers, dict):
+        sys.exit(
+            ".mcp.json has an \"mcpServers\" key that is %s rather than an object.\n"
+            "Left untouched. Fix it by hand, then run this again."
+            % type(servers).__name__
+        )
     return data, True
 
 
@@ -126,8 +144,12 @@ def main():
     root = os.getcwd()
     if "--root" in args:
         i = args.index("--root")
+        if i + 1 >= len(args):
+            sys.exit("--root needs a directory after it.")
         root = args[i + 1]
         del args[i:i + 2]
+        if not os.path.isdir(root):
+            sys.exit("--root %r is not a directory. Nothing was changed." % root)
 
     action = args[0].lower() if args else "status"
     names = [a for a in args[1:] if not a.startswith("-")]
