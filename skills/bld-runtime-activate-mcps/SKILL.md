@@ -26,6 +26,12 @@ compact search results once, then work from them.
 
 ## How to run it
 
+> **`python` is the Windows spelling.** macOS and most Linux distros ship the
+> interpreter as `python3` and have no bare `python` at all, so every command
+> below fails with `command not found` until you swap the name. Check once with
+> `python --version || python3 --version || py --version` and use whichever
+> answered.
+
 The runner spawns the server, runs a batch of tool calls, prints results with
 token counts, then terminates. Feed it a JSON array of calls on stdin:
 

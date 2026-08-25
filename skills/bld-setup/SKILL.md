@@ -75,7 +75,10 @@ Then give them the fix and stop:
 > everything fails confusingly without it. Restart your terminal, then run
 > `/bld-setup` again.
 
-Note which of `python` / `python3` / `py` worked, and use that name from then on.
+Note which of `python` / `python3` / `py` worked. That is `<PY>` for the rest of
+this run: **every command below that shows `<PY>` gets the name that actually
+worked**, never a guess. On macOS and most Linux distros bare `python` does not
+exist at all, so guessing it silently breaks things that never report an error.
 
 ### 0c. Run preflight
 
@@ -137,8 +140,22 @@ If yes, and preflight showed them missing:
 
 ```bash
 npm install -g vercel
-# gh has no npm package: cli.github.com, or `winget install GitHub.cli`
 ```
+
+`gh` has no npm package, so it installs per-platform. **Give them the one line for
+their OS, not all four** — a beginner reading a menu of package managers they do
+not have will pick the wrong one:
+
+| OS | Command |
+|---|---|
+| Windows | `winget install GitHub.cli` |
+| macOS | `brew install gh` |
+| Debian / Ubuntu | `sudo apt install gh` |
+| Anything else | [cli.github.com](https://cli.github.com) |
+
+If `brew` or `winget` is itself missing, send them to `cli.github.com` rather than
+starting a second install project. Setting up a package manager is not this
+skill's job.
 
 Then hand over the logins. **You cannot run these** — both open a browser and ask
 for credentials:
@@ -277,8 +294,15 @@ an **absolute path** (it runs with an unpredictable working directory):
 
 ```json
 { "hooks": { "PreToolUse": [ { "matcher": "Skill", "hooks": [
-  { "type": "command", "command": "python \"<abs path>/hooks/block-image-skills.py\"" } ] } ] } }
+  { "type": "command", "command": "<PY> \"<abs path>/hooks/block-image-skills.py\"" } ] } ] } }
 ```
+
+**`<PY>` here is not optional.** Substitute the interpreter Phase 0b found. A hook
+that names a missing interpreter still registers fine and then fails every single
+time it fires, printing nothing the user will see. The result is a security
+control that looks installed and is not running. After writing the file, fire it
+once on purpose to prove it works: ask Claude for an image-generation skill and
+confirm it is refused. A hook nobody tested is a hook nobody has.
 
 ### React tools
 
@@ -450,7 +474,7 @@ setup looks broken.
 After restarting:
 
 ```bash
-python <resolved path>/skills/bld-setup/scripts/preflight.py
+<PY> <resolved path>/skills/bld-setup/scripts/preflight.py
 ```
 
 Then have them type `/bld-` and confirm the commands appear. A skill on disk but

@@ -154,10 +154,27 @@ def main():
     plug_have = [p for p in PLUGINS if any(k.startswith(p) for k in enabled)]
     row("plugins", len(plug_have) == len(PLUGINS), "%d of %d" % (len(plug_have), len(PLUGINS)))
 
+    cli_have = {}
     for cli in ("react-doctor", "react-scan", "claude-monitor"):
-        row(cli, bool(have(cli)), "")
+        cli_have[cli] = bool(have(cli))
+        row(cli, cli_have[cli], "")
 
     row("~/.claude/CLAUDE.md", os.path.isfile(os.path.join(CLAUDE, "CLAUDE.md")), "")
+
+    # What the disk actually proves, keyed by the group slugs written to
+    # .bld-setup.json. Used below to catch a state file that claims a group
+    # finished when it did not. Groups with no reliable on-disk signature
+    # (prereqs, mcp, agents) are deliberately absent rather than guessed at.
+    evidence = {
+        "core-skills":   len(core_have) == len(CORE_SKILLS),
+        "bld":           bool(bld_have),
+        "plugins":       len(plug_have) == len(PLUGINS),
+        "react-tools":   cli_have["react-doctor"] and cli_have["react-scan"],
+        "token-monitor": cli_have["claude-monitor"],
+        "gstack":        gstack_have,
+        "impeccable":    impec_have,
+        "deploy":        bool(gh_path) and bool(have("vercel")),
+    }
 
     # ── 4. verdict ──────────────────────────────────────────────────────
     state = {}
@@ -187,13 +204,26 @@ def main():
         print("  RESUMING an unfinished setup.")
         print("  Done so far : " + (", ".join(done) if done else "nothing yet"))
         print("  Chose       : " + ", ".join(state.get("chose", [])))
-        remaining = [g for g in state.get("chose", []) if g not in done]
+        # A crash between installing and writing leaves the state file lying in
+        # both directions, so trust the disk over the claim.
+        unproven = [g for g in done if evidence.get(g) is False]
+        remaining = [g for g in state.get("chose", []) if g not in done] + unproven
         print("  Still to do : " + (", ".join(remaining) if remaining else "finish up + restart"))
+        if unproven:
+            print("  RECHECK     : " + ", ".join(unproven))
+            print("                marked done, but not found on disk. The state")
+            print("                file is wrong. Re-install these, do not skip them.")
         print("  -> Skip Phase 1-2. Pick up at the first item in 'Still to do'.")
     else:
         declined = state.get("declined", [])
         print("  RETURNING USER. Setup was completed on " + str(state.get("completed_on", "?")) + ".")
         print("  Previously declined: " + (", ".join(declined) if declined else "nothing"))
+        gone = [g for g, ok in sorted(evidence.items())
+                if ok is False and g not in declined]
+        if gone:
+            print("  MISSING NOW : " + ", ".join(gone))
+            print("                completed once, absent today. Uninstalled, or a")
+            print("                fresh machine reusing an old state file.")
         print("  -> Do NOT re-run the full flow. Offer only what is missing or was declined.")
 
     print("\n  state file: " + (STATE if state else "none yet (" + STATE + ")"))

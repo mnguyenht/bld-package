@@ -28,6 +28,11 @@ instead of doing it by hand.
 
 ## How to run it
 
+> **`python` is the Windows spelling.** macOS and most Linux distros ship it as
+> `python3` only. If these fail with `command not found`, that is why: run
+> `python --version || python3 --version || py --version` and use the one that
+> answered.
+
 ```bash
 python skills/bld-professional-mode/scripts/switch-mode.py status     # read-only, changes nothing
 python skills/bld-professional-mode/scripts/switch-mode.py pro
