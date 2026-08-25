@@ -67,7 +67,11 @@ npm --prefix <app-path> run lint
 
 Check for `eslint.config.mjs` + a `lint` script first; skip silently if absent.
 Report **only** rules react-doctor didn't already flag — mostly `@next/next/*`.
-Exit code is non-zero on warnings; judge by output, not the code.
+**Judge by the output, not the exit code.** eslint exits `0` when it found only
+warnings, `1` when it found errors (or when `--max-warnings` is configured and
+exceeded), and `2` when the config itself failed to load. So a `0` here does not
+mean a clean run, and a `2` is not a finding at all, it is a broken setup that
+reviewed nothing. Read what it printed.
 
 ⚠️ **Expect this to add little.** On a real project (2026-07-29) it returned a strict
 *subset* of phase 1 — react-doctor `--verbose` already had all 5 `no-img-element`
