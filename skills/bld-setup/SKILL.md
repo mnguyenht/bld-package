@@ -1,121 +1,171 @@
 ---
 name: bld-setup
-description: Turn a fresh Claude Code install into a full BLD workstation — print a complete manifest of every skill, plugin, CLI and MCP server first, get consent, then install only what is missing and write the CLAUDE.md rule layers. Use when the user says /bld-setup, "set up BLD", "install the BLD toolkit", "make my Claude like yours", or has just cloned bld-package and wants it working. Idempotent, and never installs anything it did not list first.
+description: Set up BLD on a machine, or add more of it later. Checks prerequisites, shows every tool it would install with a source link, installs only what you pick, and records where it got to so an interrupted setup resumes instead of restarting. Use when the user says /bld-setup, "set up BLD", "install the BLD toolkit", "add the rest of BLD", "what else can I install", or has just cloned bld-package. Never installs anything it did not list first.
 ---
 
-# bld-setup — the manifest comes first, always
+# bld-setup
 
-This skill installs other people's software onto someone's machine. That is a
-trust transaction, so it runs in one fixed order and the order is not negotiable:
+Installs other people's software onto someone's machine. That is a trust
+transaction, so the order is fixed:
 
-> **Show the whole list → get a yes → install → verify.**
+> **Check the machine → show the list → get a yes → install → record it.**
 
-**Never install anything that was not in the printed table.** If you find yourself
-reaching for a package mid-install that the manifest doesn't name, stop and ask.
+**Never install anything that was not in the printed table.** If you reach for a
+package mid-install that the manifest does not name, stop and ask.
 
-## Phase 0 — print the manifest (FIRST OUTPUT, no exceptions)
+## How to talk during this skill
 
-Read `references/manifest.md` and **print all seven sections verbatim** as your
-first response. Not a summary, not "here's roughly what we'll install" — the
-actual tables, with the GitHub column intact, so the user can click through and
-read the source of anything before it lands.
+The audience is often new to Claude Code. That means **explain the unfamiliar**,
+not everything.
 
-Then say these four things in your own words:
+- **No preamble.** Do not announce what you are about to do before doing it.
+  Run the thing, show the result.
+- **Explain a command the first time it appears**, in one short block, then stop
+  re-explaining it.
+- **Tables and short lines, not paragraphs.** A wall of prose is where a beginner
+  stops reading, and this skill is mostly lists.
+- **Say the trade-off, not the reassurance.** "Adds a global command" beats "this
+  is completely safe and won't affect anything else."
+- One idea per line. If a sentence joins two clauses with "and", it is probably
+  two lines.
 
-1. **Nothing is installed yet.** This is a list, not a report.
-2. **Which rows execute code** vs. which are pure markdown. Markdown skills can
-   only ever suggest text at you. Anything marked `code` gets to run on their
-   machine, and they should read it first.
-3. **§7 is not installed by default.** It exists so they know those tools are
-   real, optional, and cost money. Phase 3.5 offers to help set one up if they
-   want `/bld-runtime-agents`.
-4. **How to back out:** every install is a file in `~/.claude/` or a global
-   package. Nothing touches their projects. `/bld-setup remove` is not a thing —
-   deleting the folder is.
-
-Only after that, ask what to install.
-
-## Phase 1 — survey before asking
-
-Run this first so the question in Phase 2 is about **what's missing**, not what
-they already have. Nobody wants to be asked to install something twice.
+## Phase 0 — preflight (always first, even on a resume)
 
 ```bash
-echo "== plugins =="        ; cat ~/.claude/plugins/installed_plugins.json 2>/dev/null | grep -o '"[a-z-]*@[a-z-]*"' | sort -u
-echo "== global skills =="  ; ls -1 ~/.claude/skills/ 2>/dev/null
-echo "== CLIs =="           ; for c in react-doctor react-scan claude-monitor vercel gh node npm python uv; do printf "%-16s" "$c"; command -v $c 2>/dev/null || echo "MISSING"; done
-echo "== MCP =="            ; pip show jcodemunch-mcp 2>/dev/null | head -2
-echo "== leaks =="          ; ls ~/.claude/CLAUDE.md .mcp.json 2>/dev/null
+python <BLD>/skills/bld-setup/scripts/preflight.py
 ```
 
-Two things to look for beyond presence:
+`<BLD>` is the folder holding `skills/`. Read-only: it installs nothing.
 
-- **An existing `~/.claude/CLAUDE.md`.** If they have one, it is theirs and it has
-  their rules in it. See Phase 4 — you merge, you never overwrite.
-- **An existing `.mcp.json`** in the project. BLD's whole MCP posture is that this
-  file does not exist. If it does, say so and ask before removing anything; it may
-  be there for a reason that has nothing to do with BLD.
+It prints prerequisites, deploy tooling, what BLD already installed, and a
+**verdict**. Route on the verdict:
 
-## Phase 2 — ask, in groups, once
+| Verdict | Do |
+|---|---|
+| `BLOCKED` | Stop. Give the install links it printed. Nothing works without node, npm and git. |
+| `FIRST RUN` | Full flow, Phase 1 onward. |
+| `RESUMING` | **Skip Phases 1-3.** Pick up at the first item in "Still to do". Do not re-ask what they already chose. |
+| `RETURNING USER` | Skip to **Phase 6**. Do not re-run the flow. |
 
-One `AskUserQuestion`, multi-select, with the missing items only. Group them the
-way the manifest does, because the groups have genuinely different trust profiles:
+Show the user the preflight output. It is short, and it is the honest picture of
+their machine.
 
-| Group | Default | Why |
+## Phase 1 — the manifest
+
+Print all seven sections of `references/manifest.md` **verbatim**, tables and
+source links intact.
+
+Then, briefly:
+
+- Nothing is installed yet.
+- **`Runs code?`** is the column that matters. `md` rows are text and can only
+  suggest things. `code` rows execute on their machine.
+- Section 7 is not installed. Those cost money.
+- Uninstalling is deleting files in `~/.claude/`. Nothing touches their projects.
+
+Four lines, not four paragraphs.
+
+### Three kinds of thing, and users conflate them
+
+Say this once. It is the most common confusion in the whole skill:
+
+| Kind | What it is | Examples |
 |---|---|---|
-| Core skills (§2, markdown) | ✅ recommended | Free, offline, can't do anything but talk. |
-| BLD's own skills + hook + CLAUDE.md (§6) | ✅ recommended | This is the actual point of the package. |
-| Plugins (§1) | ✅ recommended | ponytail and ui-ux-pro-max are load-bearing for `/bld-sprint-init` and `/bld-sprint-refine`. |
-| CLIs (§4) | ask | Global installs. `react-doctor` and `lighthouse` power two BLD skills; the rest are situational. |
-| gstack + impeccable (§3) | ask | Large, opinionated, and both ship code. Fine to skip and add later. |
-| MCP servers (§5) | ask | `context-mode` in particular runs shell with their logged-in CLIs. |
+| **Plugin** | Claude Code extension, loads at startup | ponytail, ui-ux-pro-max |
+| **CLI** | Ordinary command-line program | `gh`, `vercel`, `lighthouse` |
+| **MCP server** | A data source Claude queries | jcodemunch, shadcn |
 
-Fire a `PushNotification` alongside the question — this is a blocking ask and they
-may have walked away while the survey ran.
+**There is no GitHub plugin and no Vercel plugin.** They are CLIs that
+`/bld-util-deploy` shells out to.
 
-## Phase 3 — install what they picked
+## Phase 2 — deploy accounts, asked early on purpose
 
-Order matters: skills and plugins before CLIs, because the CLIs are the slow part
-and a failure there shouldn't block the cheap stuff.
+Ask before the main install, because these need **human logins** nobody else can
+do, and they are the slow part:
 
-**Explain every approval-required command before running it** — one sentence on
-what it does, what the non-obvious flags mean, and whether it modifies anything.
-That rule is in the CLAUDE.md this skill is about to install; apply it while
-installing it.
+> *"Do you want `/bld-util-deploy`? It puts an app in a private GitHub repo and
+> on a live URL, redeploying every time you push. It needs a GitHub account and a
+> Vercel account, and you do both logins yourself. About five minutes. Skip it
+> and everything else still works."*
 
-### Global skills
+If yes, and preflight showed them missing:
 
 ```bash
-npx -y skills add emilkowalski/skill --skill emil-design-eng     -g -a claude-code --copy
+npm install -g vercel
+# gh has no npm package: cli.github.com, or `winget install GitHub.cli`
+```
+
+Then hand over the logins. **You cannot run these** — both open a browser and ask
+for credentials:
+
+```bash
+gh auth login
+vercel login
+```
+
+Wait, then confirm with `preflight.py` rather than assuming. **An installed CLI
+is not a signed-in CLI**, and `--version` passes on both.
+
+## Phase 3 — pick what to install
+
+One `AskUserQuestion`, multi-select. Offer **"Everything recommended"** as the
+first option so nobody ticks six boxes, then the individual groups.
+
+Fire a `PushNotification` alongside it. This blocks, and they may have walked off
+during preflight.
+
+Use these descriptions. They name what it does and what it costs:
+
+| Group | What you get |
+|---|---|
+| **Everything recommended** | The four ✅ groups below. The usual answer. |
+| ✅ **Core skills** (11) | Design taste from a working design engineer, animation craft, marketing copy, WCAG accessibility audits, and draft terms/privacy pages. All markdown, so they can only suggest, never execute. |
+| ✅ **BLD** (21 commands) | What you cloned this for. Also adds a hook that blocks AI image generation. |
+| ✅ **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Both run code. ui-ux-pro-max also ships image generation, which BLD blocks. |
+| ✅ **React tools** (2 CLIs) | react-doctor and react-scan find real bugs, hook misuse, and needless re-renders. They power `/bld-optimize-react`. Adds two global commands. |
+| **Token monitor** | `/bld-runtime-tokens` shows how much Claude usage is left before a long session. Needs `uv`, one more installer. Skip if you would rather not add it. |
+| **Code search** (3 MCP servers) | Cheaper exploration of large codebases. Only pays off past roughly fifty files. **context-mode runs shell commands with your logged-in CLIs**, making it the highest-trust item here. Easy to add later. |
+| **gstack + impeccable** | Two large opinionated suites: engineering specs, security review, deep design audits. Both ship code, both are big. Nothing depends on them, so adding them later costs nothing. |
+
+Record the answer in the state file (Phase 5) **before** installing, so an
+interrupted run knows what they wanted.
+
+## Phase 4 — install
+
+Cheap and safe first, slow last, so a late failure does not block the rest.
+
+**Explain each command the first time it appears.** One block, then move on.
+
+### Core skills
+
+```bash
+npx -y skills add emilkowalski/skill --skill emil-design-eng      -g -a claude-code --copy
 npx -y skills add emilkowalski/skill --skill animation-vocabulary -g -a claude-code --copy
-npx -y skills add emilkowalski/skill --skill review-animations   -g -a claude-code --copy
+npx -y skills add emilkowalski/skill --skill review-animations    -g -a claude-code --copy
 npx -y skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines -g -a claude-code --copy
-npx -y skills add vercel-labs/skills --skill find-skills         -g -a claude-code --copy
+npx -y skills add vercel-labs/skills --skill find-skills          -g -a claude-code --copy
 npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy
-npx -y skills add alirezarezvani/claude-skills@a11y-audit        -g -a claude-code --copy
+npx -y skills add alirezarezvani/claude-skills@a11y-audit         -g -a claude-code --copy
 npx -y skills add dylantarre/animation-principles --skill framer-motion -g -a claude-code --copy
-npx -y skills add anthropics/skills@webapp-testing               -g -a claude-code --copy
+npx -y skills add anthropics/skills@webapp-testing                -g -a claude-code --copy
 npx -y skills add shawnpang/startup-founder-skills@terms-of-service -g -a claude-code --copy
 npx -y skills add shawnpang/startup-founder-skills@privacy-policy   -g -a claude-code --copy
 ```
 
-Three flags that are not optional and one that is a trap:
+Flags that matter:
 
-- **`-a claude-code`**, not `-a claude`. `claude` fails with `Invalid agents: claude`.
-  Without the flag entirely, skills land in `~/.agents/` and Claude Code never
-  reads them.
-- **`-g`** = global (`~/.claude/skills/`), so every project sees them.
-- **`--copy`** = real files instead of symlinks. Windows symlinks are flaky enough
-  that this is worth the disk.
-- **`-y`** stops npx pausing to confirm the download.
+- **`-a claude-code`**, never `-a claude` (fails: `Invalid agents: claude`). Omit
+  it entirely and skills land in `~/.agents/`, where Claude Code never looks.
+- **`-g`** installs globally, so every project sees them.
+- **`--copy`** writes real files instead of symlinks. Windows symlinks are flaky.
 
-Run them one at a time, not chained with `&&` — one 404 shouldn't kill the batch.
+Run them one at a time. Chaining with `&&` lets one dead repo kill the batch.
 
 ### Plugins
 
-Plugins are normally added with the interactive `/plugin` command, which Claude
-cannot run. Write the config instead and let startup do the download. Merge into
-`~/.claude/settings.json` — **read it first, never clobber it**:
+Plugins normally install through the interactive `/plugin` command, which Claude
+cannot run. Write the config and let startup fetch them. **Read
+`~/.claude/settings.json` first and merge. Never overwrite it.**
 
 ```json
 {
@@ -125,34 +175,75 @@ cannot run. Write the config instead and let startup do the download. Merge into
     "claude-code-setup@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
-    "ponytail":              { "source": { "source": "github", "repo": "DietrichGebert/ponytail" } },
-    "ui-ux-pro-max-skill":   { "source": { "source": "github", "repo": "nextlevelbuilder/ui-ux-pro-max-skill" } }
+    "ponytail":            { "source": { "source": "github", "repo": "DietrichGebert/ponytail" } },
+    "ui-ux-pro-max-skill": { "source": { "source": "github", "repo": "nextlevelbuilder/ui-ux-pro-max-skill" } }
   }
 }
 ```
 
-`claude-plugins-official` is a built-in marketplace and needs no entry. If the
-plugins don't appear after restart, fall back: tell the user to run
-`/plugin marketplace add DietrichGebert/ponytail` then `/plugin install ponytail@ponytail`
-themselves, in an interactive terminal.
+`claude-plugins-official` is built in and needs no marketplace entry. If plugins
+do not appear after restart, have them run
+`/plugin marketplace add DietrichGebert/ponytail` themselves.
 
-### gstack — install then immediately prune
+### BLD itself
+
+**Recommend global** unless they already have a project in mind. A first-timer
+has no project yet, so asking them to choose is asking about something they
+cannot evaluate.
+
+```bash
+cp -r <BLD>/skills/*  ~/.claude/skills/
+cp -r <BLD>/agents/*  ~/.claude/agents/
+```
+
+Project-scoped (`<project>/.claude/skills/`) also works and wins on a name clash.
+One line about it; do not turn it into a decision.
+
+The hook needs registering in the project's `.claude/settings.local.json`, with
+an **absolute path** (it runs with an unpredictable working directory):
+
+```json
+{ "hooks": { "PreToolUse": [ { "matcher": "Skill", "hooks": [
+  { "type": "command", "command": "python \"<abs path>/hooks/block-image-skills.py\"" } ] } ] } }
+```
+
+### React tools
+
+```bash
+npm install -g react-doctor react-scan
+```
+
+`npm install -g` adds commands you can run from anywhere. It does not touch their
+projects.
+
+**Lighthouse is deliberately not installed.** `/bld-optimize-app` runs it through
+`npx` so the version is never stale.
+
+### Token monitor (only if chosen)
+
+```bash
+uv tool install claude-monitor        # or: pipx install claude-monitor
+```
+
+If `uv` is missing and unwanted, skip. The only loss is `/bld-runtime-tokens`.
+Say that plainly rather than pushing.
+
+### gstack (only if chosen) — install, then immediately prune
 
 ```bash
 git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
 bash ~/.claude/skills/gstack/setup
 ```
 
-`setup` generates **54** skill wrappers in `~/.claude/skills/`. BLD keeps six. The
-other 48 are iOS, paid-provider, browser, deploy, design and team-process skills
-that duplicate what BLD already does — and they cost context on every single
-session. Write the prune script and run it:
+`setup` generates **54** skill wrappers. BLD keeps six. The other 48 are iOS,
+paid-provider, browser, deploy and team-process skills that duplicate what BLD
+does, and every one costs context on every session.
 
 ```bash
 cat > ~/.claude/skills/gstack-prune.sh <<'SH'
 #!/usr/bin/env bash
 # Deletes generated gstack wrappers in ~/.claude/skills. Idempotent.
-# The gstack repo itself is never touched — re-run `setup` to undo this.
+# The gstack repo is never touched, so re-running `setup` undoes this.
 keep="gstack _gstack-command gstack-spec gstack-investigate gstack-cso gstack-review gstack-careful gstack-upgrade"
 for d in ~/.claude/skills/gstack-*; do
   n=$(basename "$d")
@@ -163,16 +254,11 @@ SH
 bash ~/.claude/skills/gstack-prune.sh
 ```
 
-**Re-run the prune after every `git pull` or `/gstack-upgrade`.** On Windows the
-wrappers are file copies, not symlinks, so `setup` has to be re-run to refresh
-them — and `setup` un-prunes. Tell the user this; it is the single easiest way for
-their context budget to quietly triple.
+⚠️ **`setup` un-prunes.** Re-run the prune after every `git pull` or
+`/gstack-upgrade`. Tell them once; it is the easiest way for a context budget to
+quietly triple.
 
-Context cost after prune: ~160 tokens, down from ~1.5k. Note the *invoke* cost is
-the heavy one — `gstack-spec`'s body is ~32k tokens, so it is reached for
-deliberately, not reflexively.
-
-### impeccable — skill files only
+### impeccable (only if chosen) — skill files only
 
 ```bash
 git clone --depth 1 https://github.com/pbakaus/impeccable.git /tmp/impeccable
@@ -180,183 +266,139 @@ cp -r /tmp/impeccable/skills/impeccable ~/.claude/skills/impeccable
 rm -rf /tmp/impeccable
 ```
 
-Check the repo layout before copying; if `skills/impeccable/` isn't where the
-`SKILL.md` lives, find it and adjust rather than guessing.
+🚩 **Never run `npx impeccable install` or `update`** — both wire hooks into
+their settings. And **never `/impeccable live`**: it forwards
+`ANTHROPIC_API_KEY` / `CLAUDE_CODE_OAUTH_TOKEN` to a third-party backend. Every
+other impeccable command is fine.
 
-**Do not run `npx impeccable install` or `npx impeccable update`.** Both wire
-hooks into settings. Restate the `/impeccable live` warning from the manifest
-when this one finishes — it is the highest-consequence item in the whole set.
+## Phase 5 — record what happened
 
-### CLIs
-
-```bash
-npm install -g react-doctor react-scan vercel
-uv tool install claude-monitor        # or: pipx install claude-monitor
-pip install jcodemunch-mcp            # only if they took the MCP group
-```
-
-`lighthouse` is deliberately absent — `/bld-optimize-app` runs it through `npx`
-so the version is never stale. `gh` has no npm package; point them at
-https://cli.github.com or `winget install GitHub.cli` and let them do it.
-
-### BLD's own files
-
-```bash
-BLD=<path to the cloned bld-package>
-cp -r "$BLD/skills/"*      ~/.claude/skills/          # or <project>/.claude/skills/
-cp -r "$BLD/agents/"*      ~/.claude/agents/
-mkdir -p <project>/.claude/hooks && cp "$BLD/hooks/block-image-skills.py" $_
-```
-
-**Ask where they want the `bld-*` skills.** Global (`~/.claude/skills/`) makes
-them available everywhere; project-level (`<project>/.claude/skills/`) keeps them
-scoped to one workspace and is how the original machine runs them. Project-level
-wins on a name clash.
-
-The hook needs registering in the project's `.claude/settings.local.json`:
+Write `~/.claude/.bld-setup.json` **as you go**, not at the end. An interrupted
+setup that recorded nothing is a setup that starts over.
 
 ```json
-{ "hooks": { "PreToolUse": [ { "matcher": "Skill", "hooks": [
-  { "type": "command", "command": "python \"<abs path>/.claude/hooks/block-image-skills.py\"" } ] } ] } }
+{
+  "chose": ["core-skills", "bld", "plugins", "react-tools"],
+  "declined": ["gstack", "impeccable", "mcp", "token-monitor", "agents"],
+  "done": ["prereqs", "deploy", "core-skills", "plugins"],
+  "completed": false,
+  "completed_on": null,
+  "notes": { "uv": "declined, /bld-runtime-tokens unavailable" }
+}
 ```
 
-Use an **absolute path** — the hook is invoked with an unpredictable cwd.
+- Append to `done` after each group finishes.
+- `declined` is what they said no to. It is the difference between *not yet* and
+  *not wanted*, and Phase 6 depends on it.
+- Set `completed: true` and `completed_on` only after the restart reminder.
 
-## Phase 3.5 — external coding agents (optional, and they cost money)
+## Phase 6 — returning user
 
-`/bld-runtime-agents` is the one BLD skill that needs something BLD cannot give
-you: an account with another AI company. Everything else in the package is free.
-**Offer this, do not push it.** Skipping it costs the user exactly one skill.
+Preflight said `RETURNING USER`. They already have BLD. **Do not re-run the
+flow, and do not re-print the manifest.**
 
-Ask first, in one line: *"`/bld-runtime-agents` hands bulky work to Codex or
-Gemini so it does not spend your Claude window. Want help setting one up? It
-needs a paid ChatGPT plan for Codex, or a Google account for Gemini's free
-tier."*
+Open with what is actually available to them, as a short table:
 
-If they say no, say which skill will not work and move on.
+- Anything in `declined` they might now want.
+- Anything in the manifest that is missing.
+- Anything installed but **unauthenticated** (`gh`, `vercel`).
 
-### The rule that outranks convenience here
+> *"You already have core skills, plugins and the BLD commands. Three things you
+> skipped are still available:"*
 
-> **Claude never touches the credentials.** Not the password, not the API key,
-> not the browser login.
+| | What it adds |
+|---|---|
+| gstack + impeccable | Engineering specs, security review, deep design audits |
+| Code search MCPs | Cheaper exploration once a codebase gets big |
+| Codex or Gemini | Makes `/bld-runtime-agents` work |
 
-Print the commands. The user runs them, in their own terminal, and logs in
-themselves. If a login flow asks for anything secret, hand it back to them
-rather than helping past it. This is not a formality: these logins hold a paid
-account, and an agent typing them is an agent that has seen them.
+Install only what they pick, then update `declined` and `done`. Nothing else.
 
-### Codex — the default executor
+## Phase 7 — external coding agents (optional, cost money)
 
-Needs a **paid ChatGPT plan**. There is no useful free tier, so if they do not
-already pay for ChatGPT, Gemini is the better suggestion.
+`/bld-runtime-agents` is the one BLD skill needing an account elsewhere.
+**Offer, do not push.** Skipping costs exactly one skill.
 
-```bash
-# Install: check the repo for the current method on their OS.
-#   https://github.com/openai/codex
-npm install -g @openai/codex        # or the platform installer
+> **Claude never touches the credentials.** Print the commands; the user runs
+> them and logs in. If a flow asks for anything secret, hand it back.
 
-codex login                          # opens a browser; THE USER signs in
-codex --version                      # verify it landed
-```
-
-Then prove it works end to end before claiming it does, because a CLI that
-installs fine and cannot authenticate looks identical until you run it:
+**Codex** needs a paid ChatGPT plan. **Gemini** has a free tier, so suggest it
+first to anyone not already paying OpenAI.
 
 ```bash
-codex exec "reply with the single word: ready"
-```
+npm install -g @openai/codex     # see github.com/openai/codex for your OS
+codex login                      # opens a browser; THE USER signs in
 
-Three things to tell them once, because each has bitten:
-
-- **Codex refuses to run outside a git repo** ("Not inside a trusted directory").
-  `git init` first. `--skip-git-repo-check` exists but defeats the review step
-  that makes delegation safe.
-- **Every run costs roughly 15k input tokens before it reads your prompt** —
-  system prompt plus repo context. Batch related work into one run; a dozen
-  micro-handoffs are mostly floor.
-- 🚩 **Never `--dangerously-bypass-approvals-and-sandbox`.** That is the YOLO
-  switch and it drops the sandbox entirely. `-s workspace-write` is the flag
-  BLD uses.
-
-### Gemini — the fallback
-
-Free tier, and the better first suggestion for anyone not already paying OpenAI.
-
-```bash
 npm install -g @google/gemini-cli
-gemini                               # first run prompts for auth; THE USER signs in
+gemini                           # first run prompts for auth; THE USER signs in
 ```
 
-- Sign in with a **Google account** rather than pasting an API key. The
-  API-key free tier is roughly **20 requests a day** and runs dry after about
-  one handoff; account auth raises it substantially.
-- 🚩 **Never `-y` / `--yolo`.** `--approval-mode auto_edit` approves edit tools
-  only, which is what BLD uses.
-- Quirk worth pre-empting: **gemini exits 255 even on success.** Judge by the
-  response and the diff, not the exit code, or you will chase a failure that
-  did not happen.
+Prove it works rather than assuming: `codex exec "reply with one word: ready"`.
 
-### After either one
+Four things that have actually bitten:
 
-Update the delegation block in `~/.claude/CLAUDE.md` to name the executor they
-actually installed and the account it uses. If they installed neither, say so in
-that file explicitly, so Claude stops offering delegation it cannot perform.
+- **Codex refuses to run outside a git repo.** `git init` first.
+- **Each `codex exec` costs ~15k input tokens before reading your prompt.** Batch
+  work; many small handoffs are mostly floor.
+- **Gemini exits 255 even on success.** Judge by the diff, not the exit code.
+- 🚩 **Never `--dangerously-bypass-approvals-and-sandbox` (Codex) or `-y` /
+  `--yolo` (Gemini).** Those drop the sandbox. BLD uses `-s workspace-write` and
+  `--approval-mode auto_edit`.
 
-## Phase 4 — the CLAUDE.md layers (merge, never overwrite)
+Then update the delegation block in `~/.claude/CLAUDE.md` to name what they
+installed, or mark it unavailable so Claude stops offering it.
 
-BLD is three layers, each holding only what is true at that level:
+## Phase 8 — the CLAUDE.md rules
+
+Two layers:
 
 | File | Holds | From |
 |---|---|---|
-| `~/.claude/CLAUDE.md` | Machine-wide: who you are, security drill, install rules, dev loop, delegation | `templates/CLAUDE.global.md` |
-| `<workspace>/CLAUDE.md` | Mission, skill routing table, guardrails, deploy conventions | `templates/CLAUDE.workspace.md` |
-| `<app>/CLAUDE.md` | Per-app purpose, stack, status. ~30 lines. | `/bld-sprint-init` writes it |
+| `~/.claude/CLAUDE.md` | Machine-wide: who you are, security drill, dev loop | `templates/CLAUDE.global.md` |
+| `<workspace>/CLAUDE.md` | Mission, routing table, guardrails, deploy conventions | `templates/CLAUDE.workspace.md` |
 
-**If `~/.claude/CLAUDE.md` already exists, do not overwrite it.** Show them a diff
-of what BLD would add, section by section, and let them choose. Their existing
-file has their rules in it and those rules outrank yours.
+**If `~/.claude/CLAUDE.md` exists, do not overwrite it.** Show a diff of what BLD
+would add and let them choose. Their rules outrank yours.
 
-Both templates ship with the personal details stripped and marked `<FILL IN>`.
-Walk the user through the ones that actually change behaviour:
+Four `<FILL IN>` blocks change behaviour and deserve their attention:
 
-- **Who you're working with** — experience level drives how much gets explained.
-- **Deploy target** — GitHub account, whether repos are private, Vercel or not.
-- **Delegation** — the `/bld-runtime-agents` block assumes a Codex login. No Codex? Say so
-  in the file, so Claude stops offering it.
-- **The dev-loop rules** — never auto-push, always hand back a localhost link,
-  keep the server running. These are the ones that change day-to-day behaviour
-  most, so make sure they're actually wanted rather than pasted past.
+1. **Who they are** — decides how much gets explained.
+2. **GitHub username** — used by `/bld-util-deploy`.
+3. **Delegation** — mark unavailable if they skipped Phase 7.
+4. **The dev loop** — server stays up, localhost link instead of opening their
+   browser, and **never push without being asked**. Worth reading, not skimming.
 
-## Phase 5 — restart, then verify
+## Phase 9 — restart, then verify
 
-**Skills, hooks and plugins register at startup.** Nothing installed above is live
-until Claude Code restarts. Say this plainly; it is the number one reason a fresh
+**Skills, hooks and plugins register at startup.** Nothing installed is live
+until Claude Code restarts. Say this plainly. It is the number one reason a fresh
 setup looks broken.
 
-After the restart, verify rather than assume:
+After restarting:
 
 ```bash
-ls -1 ~/.claude/skills/ | wc -l
-react-doctor --version; claude-monitor --version; vercel --version
+python <BLD>/skills/bld-setup/scripts/preflight.py
 ```
 
-Then have them type `/bld-` and confirm the skills autocomplete. A skill that is
-present on disk but absent from the picker means the frontmatter didn't parse —
-check `name:` and `description:` are both present and unquoted-safe.
+Then have them type `/bld-` and confirm the commands appear. A skill on disk but
+missing from the list means its frontmatter did not parse.
 
-Close with what got installed, what got skipped and why, and the one-line
-reminder that `/bld-sprint-init` is where a first app starts.
+Close with what was installed, what was skipped, and that
+`/bld-sprint-planning` is where a first app starts.
+
+Set `completed: true` in the state file.
 
 ## Pitfalls
 
-- **Installing before printing the manifest.** The whole skill exists to not do
-  this. If the user says "just install everything", still print the table first —
-  it takes one message and it is the only chance they get to object.
-- **Overwriting an existing `~/.claude/CLAUDE.md`.** Merge or ask. Always.
-- **Claiming success before restart.** Verify after, not before.
-- **Chaining installs with `&&`.** One dead repo kills the rest of the batch.
-- **Adding MCP servers to `.mcp.json`** because it's easier than the on-demand
-  runner. That trades the entire trust model for a few saved keystrokes.
-- **Forgetting the gstack re-prune** after an upgrade.
-- **Assuming the skill-add flags.** `-a claude` is wrong, `-a claude-code` is right,
-  and no flag at all silently installs somewhere Claude Code never looks.
+- **Installing before printing the manifest.** Even when told "just install
+  everything" — printing costs one message and is their only chance to object.
+- **Skipping preflight on a resume.** It is what tells you where you are.
+- **Overwriting an existing `~/.claude/CLAUDE.md`.** Merge or ask.
+- **Treating installed as authenticated.** `gh --version` passes on a signed-out
+  CLI, and `/bld-util-deploy` fails on one.
+- **Claiming success before a restart.**
+- **Chaining installs with `&&`.** One dead repo kills the batch.
+- **Re-running the full flow for a returning user.** That is Phase 6.
+- **Asking a first-timer to choose global vs project scope.** Recommend global.
+- **Over-explaining.** See the voice rules at the top. Beginners need the
+  unfamiliar explained, not everything.

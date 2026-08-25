@@ -3,6 +3,18 @@
 Everything `/bld-setup` can put on a machine. **Print this table verbatim before
 installing anything.** Nothing here is installed silently.
 
+Three different kinds of thing live in this table, and they get confused:
+
+| Kind | What it is | Where |
+|---|---|---|
+| **Plugin** | A Claude Code extension, loaded at startup | S1 |
+| **Skill** | Markdown instructions Claude reads | S2, S3, S6 |
+| **CLI** | An ordinary command-line program | S4 |
+| **MCP server** | A data source Claude queries | S5 |
+
+**There is no GitHub plugin and no Vercel plugin.** `gh` and `vercel` are
+plain CLIs in S4 that `/bld-util-deploy` shells out to.
+
 **Runs code?** is the column that matters most for trust. `md` = pure markdown, it
 can only ever suggest text. `code` = ships scripts or binaries that execute on your
 machine. Read the source of anything marked `code` before you accept it.
@@ -111,7 +123,7 @@ so none of them ever ambiently sees your codebase.
 ## 7. NOT installed — opt-in, and most cost money
 
 Listed so you know they exist and know BLD did not put them on your machine.
-`/bld-setup` Phase 3.5 offers to walk you through Codex or Gemini if you want
+`/bld-setup` Phase 7 offers to walk you through Codex or Gemini if you want
 `/bld-runtime-agents`. The user does every login themselves.
 
 | Tool | Why it's separate | Verify at |

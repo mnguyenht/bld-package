@@ -7,8 +7,11 @@ read by Claude Code on someone else's machine.
 - **Users:** people who want the BLD workflow without rebuilding it. Installed via
   `/bld-setup`.
 - **Monetization:** none. Public, free, credit-the-sources.
-- **Stack:** markdown, plus `skills/bld-runtime-activate-mcps/run.py` (MCP runner) and
-  `skills/bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader).
+- **Stack:** markdown, plus four helper scripts where the work must be deterministic:
+  `bld-setup/scripts/preflight.py` (environment + resume state),
+  `bld-professional-mode/scripts/switch-mode.py` (renames every command),
+  `bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader),
+  `bld-runtime-activate-mcps/run.py` (MCP runner).
 
 ## The rule that matters here
 
@@ -46,11 +49,22 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   instructions to a model and follow the existing house style instead.
 - **Two things must stay in sync:** the credits table in `README.md` and
   `skills/bld-setup/references/manifest.md`. Different readers, same facts.
-- **Adding a skill?** Update three places: its own `SKILL.md`, the phase table in
-  `README.md`, and the routing table in `templates/CLAUDE.workspace.md`.
+- **Adding a skill? Four places.** Its own `SKILL.md`, the `SKILLS` table in
+  `bld-professional-mode/scripts/switch-mode.py` (the canonical taxonomy, and the
+  rename breaks without it), the type table in `README.md`, and the routing table
+  in `templates/CLAUDE.workspace.md`.
+- **Renaming a command?** Add the old name to `LEGACY` in that same script rather
+  than editing `SKILLS` in place, so existing installs still migrate.
+- **`bld-professional-mode` is exempt from the rename pass** (`NO_REWRITE`). Its docs
+  deliberately hold both naming schemes; rewriting them collapsed every example
+  into "x becomes x" the first time it ran.
 
 ## Status
 
-All 21 skills present. `bld-setup`, `bld-app-optimize` and `bld-planning` are new
-and have not been run end to end by a real user yet. `lh-report.mjs` is verified
-against a live Lighthouse v13.4.1 report. No LICENSE file yet.
+21 skills. Naming is prefix-type-skill by default; `/bld-professional-mode on`
+switches to short names and the round trip is verified byte-identical.
+
+Verified: `lh-report.mjs` against a live Lighthouse v13.4.1 report, `preflight.py`
+on a real machine, `switch-mode.py` across two full round trips.
+
+Not yet run end to end by a real new user: `/bld-setup`. No LICENSE file.
