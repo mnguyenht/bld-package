@@ -125,7 +125,7 @@ the server is connected for your whole session rather than for one batch.
 
 ---
 
-## 7. NOT installed — opt-in, and most cost money
+## 7. NOT installed — opt-in, and one of them costs money
 
 Listed so you know they exist and know BLD did not put them on your machine.
 `/bld-setup` Phase 7 offers to walk you through Codex or Gemini if you want

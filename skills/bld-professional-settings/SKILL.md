@@ -13,7 +13,7 @@ behaviour, different thing to type.
 | **friendly** (default) | `bld-<type>-<skill>` | `/bld-sprint-init` | Learning the set. Typing `/bld-` groups everything by type, so the list teaches you the taxonomy. |
 | **pro** | `bld-<skill>` | `/bld-init` | Knowing the set. The type is confirmation you no longer need, so it just costs keystrokes. |
 
-Neither is better. Friendly is the default because a first-timer facing 21
+Neither is better. Friendly is the default because a first-timer facing 22
 unfamiliar commands benefits from the grouping, and a pro can switch in one
 command.
 
@@ -115,13 +115,15 @@ trap, and this one renames every other command in the package.
 ## Adding a skill later
 
 Add one row to `SKILLS` in the script, giving its type, friendly name and pro
-name. The script picks it up on the next run. **If the type is a new one, add it
-to the type table above too** — this file is deliberately excluded from the
-rename pass, so nothing here is ever updated automatically, and the table went a
-whole category stale exactly this way. It also carries a `LEGACY` dict
+name. The script picks it up on the next run. It also carries a `LEGACY` dict
 mapping retired names to their row, so an older install migrates cleanly instead
 of leaving orphans — add to it rather than editing `SKILLS` in place when a
 command gets renamed.
+
+**If the type is a new one, add it to the type table above by hand.** This file
+is deliberately excluded from the rename pass, so nothing in it is ever updated
+automatically. The table sat a whole category stale exactly this way, and so did
+the command count two paragraphs up.
 
 If a folder is not in the table, the script says so and leaves it alone. It never
 guesses, and it refuses to overwrite an existing folder rather than clobbering it.

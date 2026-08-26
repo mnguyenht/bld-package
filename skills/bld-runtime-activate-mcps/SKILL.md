@@ -1,6 +1,6 @@
 ---
 name: bld-runtime-activate-mcps
-description: Run the third-party code-optimizer MCP servers (jcodemunch, context-mode) on-demand for a single burst of code search, then shut them down — no persistent connection. Use when the user says /bld-runtime-activate-mcps, "hard optimize", "token-optimize this search", or is about to do a big code sprint across many files and wants compact, cheap code exploration.
+description: Run the third-party code-optimizer MCP servers (jcodemunch, context-mode, shadcn) on-demand for a single burst of code search, then shut them down — no persistent connection. Use when the user says /bld-runtime-activate-mcps, "hard optimize", "token-optimize this search", or is about to do a big code sprint across many files and wants compact, cheap code exploration.
 ---
 
 # bld-runtime-activate-mcps — burst-use the optimizer MCPs, then dip
@@ -44,8 +44,8 @@ The runner spawns the server, runs a batch of tool calls, prints results with
 token counts, then terminates. Feed it a JSON array of calls on stdin:
 
 ```bash
-cd <project-root>
-python <BLD>/bld-runtime-activate-mcps/run.py jcodemunch <<'EOF'
+cd "<project-root>"
+python "<BLD>/bld-runtime-activate-mcps/run.py" jcodemunch <<'EOF'
 [
   {"name": "list_repos", "arguments": {}},
   {"name": "search_text", "arguments": {"repo": "REPO", "query": "var("}}
@@ -86,7 +86,7 @@ when building/adding shadcn components so you pull real registry data instead of
 guessing. Pass `shadcn` as the server arg:
 
 ```bash
-python <BLD>/bld-runtime-activate-mcps/run.py shadcn <<'EOF'
+python "<BLD>/bld-runtime-activate-mcps/run.py" shadcn <<'EOF'
 [{"name":"search_items_in_registries","arguments":{"registries":["@shadcn"],"query":"dialog"}},
  {"name":"get_item_examples_from_registries","arguments":{"registries":["@shadcn"],"query":"dialog"}}]
 EOF

@@ -64,7 +64,7 @@ file holds only what's specific to this workspace.
 | Long session, context rotting | `/bld-util-handoff` → `/clear` → "read handoff.md and continue" |
 | Session starts and `handoff.md` exists | offer to resume from it |
 | Want the MCP servers connected all session instead of per-query | `/bld-mcp-settings on <server>` — writes them into `.mcp.json`. `off` removes them. Enable `context-mode` only on its own, never in a bundle |
-| These command names are too long to type | `/bld-professional-settings on` — pro mode drops the type segment from all 21 names, so each becomes noticeably shorter. `off` returns to the long ones |
+| These command names are too long to type | `/bld-professional-settings on` — pro mode drops the type segment from all 22 names, so each becomes noticeably shorter. `off` returns to the long ones |
 | Change done & user explicitly says ship it | `/bld-util-deploy` (established app = just commit + push) — NOT after every edit |
 | App about to **charge users** | install a Stripe skill |
 | App needs **accounts/DB/backend** | install a Supabase skill |

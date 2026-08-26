@@ -94,7 +94,7 @@ here means they never see a traceback at all. Anything
 below 3.7 is too old (preflight uses `subprocess.run(capture_output=)`):
 
 ```bash
-python3 -c "import sys; print(sys.version_info[:2])"
+python3 -c "import sys;print(sys.version_info[:2])" || python -c "import sys;print(sys.version_info[:2])" || py -c "import sys;print(sys.version_info[:2])"
 ```
 
 Note which of `python` / `python3` / `py` worked. That is `<PY>` for the rest of
@@ -107,7 +107,7 @@ exist at all, so guessing it silently breaks things that never report an error.
 Read-only: it installs nothing.
 
 **If they want BLD scoped to one project rather than global, pass that project:**
-`<PY> <resolved path>/skills/bld-setup/scripts/preflight.py --project <project dir>`.
+`<PY> "<resolved path>/skills/bld-setup/scripts/preflight.py" --project "<project dir>"`.
 Without it preflight looks for a project-scoped install in the *current*
 directory, which during setup is the package folder, so a real install sitting
 in their project reads as absent and the verdict says to install it all again.
@@ -560,7 +560,7 @@ setup looks broken.
 After restarting:
 
 ```bash
-<PY> <resolved path>/skills/bld-setup/scripts/preflight.py
+<PY> "<resolved path>/skills/bld-setup/scripts/preflight.py"
 ```
 
 Same `--project <project dir>` rule as Phase 0c if the install was scoped to one

@@ -57,10 +57,10 @@ absolute path, and name the project with `--root`:
 ```bash
 PY=~/.claude/skills/bld-mcp-settings/scripts/mcp-settings.py   # or the scoped path
 
-python3 "$PY" status                          --root <project>
-python3 "$PY" on  jcodemunch shadcn           --root <project>
-python3 "$PY" off jcodemunch                  --root <project>
-python3 "$PY" off --all                       --root <project>
+python3 "$PY" status                          --root "<project>"
+python3 "$PY" on  jcodemunch shadcn           --root "<project>"
+python3 "$PY" off jcodemunch                  --root "<project>"
+python3 "$PY" off --all                       --root "<project>"
 ```
 
 `--root` defaults to the current directory, so it can be omitted when you are
@@ -73,7 +73,7 @@ exists and what is in it.
 
 Servers: `jcodemunch`, `context-mode`, `shadcn`.
 
-Add `--root <path>` to target a project other than the current directory.
+Add `--root "<path>"` to target a project other than the current directory.
 `.mcp.json` is per-project, so the working directory decides which project you
 are configuring. Getting that wrong writes config into the wrong repo.
 

@@ -380,7 +380,7 @@ def main():
             print("  RECHECK     : " + ", ".join(unproven))
             print("                marked done, but not found on disk. The state")
             print("                file is wrong. Re-install these, do not skip them.")
-        print("  -> Skip Phase 1-2. Pick up at the first item in 'Still to do'.")
+        print("  -> Skip Phases 1-3. Pick up at the first item in 'Still to do'.")
     else:
         declined = state.get("declined", [])
         print("  RETURNING USER. Setup was completed on " + str(state.get("completed_on", "?")) + ".")

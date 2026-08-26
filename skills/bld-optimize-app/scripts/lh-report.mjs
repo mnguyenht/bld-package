@@ -144,7 +144,10 @@ if (weighted.length) {
 // ── LCP phase breakdown: WHY is LCP slow, not just THAT it is ───────────────
 const lcpPhases = first.audits["largest-contentful-paint-element"]?.details?.items?.find((i) => i.type === "table");
 if (lcpPhases?.items?.length) {
-  console.log(`\n== LCP BREAKDOWN ==`);
+  // Run 1 only, and labelled as such. Everything else here is a median, but the
+  // LCP element can differ between runs, and averaging the phase split of two
+  // different elements produces a breakdown of nothing.
+  console.log(`\n== LCP BREAKDOWN (run 1 only${runs.length > 1 ? ", not a median" : ""}) ==`);
   const el = first.audits["largest-contentful-paint-element"]?.details?.items?.[0]?.items?.[0]?.node;
   if (el) console.log(`  element: ${(el.nodeLabel ?? el.snippet ?? "").slice(0, 90)}`);
   for (const row of lcpPhases.items) {
@@ -159,10 +162,19 @@ if (lcpPhases?.items?.length) {
 // Medianed across runs like everything else above. This used to read run 0
 // only, while the header promised medians, so one unlucky run could put a
 // nonexistent 1000 ms opportunity at the top of the list, or bury a real one.
-const opps = Object.entries(first.audits)
-  .filter(([, a]) => a.details && (a.details.overallSavingsMs > 0 || a.details.overallSavingsBytes > 0))
-  .map(([id, a]) => ({
-    title: a.title,
+// The candidate list is the UNION of all runs. Taking it from run 0 alone meant
+// an opportunity that happened to show zero savings in the first run never
+// appeared at all, however large it was in the other two — the medians below
+// were honest, but only for the rows one unlucky run had already let through.
+const oppIds = new Set(
+  runs.flatMap((r) =>
+    Object.entries(r.audits)
+      .filter(([, a]) => a.details && (a.details.overallSavingsMs > 0 || a.details.overallSavingsBytes > 0))
+      .map(([id]) => id)),
+);
+const opps = [...oppIds]
+  .map((id) => ({
+    title: first.audits[id]?.title ?? id,
     savedMs: median(runs.map((r) => r.audits[id]?.details?.overallSavingsMs ?? 0)) ?? 0,
     savedKb: Math.round((median(runs.map((r) => r.audits[id]?.details?.overallSavingsBytes ?? 0)) ?? 0) / 1024),
   }))

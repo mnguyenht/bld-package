@@ -150,7 +150,10 @@ deterministic; only performance needs the repeats.
 node <skill>/scripts/lh-report.mjs lh-r1.json lh-r2.json lh-r3.json
 ```
 
-That prints medians for everything, plus the four things that matter:
+That prints medians for everything except the LCP phase breakdown, which is
+run 1 alone and says so — the LCP element can differ between runs, and the
+average of two different elements' phases describes neither. Plus the four
+things that matter:
 
 **1. Which metric is costing the points.** The performance score is five weighted
 metrics, and the weights are lopsided — TBT and LCP together are usually well

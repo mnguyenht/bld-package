@@ -3,7 +3,7 @@
 **A lightweight agent skillset for every step of the building process.**
 
 Ask Claude Code to build something and it will. Ask it twice and you get two
-different processes. BLD gives the process a shape: 21 slash commands, one per
+different processes. BLD gives the process a shape: 22 slash commands, one per
 step, each carrying the checklist and the gotchas for that step.
 
 Decide what is worth building with `/bld-sprint-planning`. Build it with
