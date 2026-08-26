@@ -13,10 +13,14 @@ step, every table, every hard rule applies unchanged. The executor pool already
 defaults to sonnet, so the workers sit below the boss without any re-tiering.
 Nothing here overrides a rule there.
 
-`model: opus` pins the boss seat for the invoking turn only — the session model
-resumes on the next prompt, and this loop spans several turns. For a loop that stays
-on Opus the whole way, the user runs `/model opus` before starting. Ultracode is a
-session toggle the user sets, not something a skill can turn on.
+**Do not rely on `model: opus` to put this loop in the top seat.** Verified
+2026-08-26: reaching this skill through the Skill tool mid-turn does not change the
+model at all — the turn finishes on whatever the session was already running.
+Whether a user-typed `/bld-orchestrator-opus` *starts* its turn on Opus has not been
+tested, and even at best that covers one turn of a loop spanning several. The
+reliable path is the user running `/model opus` before starting. Treat the
+frontmatter as a hint, never a guarantee.
+Ultracode is a session toggle the user sets, not something a skill can turn on.
 
 The one judgment shift: `bld-executor` @ opus puts a worker in the same seat as the
 boss, so the "hardest stream" escalation buys no tier gap here — only a clean, fresh

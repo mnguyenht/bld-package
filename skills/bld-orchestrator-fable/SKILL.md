@@ -14,9 +14,13 @@ an executor.
 The reasoning is a thin slice of the work; the grinding is the thick slice. This skill
 keeps the reasoning in one seat and pushes the grinding out to workers running at once.
 
-`model: fable` pins the boss seat for the invoking turn only — the session model
-resumes on the next prompt, and this loop spans several turns. For a loop that stays in
-the top seat the whole way, the user runs `/model fable` before starting.
+**Do not rely on `model: fable` to put this loop in the top seat.** Verified
+2026-08-26: reaching this skill through the Skill tool mid-turn does not change the
+model at all — the turn finishes on whatever the session was already running.
+Whether a user-typed `/bld-orchestrator-fable` *starts* its turn on Fable has not been
+tested, and even at best that covers one turn of a loop spanning several. The
+reliable path is the user running `/model fable` before starting. Treat the
+frontmatter as a hint, never a guarantee.
 
 ## The executor pool
 
