@@ -71,12 +71,20 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   deliberately hold both naming schemes; rewriting them collapsed every example
   into "x becomes x" the first time it ran.
 - **Never write a literal `/bld-*` example of the *other* naming mode in any file
-  except that one.** Every other doc gets rewritten, so an example like "becomes
-  the short name `/bld-refine`" is silently converted to `/bld-sprint-refine` on
-  the next mode switch and the sentence ends up contradicting itself. This is not
-  hypothetical: it happened to a line in `templates/CLAUDE.workspace.md` within an
-  hour of it being written. Describe the shape of the change in words instead of
-  naming a command, and the rewriter has nothing to grab.
+  except that one.** Every other doc gets rewritten, so a sentence that names a
+  command's short form and contrasts it with its type-prefixed form has BOTH
+  halves converted to the same string on the next mode switch, and is left
+  claiming that a name is silently converted into itself. Worse, the damage is
+  permanent: once both halves match, no later switch can tell them apart again.
+  This is not hypothetical and it is not rare. It happened to a line in
+  `templates/CLAUDE.workspace.md` within an hour of it being written, and then it
+  happened to this very rule, whose own worked example was flattened by the pass
+  it exists to warn about — caught only because the naming round trip stopped
+  coming back byte-identical. Describe the shape of the change in words instead
+  of naming a command, and the rewriter has nothing to grab.
+- **Run the naming round trip before committing docs.** `switch-mode.py on`, then
+  `off`, then `git status`. Anything but a clean tree means the pass is not
+  reversible on your text, and the diff shows you exactly which sentence it ate.
 - **The rename pass rewrites three shapes**, all in `switch-mode.py`: `/command`,
   `skills/<name>/` paths, and the `# <name>` H1 title. The H1 pattern was added
   after 16 of 21 skills were found still carrying their pre-rename titles, since
