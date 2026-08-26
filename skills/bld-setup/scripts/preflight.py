@@ -2,6 +2,7 @@
 """BLD setup preflight: what's here, what's missing, and where we left off.
 
     python preflight.py
+    python preflight.py --project /path/to/your-app
 
 Prints three things:
   1. PREREQUISITES  - the tools without which the install cannot start
@@ -41,6 +42,26 @@ HOME = os.path.expanduser("~")
 CLAUDE = os.path.join(HOME, ".claude")
 STATE = os.path.join(CLAUDE, ".bld-setup.json")
 
+
+def project_dir(argv):
+    """Where a project-scoped install would live.
+
+    Defaults to the current directory, which is wrong more often than it looks:
+    /bld-setup runs this from the package folder it was cloned into, so a real
+    project-scoped install in some other directory read as "nothing installed",
+    and the verdict then told a returning user to install everything again.
+    Name the project instead:  --project /path/to/your-app
+    """
+    for i, a in enumerate(argv):
+        if a.startswith("--project="):
+            return os.path.abspath(a.split("=", 1)[1])
+        if a == "--project" and i + 1 < len(argv):
+            return os.path.abspath(argv[i + 1])
+    return os.getcwd()
+
+
+PROJECT = project_dir(sys.argv[1:])
+
 # skill-group key -> the skills it installs, for inventory purposes
 CORE_SKILLS = [
     "emil-design-eng", "animation-vocabulary", "review-animations",
@@ -74,6 +95,56 @@ def run(args, timeout=15):
         return p.returncode == 0, out.strip().splitlines()[0] if out.strip() else ""
     except Exception as e:
         return False, str(e)[:60]
+
+
+def expected_bld_names():
+    """{"friendly": {folder names...}, "pro": {...}}, or {} if unknown.
+
+    The canonical table lives in the professional-settings skill. That skill is
+    a sibling of this one in BOTH layouts (the package, and ~/.claude/skills
+    after install) and is one of the few whose own name never changes between
+    modes, so this relative path holds either way.
+
+    Reading names beats counting folders. The old count came from listing the
+    package's own skills/ directory, which had two failure modes: an unrelated
+    bld-* folder on the machine silently stood in for a skill that never copied,
+    and when preflight ran from an installed copy the same walk landed on
+    ~/.claude/skills itself, comparing the install to itself.
+    """
+    table = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                         "bld-professional-settings", "scripts", "switch-mode.py")
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("bld_switch_mode", table)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return {"friendly": set(f for _, f, _ in mod.SKILLS.values()),
+                "pro": set(p for _, _, p in mod.SKILLS.values())}
+    except Exception:
+        return {}
+
+
+def installed_plugins():
+    """Plugin names whose files are actually on disk.
+
+    settings.json's enabledPlugins records intent only: a plugin whose download
+    failed, or whose cache was deleted later, still sits in that list forever.
+    Claude Code writes the real install path into the plugin registry, so check
+    that the directory it names is still there.
+    """
+    reg = os.path.join(CLAUDE, "plugins", "installed_plugins.json")
+    out = set()
+    try:
+        data = json.load(io.open(reg, encoding="utf-8")).get("plugins", {})
+    except Exception:
+        return out
+    for key, entries in data.items():
+        if not isinstance(entries, list):
+            entries = [entries]
+        for e in entries:
+            if isinstance(e, dict) and os.path.isdir(e.get("installPath") or ""):
+                out.add(key.split("@")[0])
+    return out
 
 
 def row(label, ok, detail=""):
@@ -140,28 +211,33 @@ def main():
     present = set()
     scopes = []
     for label, d in (("global", os.path.join(CLAUDE, "skills")),
-                     ("project", os.path.join(os.getcwd(), ".claude", "skills"))):
+                     ("project", os.path.join(PROJECT, ".claude", "skills"))):
         if os.path.isdir(d):
             found = set(os.listdir(d))
             present |= found
             if any(s.startswith("bld-") for s in found):
                 scopes.append(label)
+    print("  project scope checked: " + os.path.join(PROJECT, ".claude"))
 
     core_have = [s for s in CORE_SKILLS if s in present]
-    bld_have = sorted(s for s in present if s.startswith("bld-"))
+    bld_names = set(s for s in present if s.startswith("bld-"))
+    bld_have = sorted(bld_names)
 
-    # How many bld-* skills SHOULD be there. Counting the package we are running
-    # from keeps this correct as skills are added, where a hardcoded 21 would
-    # quietly go stale. Only trust it when this really is the package and not an
-    # installed copy: from ~/.claude/skills/bld-setup/scripts/ the same walk
-    # lands on ~/.claude/skills itself, and comparing the install to itself
-    # always passes, which is the exact bug this is here to catch.
-    pkg = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    # Which bld-* skills SHOULD be there, by NAME, in whichever naming mode this
+    # machine is in. Comparing sets rather than counts is the point: a count let
+    # any unrelated bld-* folder cover for a skill that never copied.
+    expected = expected_bld_names()
+    bld_missing = []
     bld_expected = 0
-    if os.path.isfile(os.path.join(pkg, "README.md")) and \
-       os.path.isdir(os.path.join(pkg, "templates")):
-        bld_expected = len([d for d in os.listdir(os.path.join(pkg, "skills"))
-                            if d.startswith("bld-")])
+    mode_note = ""
+    if expected:
+        # Whichever mode is closer to what is on disk is the one being run. A
+        # tree that matches neither is usually a half-finished mode switch, and
+        # naming the leftovers from the nearer mode is the useful thing to say.
+        best = min(expected, key=lambda m: len(expected[m] - bld_names))
+        bld_missing = sorted(expected[best] - bld_names)
+        bld_expected = len(expected[best])
+        mode_note = best
     gstack_have = "gstack" in present
     impec_have = "impeccable" in present
 
@@ -175,17 +251,20 @@ def main():
     # looking only in the home directory reported a working install as broken.
     agent_have = any(
         os.path.isfile(os.path.join(d, "agents", "bld-executor.md"))
-        for d in (CLAUDE, os.path.join(os.getcwd(), ".claude")))
-    bld_ok = (len(bld_have) >= bld_expected if bld_expected
-              else bool(bld_have)) and agent_have
+        for d in (CLAUDE, os.path.join(PROJECT, ".claude")))
+    bld_ok = bool(bld_names) and not bld_missing and agent_have
     if not bld_have:
         bld_note = "none"
     elif bld_expected:
-        bld_note = "%d of %d (%s)" % (len(bld_have), bld_expected, "+".join(scopes))
-        if len(bld_have) < bld_expected:
-            bld_note += "  PARTIAL - copy did not finish"
+        bld_note = "%d of %d (%s, %s mode)" % (
+            len(expected[mode_note] & bld_names), bld_expected,
+            "+".join(scopes), mode_note)
+        if bld_missing:
+            bld_note += "  MISSING: " + ", ".join(bld_missing[:4])
+            if len(bld_missing) > 4:
+                bld_note += " +%d more" % (len(bld_missing) - 4)
     else:
-        bld_note = "%d found (%s), expected count unknown" % (
+        bld_note = "%d found (%s), expected names unknown" % (
             len(bld_have), "+".join(scopes))
     row("bld-* skills", bld_ok, bld_note)
     row("gstack", gstack_have, "")
@@ -198,8 +277,20 @@ def main():
             enabled = json.load(io.open(settings, encoding="utf-8")).get("enabledPlugins", {})
         except Exception:
             pass
-    plug_have = [p for p in PLUGINS if any(k.startswith(p) for k in enabled)]
-    row("plugins", len(plug_have) == len(PLUGINS), "%d of %d" % (len(plug_have), len(PLUGINS)))
+    # A plugin counts as installed only when it is BOTH enabled in settings and
+    # present on disk. Enabled-only was the old test, and it reported a plugin
+    # that failed to load as fine. Exact key match, too: `startswith` let a
+    # `ponytail-something@...` key answer for `ponytail`.
+    on_disk = installed_plugins()
+    enabled_names = set(k.split("@")[0] for k in enabled)
+    plug_have = [p for p in PLUGINS if p in enabled_names and p in on_disk]
+    plug_note = "%d of %d" % (len(plug_have), len(PLUGINS))
+    for p in PLUGINS:
+        if p in enabled_names and p not in on_disk:
+            plug_note += "  %s: enabled but not on disk (did not install)" % p
+        elif p in on_disk and p not in enabled_names:
+            plug_note += "  %s: on disk but not enabled" % p
+    row("plugins", len(plug_have) == len(PLUGINS), plug_note)
 
     cli_have = {}
     for cli in ("react-doctor", "react-scan", "claude-monitor"):

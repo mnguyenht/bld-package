@@ -103,21 +103,42 @@ const perfRefs = first.categories.performance?.auditRefs ?? [];
 const weighted = perfRefs.filter((a) => a.weight > 0).sort((a, b) => b.weight - a.weight);
 
 if (weighted.length) {
-  const totalW = weighted.reduce((s, a) => s + a.weight, 0);
+  // Score every metric BEFORE dividing up the weight. An audit that did not run
+  // — errored, or notApplicable on this page — medians to a null score. It used
+  // to keep its weight in the denominator anyway, which quietly shrank every
+  // other metric's share, and it printed "-0" lost, which reads as "measured,
+  // costing nothing". Both are wrong: nothing was measured. Shares are now over
+  // the metrics that actually ran, and the ones that didn't say so.
+  const rows = weighted.map((ref) => ({
+    ref,
+    val: median(runs.map((r) => r.audits[ref.id]?.numericValue)),
+    sc: median(runs.map((r) => r.audits[ref.id]?.score)),
+  }));
+  const measured = rows.filter((r) => r.sc !== null);
+  const totalW = measured.reduce((s, r) => s + r.ref.weight, 0);
   console.log(`\n== PERFORMANCE METRICS — where the points actually are ==`);
   console.log(`     value    score  weight  lost   metric`);
-  for (const ref of weighted) {
-    const val = median(runs.map((r) => r.audits[ref.id]?.numericValue));
-    const sc = median(runs.map((r) => r.audits[ref.id]?.score));
-    const share = ref.weight / totalW;
-    const lost = sc === null ? 0 : (1 - sc) * share * 100;
+  for (const row of rows) {
+    const title = first.audits[row.ref.id]?.title ?? row.ref.id;
+    if (row.sc === null || !totalW) {
+      console.log(`  ${ms(row.val).padStart(8)}  ${pct(null)}     -      -   ${title}  (not measured)`);
+      continue;
+    }
+    const share = row.ref.weight / totalW;
+    const lost = (1 - row.sc) * share * 100;
     const flag = lost >= 10 ? " ←── the problem" : lost >= 4 ? " ←" : "";
     console.log(
-      `  ${ms(val).padStart(8)}  ${pct(sc)}   ${String(Math.round(share * 100)).padStart(3)}%  ` +
-        `${("-" + lost.toFixed(0)).padStart(5)}   ${first.audits[ref.id].title}${flag}`,
+      `  ${ms(row.val).padStart(8)}  ${pct(row.sc)}   ${String(Math.round(share * 100)).padStart(3)}%  ` +
+        `${("-" + lost.toFixed(0)).padStart(5)}   ${title}${flag}`,
     );
   }
   console.log(`  "lost" = points this metric costs the 100. Fix the biggest number, not the ugliest one.`);
+  if (measured.length < rows.length) {
+    console.log(
+      `  ${rows.length - measured.length} metric(s) did not run, so the weights above are shares of the ` +
+        `${Math.round((totalW / weighted.reduce((s, a) => s + a.weight, 0)) * 100)}% that did.`,
+    );
+  }
 }
 
 // ── LCP phase breakdown: WHY is LCP slow, not just THAT it is ───────────────
