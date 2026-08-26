@@ -43,36 +43,6 @@ CLAUDE = os.path.join(HOME, ".claude")
 STATE = os.path.join(CLAUDE, ".bld-setup.json")
 
 
-def project_dir(argv):
-    """Where a project-scoped install would live.
-
-    Defaults to the current directory, which is wrong more often than it looks:
-    /bld-setup runs this from the package folder it was cloned into, so a real
-    project-scoped install in some other directory read as "nothing installed",
-    and the verdict then told a returning user to install everything again.
-    Name the project instead:  --project /path/to/your-app
-
-    Returns (path, was_given_explicitly).
-    """
-    path, explicit, i = os.getcwd(), False, 0
-    while i < len(argv):
-        a = argv[i]
-        if a.startswith("--project="):
-            path, explicit = os.path.abspath(a.split("=", 1)[1]), True
-        elif a == "--project" and i + 1 < len(argv):
-            path, explicit, i = os.path.abspath(argv[i + 1]), True, i + 1
-        else:
-            # Never ignore an argument we do not understand. A typo'd flag that
-            # silently falls back to the current directory recreates the exact
-            # bug --project exists to fix, and does it invisibly.
-            sys.exit("preflight: unrecognised argument %r\n"
-                     "usage: preflight.py [--project <dir>]" % a)
-        i += 1
-    return path, explicit
-
-
-PROJECT, PROJECT_EXPLICIT = project_dir(sys.argv[1:])
-
 # skill-group key -> the skills it installs, for inventory purposes
 CORE_SKILLS = [
     "emil-design-eng", "animation-vocabulary", "review-animations",
@@ -106,6 +76,34 @@ def run(args, timeout=15):
         return p.returncode == 0, out.strip().splitlines()[0] if out.strip() else ""
     except Exception as e:
         return False, str(e)[:60]
+
+
+def project_dir(argv):
+    """Where a project-scoped install would live.
+
+    Defaults to the current directory, which is wrong more often than it looks:
+    /bld-setup runs this from the package folder it was cloned into, so a real
+    project-scoped install in some other directory read as "nothing installed",
+    and the verdict then told a returning user to install everything again.
+    Name the project instead:  --project /path/to/your-app
+
+    Returns (path, was_given_explicitly).
+    """
+    path, explicit, i = os.getcwd(), False, 0
+    while i < len(argv):
+        a = argv[i]
+        if a.startswith("--project="):
+            path, explicit = os.path.abspath(a.split("=", 1)[1]), True
+        elif a == "--project" and i + 1 < len(argv):
+            path, explicit, i = os.path.abspath(argv[i + 1]), True, i + 1
+        else:
+            # Never ignore an argument we do not understand. A typo'd flag that
+            # silently falls back to the current directory recreates the exact
+            # bug --project exists to fix, and does it invisibly.
+            sys.exit("preflight: unrecognised argument %r\n"
+                     "usage: preflight.py [--project <dir>]" % a)
+        i += 1
+    return path, explicit
 
 
 def expected_bld_names():
@@ -165,6 +163,11 @@ def row(label, ok, detail=""):
 
 
 def main():
+    # Parsed here rather than at module level. At module level this ran on
+    # import, so anything that imported preflight - a test, another script -
+    # got its OWN argv parsed and sys.exit'd out from under it.
+    project, project_given = project_dir(sys.argv[1:])
+
     # ── 1. prerequisites ────────────────────────────────────────────────
     print("\nPREREQUISITES")
     print("  Without these the install cannot start.\n")
@@ -222,14 +225,14 @@ def main():
     present = set()
     scopes = []
     for label, d in (("global", os.path.join(CLAUDE, "skills")),
-                     ("project", os.path.join(PROJECT, ".claude", "skills"))):
+                     ("project", os.path.join(project, ".claude", "skills"))):
         if os.path.isdir(d):
             found = set(os.listdir(d))
             present |= found
             if any(s.startswith("bld-") for s in found):
                 scopes.append(label)
-    print("  project scope checked: " + os.path.join(PROJECT, ".claude"))
-    if PROJECT_EXPLICIT and not os.path.isdir(PROJECT):
+    print("  project scope checked: " + os.path.join(project, ".claude"))
+    if project_given and not os.path.isdir(project):
         print("  !! that directory does not exist. Everything below will read as")
         print("     'not installed' whether it is or not. Check the --project path.")
 
@@ -265,7 +268,7 @@ def main():
     # looking only in the home directory reported a working install as broken.
     agent_have = any(
         os.path.isfile(os.path.join(d, "agents", "bld-executor.md"))
-        for d in (CLAUDE, os.path.join(PROJECT, ".claude")))
+        for d in (CLAUDE, os.path.join(project, ".claude")))
     bld_ok = bool(bld_names) and not bld_missing and agent_have
     if not bld_have:
         bld_note = "none"
