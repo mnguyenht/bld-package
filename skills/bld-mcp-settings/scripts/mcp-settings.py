@@ -6,6 +6,8 @@
     python mcp-settings.py off jcodemunch
     python mcp-settings.py off --all
 
+Add --root <dir> to target a project other than the current directory.
+
 ON  writes the named servers into .mcp.json, so Claude Code starts them at
     launch and keeps them running for the whole session.
 OFF removes them again. The servers still work on demand through
@@ -43,7 +45,10 @@ SERVERS = {
     "shadcn":       {"command": "npx", "args": ["-y", "shadcn@latest", "mcp"]},
 }
 
-# Trust notes printed before enabling. context-mode is not like the other two.
+# Trust notes, recapped after a successful `on`. They are NOT the consent gate:
+# that lives in SKILL.md, which tells Claude to say this before running anything
+# and to never fold context-mode into a blanket "turn them all on". context-mode
+# is not like the other two.
 TRUST = {
     "jcodemunch":   "read-only code search. Lowest risk of the three.",
     "context-mode": "HIGH TRUST. Its ctx_execute runs real shell commands with "
@@ -174,6 +179,7 @@ def main():
 
     if action not in ("status", "on", "off"):
         sys.exit("usage: mcp-settings.py status | on <server...> | off <server...|--all>\n"
+                 "       [--root <dir>]   target a project other than the current directory\n"
                  "       servers: " + ", ".join(sorted(SERVERS)))
 
     path = config_path(root)
@@ -185,6 +191,12 @@ def main():
 
     if every:
         names = sorted(SERVERS) if action == "on" else sorted(data["mcpServers"])
+        if not names:
+            # `off --all` with nothing to remove is the desired state, not a
+            # usage error. It used to fall through to "name at least one server,
+            # or pass --all", which tells you to do the thing you just did.
+            print("  nothing to turn off - no servers are listed in %s" % path)
+            return
     if not names:
         sys.exit("name at least one server, or pass --all. Available: "
                  + ", ".join(sorted(SERVERS)))

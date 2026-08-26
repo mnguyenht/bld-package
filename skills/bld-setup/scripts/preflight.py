@@ -51,16 +51,27 @@ def project_dir(argv):
     project-scoped install in some other directory read as "nothing installed",
     and the verdict then told a returning user to install everything again.
     Name the project instead:  --project /path/to/your-app
+
+    Returns (path, was_given_explicitly).
     """
-    for i, a in enumerate(argv):
+    path, explicit, i = os.getcwd(), False, 0
+    while i < len(argv):
+        a = argv[i]
         if a.startswith("--project="):
-            return os.path.abspath(a.split("=", 1)[1])
-        if a == "--project" and i + 1 < len(argv):
-            return os.path.abspath(argv[i + 1])
-    return os.getcwd()
+            path, explicit = os.path.abspath(a.split("=", 1)[1]), True
+        elif a == "--project" and i + 1 < len(argv):
+            path, explicit, i = os.path.abspath(argv[i + 1]), True, i + 1
+        else:
+            # Never ignore an argument we do not understand. A typo'd flag that
+            # silently falls back to the current directory recreates the exact
+            # bug --project exists to fix, and does it invisibly.
+            sys.exit("preflight: unrecognised argument %r\n"
+                     "usage: preflight.py [--project <dir>]" % a)
+        i += 1
+    return path, explicit
 
 
-PROJECT = project_dir(sys.argv[1:])
+PROJECT, PROJECT_EXPLICIT = project_dir(sys.argv[1:])
 
 # skill-group key -> the skills it installs, for inventory purposes
 CORE_SKILLS = [
@@ -218,6 +229,9 @@ def main():
             if any(s.startswith("bld-") for s in found):
                 scopes.append(label)
     print("  project scope checked: " + os.path.join(PROJECT, ".claude"))
+    if PROJECT_EXPLICIT and not os.path.isdir(PROJECT):
+        print("  !! that directory does not exist. Everything below will read as")
+        print("     'not installed' whether it is or not. Check the --project path.")
 
     core_have = [s for s in CORE_SKILLS if s in present]
     bld_names = set(s for s in present if s.startswith("bld-"))

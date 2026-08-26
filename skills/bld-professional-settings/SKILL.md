@@ -103,16 +103,22 @@ the source of truth for the whole taxonomy, not just this skill.
 | **runtime** | Applies to how the session runs, not to what gets built |
 | **orchestrator** | Claude bosses other agents rather than writing code |
 | **util** | Everything in between: not building, not optimizing |
-| *(special)* | Acts on BLD itself. **Identical in both modes** — `bld-setup`, `bld-quiz`, `bld-professional-settings` |
+| **settings** | A package setting you toggle on and off. **Identical in both modes** — `bld-professional-settings`, `bld-mcp-settings` |
+| *(special)* | Acts on BLD itself. **Identical in both modes** — `bld-setup`, `bld-quiz` |
 
 Specials keep one name on purpose. They are the commands you reach for when you
 are confused about your setup, and a command that changes name between modes is
-the worst possible thing to need at that moment.
+the worst possible thing to need at that moment. Settings keep one name for a
+sharper reason: a switch whose own name depends on which way it is switched is a
+trap, and this one renames every other command in the package.
 
 ## Adding a skill later
 
 Add one row to `SKILLS` in the script, giving its type, friendly name and pro
-name. The script picks it up on the next run. It also carries a `LEGACY` dict
+name. The script picks it up on the next run. **If the type is a new one, add it
+to the type table above too** — this file is deliberately excluded from the
+rename pass, so nothing here is ever updated automatically, and the table went a
+whole category stale exactly this way. It also carries a `LEGACY` dict
 mapping retired names to their row, so an older install migrates cleanly instead
 of leaving orphans — add to it rather than editing `SKILLS` in place when a
 command gets renamed.

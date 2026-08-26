@@ -106,6 +106,13 @@ exist at all, so guessing it silently breaks things that never report an error.
 
 Read-only: it installs nothing.
 
+**If they want BLD scoped to one project rather than global, pass that project:**
+`<PY> <resolved path>/skills/bld-setup/scripts/preflight.py --project <project dir>`.
+Without it preflight looks for a project-scoped install in the *current*
+directory, which during setup is the package folder, so a real install sitting
+in their project reads as absent and the verdict says to install it all again.
+Global installs need no flag. The line it prints names the directory it checked.
+
 It prints prerequisites, deploy tooling, what BLD already installed, and a
 **verdict**. Route on the verdict:
 
@@ -555,6 +562,11 @@ After restarting:
 ```bash
 <PY> <resolved path>/skills/bld-setup/scripts/preflight.py
 ```
+
+Same `--project <project dir>` rule as Phase 0c if the install was scoped to one
+project. Getting it wrong here is worse than getting it wrong in 0c: this run
+happens seconds after a successful install, so a false "none installed" reads as
+"setup failed" at the exact moment they are already primed to believe it.
 
 Then have them type `/bld-` and confirm the commands appear. A skill on disk but
 missing from the list means its frontmatter did not parse.

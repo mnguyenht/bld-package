@@ -9,3 +9,8 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# Python bytecode. A .pyc built by one interpreter version is dead weight
+# for everyone else, and this package is meant to be cloned and read.
+__pycache__/
+*.pyc
