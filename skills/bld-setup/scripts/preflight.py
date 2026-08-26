@@ -318,7 +318,7 @@ def main():
     # install whose agents/ copy silently failed leaves them broken with nothing
     # reporting why. Cheap to check, and it is the only file that group installs.
     row("bld-executor agent", agent_have,
-        "" if agent_have else "MISSING - /bld-orchestrator-* cannot run without it")
+        "" if agent_have else "MISSING - the orchestrator skills cannot run without it")
 
     row("~/.claude/CLAUDE.md", os.path.isfile(os.path.join(CLAUDE, "CLAUDE.md")), "")
 

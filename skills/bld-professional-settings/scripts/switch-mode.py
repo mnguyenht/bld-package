@@ -2,8 +2,12 @@
 """Switch BLD command naming between friendly and pro mode.
 
     python switch-mode.py friendly   # bld-<type>-<skill>   e.g. /bld-sprint-init
-    python switch-mode.py pro        # bld-<skill>          e.g. /bld-init
+    python switch-mode.py pro        # bld-<skill>-<type>   e.g. /bld-init-sprint
     python switch-mode.py status     # report, change nothing
+
+Both modes carry all three parts. Pro moves the type to the end rather than
+dropping it, so the distinctive word comes first and the name still says what
+kind of command it is. Pro is NOT the shorter one; that was the old scheme.
 
 Renames the skill folders, rewrites the `name:` frontmatter (which is what you
 actually type), and updates every /bld-* cross-reference in the docs so nothing
@@ -28,29 +32,29 @@ import sys
 # type None = "special": acts on BLD itself, so the name never changes.
 # ─────────────────────────────────────────────────────────────────────────────
 SKILLS = {
-    "planning":            ("sprint",       "bld-sprint-planning",            "bld-planning"),
-    "init":                ("sprint",       "bld-sprint-init",                "bld-init"),
-    "refine":              ("sprint",       "bld-sprint-refine",              "bld-refine"),
+    "planning":            ("sprint",       "bld-sprint-planning",            "bld-planning-sprint"),
+    "init":                ("sprint",       "bld-sprint-init",                "bld-init-sprint"),
+    "refine":              ("sprint",       "bld-sprint-refine",              "bld-refine-sprint"),
 
-    "app":                 ("optimize",     "bld-optimize-app",               "bld-app"),
-    "react":               ("optimize",     "bld-optimize-react",             "bld-react"),
-    "security":            ("optimize",     "bld-optimize-security",          "bld-security"),
-    "seo-indexing":        ("optimize",     "bld-optimize-seo-indexing",      "bld-seo-indexing"),
+    "app":                 ("optimize",     "bld-optimize-app",               "bld-app-optimize"),
+    "react":               ("optimize",     "bld-optimize-react",             "bld-react-optimize"),
+    "security":            ("optimize",     "bld-optimize-security",          "bld-security-optimize"),
+    "seo-indexing":        ("optimize",     "bld-optimize-seo-indexing",      "bld-seo-indexing-optimize"),
 
-    "21st":                ("find",         "bld-find-21st",                  "bld-21st"),
-    "spline":              ("find",         "bld-find-spline",                "bld-spline"),
+    "21st":                ("find",         "bld-find-21st",                  "bld-21st-find"),
+    "spline":              ("find",         "bld-find-spline",                "bld-spline-find"),
 
-    "agents":              ("runtime",      "bld-runtime-agents",             "bld-agents"),
-    "tokens":              ("runtime",      "bld-runtime-tokens",             "bld-tokens"),
-    "activate-mcps":       ("runtime",      "bld-runtime-activate-mcps",      "bld-activate-mcps"),
+    "agents":              ("runtime",      "bld-runtime-agents",             "bld-agents-runtime"),
+    "tokens":              ("runtime",      "bld-runtime-tokens",             "bld-tokens-runtime"),
+    "activate-mcps":       ("runtime",      "bld-runtime-activate-mcps",      "bld-activate-mcps-runtime"),
 
-    "fable":               ("orchestrator", "bld-orchestrator-fable",         "bld-fable"),
-    "opus":                ("orchestrator", "bld-orchestrator-opus",          "bld-opus"),
+    "fable":               ("orchestrator", "bld-orchestrator-fable",         "bld-fable-orchestrator"),
+    "opus":                ("orchestrator", "bld-orchestrator-opus",          "bld-opus-orchestrator"),
 
-    "deploy":              ("util",         "bld-util-deploy",                "bld-deploy"),
-    "handoff":             ("util",         "bld-util-handoff",               "bld-handoff"),
-    "documentation":       ("util",         "bld-util-documentation",         "bld-documentation"),
-    "customize-component": ("util",         "bld-util-customize-component",   "bld-customize-component"),
+    "deploy":              ("util",         "bld-util-deploy",                "bld-deploy-util"),
+    "handoff":             ("util",         "bld-util-handoff",               "bld-handoff-util"),
+    "documentation":       ("util",         "bld-util-documentation",         "bld-documentation-util"),
+    "customize-component": ("util",         "bld-util-customize-component",   "bld-customize-component-util"),
 
     # specials — identical in both modes
     "setup":               (None,           "bld-setup",                      "bld-setup"),
@@ -62,17 +66,38 @@ SKILLS = {
     "mcp-settings":          ("settings",   "bld-mcp-settings",               "bld-mcp-settings"),
 }
 
-# Names that existed before this scheme, so an older install still migrates cleanly.
+# Names that existed before the current scheme, so an older install still
+# migrates cleanly instead of leaving orphans.
+#
+# The bare `bld-<skill>` block is the one that matters most. Pro mode used to
+# DELETE the type segment rather than move it, which was a third convention
+# nobody sanctioned: there are two, `bld-<type>-<skill>` and `bld-<skill>-<type>`,
+# and a name like `bld-app` belongs to neither. It also said less than the
+# friendly name it replaced. Every install that ran the old pro mode is sitting
+# on these names right now and has to be able to migrate off them.
 LEGACY = {
-    "bld-app-optimize": "app", "bld-react-optimize": "react",
-    "bld-find-21st": "21st", "bld-find-spline": "spline",
-    "bld-fable-orchestrator": "fable", "bld-opus-orchestrator": "opus",
+    # the invented drop-the-type scheme, retired
+    "bld-planning": "planning", "bld-init": "init", "bld-refine": "refine",
+    "bld-app": "app", "bld-react": "react", "bld-security": "security",
+    "bld-seo-indexing": "seo-indexing", "bld-21st": "21st", "bld-spline": "spline",
+    "bld-agents": "agents", "bld-tokens": "tokens",
+    "bld-activate-mcps": "activate-mcps",
+    "bld-fable": "fable", "bld-opus": "opus",
+    "bld-deploy": "deploy", "bld-handoff": "handoff",
+    "bld-documentation": "documentation",
+    "bld-customize-component": "customize-component",
+    # older still
     "bld-optimize": "activate-mcps", "bld-optimize-sprint": "activate-mcps",
     "bld-seo": "seo-indexing", "bld-mode": "professional-settings",
     "bld-professional-mode": "professional-settings",
 }
 
-DOC_SUFFIXES = (".md",)
+# Scripts too, not just markdown. The helper scripts print command names at the
+# user ("needed for /bld-runtime-tokens only"), and .md-only meant those names
+# never moved: in pro mode preflight told people to run four commands that did
+# not exist. Every match is inside a string or a comment, so this rewrites
+# prose that happens to live in a .py file, not code.
+DOC_SUFFIXES = (".md", ".py", ".mjs")
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 SKILLS_DIR = os.path.join(ROOT, "skills")
 

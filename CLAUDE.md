@@ -13,8 +13,8 @@ because that column is the one users decide on.
   `bld-setup/scripts/preflight.py` (environment + resume state),
   `bld-professional-settings/scripts/switch-mode.py` (renames every command),
   `bld-mcp-settings/scripts/mcp-settings.py` (edits `.mcp.json` without clobbering it),
-  `bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader),
-  `bld-runtime-activate-mcps/run.py` (MCP runner),
+  `skills/bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader),
+  `skills/bld-runtime-activate-mcps/run.py` (MCP runner),
   plus `hooks/block-image-skills.py`, which is a hook rather than a helper.
 
 ## The rule that matters here
@@ -100,8 +100,12 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 
 ## Status
 
-22 skills. Naming is prefix-type-skill by default; `/bld-professional-settings on`
-switches to short names and the round trip is verified byte-identical.
+22 skills. **There are exactly two naming conventions and no third:**
+prefix-type-skill (default) and prefix-skill-type (pro). Pro reorders; it never
+drops a segment. A name missing its type belongs to neither convention — pro mode
+shipped that way once, and every one of those names is now in `LEGACY`.
+`/bld-professional-settings on` switches, and the round trip is verified
+byte-identical.
 
 Verified: `lh-report.mjs` against a live Lighthouse v13.4.1 report, `preflight.py`
 on a real machine, `switch-mode.py` across two full round trips.

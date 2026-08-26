@@ -113,7 +113,7 @@ every future contributor's session.
 ## Notes
 
 - Server definitions here mirror the `SERVERS` table in
-  `bld-runtime-activate-mcps/run.py`. **Change one, change both**, or `off` stops
+  `skills/bld-runtime-activate-mcps/run.py`. **Change one, change both**, or `off` stops
   recognising entries `on` wrote and silently refuses to remove them.
 - `npx` is spelled plainly in `.mcp.json`. Claude Code resolves it, unlike
   Python's `subprocess`, which is why `run.py` has to look for `npx.cmd`.

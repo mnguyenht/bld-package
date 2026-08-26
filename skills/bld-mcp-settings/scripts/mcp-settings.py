@@ -35,7 +35,7 @@ import json
 import os
 
 # Exactly what BLD writes for each server. These mirror the SERVERS table in
-# bld-runtime-activate-mcps/run.py; if that changes, change this too.
+# skills/bld-runtime-activate-mcps/run.py; if that changes, change this too.
 #
 # `npx` is spelled plainly here, not npx.cmd. Claude Code resolves it itself,
 # unlike Python's subprocess, which is why run.py has to be fussier.

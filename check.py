@@ -134,22 +134,35 @@ def main():
     current = friendly if on_disk == friendly else pro
     other = pro if current is friendly else friendly
     other_only = sorted(other - current, key=len, reverse=True)
+    # 7. a path-shaped reference the rename pass cannot see. Its path pattern
+    #    anchors on `skills/`, so a bare `bld-x/run.py` in a comment survives
+    #    every mode switch and quietly goes stale. Only names that actually
+    #    change between modes can rot this way.
+    renameable = set(f for _, f, p in table.SKILLS.values() if f != p) | \
+                 set(p for _, f, p in table.SKILLS.values() if f != p)
+    bare_path = re.compile(r"(?<!skills/)\b(bld-[a-z0-9-]+)/")
+    cmd_pat = None
     if other_only:
-        pat = re.compile(r"(?<![\w-])/(" + "|".join(re.escape(x) for x in other_only) + r")(?![\w-])")
-        for base, _, files in os.walk(ROOT):
-            if ".git" in base.split(os.sep) or EXEMPT in base:
+        cmd_pat = re.compile(r"(?<![\w-])/(" + "|".join(re.escape(x) for x in other_only) + r")(?![\w-])")
+    for base, _, files in os.walk(ROOT):
+        if ".git" in base.split(os.sep) or EXEMPT in base:
+            continue
+        for fn in sorted(files):
+            if not fn.endswith((".md", ".py", ".mjs")):
                 continue
-            for fn in sorted(files):
-                if not fn.endswith((".md", ".py", ".mjs")):
-                    continue
-                rel = os.path.relpath(os.path.join(base, fn), ROOT).replace("\\", "/")
-                for i, line in enumerate(io.open(os.path.join(base, fn),
-                                                 encoding="utf-8", errors="replace"), 1):
-                    hit = pat.search(line)
-                    if hit:
-                        fail("%s:%d writes /%s, a command name from the other naming "
-                             "mode. The next mode switch rewrites it and the sentence "
-                             "loses its meaning permanently." % (rel, i, hit.group(1)))
+            rel = os.path.relpath(os.path.join(base, fn), ROOT).replace("\\", "/")
+            for i, line in enumerate(io.open(os.path.join(base, fn),
+                                             encoding="utf-8", errors="replace"), 1):
+                hit = cmd_pat.search(line) if cmd_pat else None
+                if hit:
+                    fail("%s:%d writes /%s, a command name from the other naming "
+                         "mode. The next mode switch rewrites it and the sentence "
+                         "loses its meaning permanently." % (rel, i, hit.group(1)))
+                for m in bare_path.finditer(line):
+                    if m.group(1) in renameable:
+                        fail("%s:%d writes the path %s/ without a skills/ prefix, so "
+                             "the rename pass cannot see it and it goes stale on the "
+                             "next mode switch." % (rel, i, m.group(1)))
 
     print("%d skills, %d types, %d problems" % (len(folders), len(types), len(problems)))
     for p in problems:

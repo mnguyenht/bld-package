@@ -104,11 +104,15 @@ kind of thing it is before you have learned the set.
  └────────────── the prefix
 ```
 
-Once you know the set, that middle segment is confirmation you are paying for in
-keystrokes. `/bld-professional-settings on` drops it, so commands become prefix plus
-skill. `off` puts it back. Same skills either way, and the switch rewrites the
-folders, the frontmatter and every cross-reference together so nothing is left
-pointing at a command that no longer exists.
+Once you know the set, leading with the type buries the word you are actually
+reaching for. `/bld-professional-settings on` moves the type to the end, so the
+distinctive word comes first and typing the first few letters lands on the
+command instead of the category. `off` puts it back in front.
+
+Both orders keep all three parts. Pro is **not** the shorter one — it is the same
+name, reordered — and nothing is ever dropped. Same skills either way, and the
+switch rewrites the folders, the frontmatter and every cross-reference together
+so nothing is left pointing at a command that no longer exists.
 
 Four commands never change name. Two are **special** — what you reach for when
 you are confused about your own setup, and a command that renames itself is the

@@ -6,7 +6,7 @@ model: opus
 
 # bld-orchestrator-opus — the same loop, Opus in the boss seat
 
-**Read `bld-orchestrator-fable/SKILL.md` and run it exactly**, from wherever BLD
+**Read `skills/bld-orchestrator-fable/SKILL.md` and run it exactly**, from wherever BLD
 is installed: `~/.claude/skills/` on a default global install, or
 `<project>/.claude/skills/` if it was scoped to one project. Every
 step, every table, every hard rule applies unchanged. The executor pool already

@@ -45,7 +45,7 @@ token counts, then terminates. Feed it a JSON array of calls on stdin:
 
 ```bash
 cd "<project-root>"
-python "<BLD>/bld-runtime-activate-mcps/run.py" jcodemunch <<'EOF'
+python "<BLD>/skills/bld-runtime-activate-mcps/run.py" jcodemunch <<'EOF'
 [
   {"name": "list_repos", "arguments": {}},
   {"name": "search_text", "arguments": {"repo": "REPO", "query": "var("}}
@@ -86,7 +86,7 @@ when building/adding shadcn components so you pull real registry data instead of
 guessing. Pass `shadcn` as the server arg:
 
 ```bash
-python "<BLD>/bld-runtime-activate-mcps/run.py" shadcn <<'EOF'
+python "<BLD>/skills/bld-runtime-activate-mcps/run.py" shadcn <<'EOF'
 [{"name":"search_items_in_registries","arguments":{"registries":["@shadcn"],"query":"dialog"}},
  {"name":"get_item_examples_from_registries","arguments":{"registries":["@shadcn"],"query":"dialog"}}]
 EOF

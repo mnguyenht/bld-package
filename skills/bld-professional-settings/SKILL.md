@@ -1,9 +1,9 @@
 ---
 name: bld-professional-settings
-description: Switch BLD's command naming between friendly mode (bld-<type>-<skill>, e.g. /bld-sprint-init) and pro mode (bld-<skill>, e.g. /bld-init). Use when the user says /bld-professional-settings, "pro mode", "activate pro mode", "shorter commands", "turn off pro mode", "go back to the long names", or asks which naming mode they are in. Renames the skill folders, the frontmatter, and every cross-reference, then tells the user to restart.
+description: Switch BLD's command naming between friendly mode (bld-<type>-<skill>, e.g. /bld-sprint-init) and pro mode (bld-<skill>-<type>, e.g. /bld-init-sprint). Use when the user says /bld-professional-settings, "pro mode", "activate pro mode", "shorter commands", "turn off pro mode", "go back to the long names", or asks which naming mode they are in. Renames the skill folders, the frontmatter, and every cross-reference, then tells the user to restart.
 ---
 
-# bld-professional-settings — friendly names or short names
+# bld-professional-settings — two orders for the same name
 
 BLD ships every command in one of two naming schemes. Same skills, same
 behaviour, different thing to type.
@@ -11,7 +11,7 @@ behaviour, different thing to type.
 | Mode | Shape | Example | For |
 |---|---|---|---|
 | **friendly** (default) | `bld-<type>-<skill>` | `/bld-sprint-init` | Learning the set. Typing `/bld-` groups everything by type, so the list teaches you the taxonomy. |
-| **pro** | `bld-<skill>` | `/bld-init` | Knowing the set. The type is confirmation you no longer need, so it just costs keystrokes. |
+| **pro** | `bld-<skill>-<type>` | `/bld-init-sprint` | Knowing the set. You already know the category, so leading with it buries the word you are reaching for. |
 
 Neither is better. Friendly is the default because a first-timer facing 22
 unfamiliar commands benefits from the grouping, and a pro can switch in one
@@ -35,7 +35,7 @@ instead of doing it by hand.
 
 ```bash
 python skills/bld-professional-settings/scripts/switch-mode.py status     # read-only, changes nothing
-python skills/bld-professional-settings/scripts/switch-mode.py on         # pro: short names
+python skills/bld-professional-settings/scripts/switch-mode.py on         # pro: type last
 python skills/bld-professional-settings/scripts/switch-mode.py off        # friendly: long names
 python skills/bld-professional-settings/scripts/switch-mode.py toggle     # flip to the other one
 ```
@@ -43,9 +43,17 @@ python skills/bld-professional-settings/scripts/switch-mode.py toggle     # flip
 `on`/`off` and `pro`/`friendly` are the same two modes under different spellings.
 Use whichever the user said.
 
-**`on` is the short names.** People say "turn pro mode on" meaning "give me
-`/bld-init` instead of `/bld-sprint-init`", so `on` is pro and `off` is friendly.
-Read it as *professional mode: on*, not *long names: on*.
+**`on` is type-last.** People say "turn pro mode on" meaning "give me
+`/bld-init-sprint` instead of `/bld-sprint-init`", so `on` is pro and `off` is
+friendly. Read it as *professional mode: on*, not *short names: on*.
+
+⚠️ **Pro is not the shorter mode, and never was meant to be.** Both conventions
+carry all three parts; pro moves the type to the end. An earlier version deleted
+the type instead, producing names like `/bld-app` that belong to neither
+convention and say less than the friendly name they replaced. Those names are
+retired and live in `LEGACY`, so an install still sitting on them migrates. If
+someone asks for "shorter commands", this is still the switch they want — just
+tell them what it actually does.
 
 **Running it with no argument prints status and changes nothing.** That is
 deliberate. This script renames folders across the whole tree, so the bare
@@ -138,6 +146,8 @@ guesses, and it refuses to overwrite an existing folder rather than clobbering i
 - **Editing `name:` in one skill to "just fix this one".** That puts the repo in
   mixed mode, which `status` will report but which nothing else will warn you
   about.
-- **Assuming pro mode is the better one.** It is shorter, not better. Pro's
-  `/bld-app` and `/bld-react` say noticeably less than friendly's
-  `/bld-optimize-app` and `/bld-optimize-react`.
+- **Assuming pro mode is the shorter one.** It is not shorter at all —
+  `/bld-app-optimize` and `/bld-optimize-app` are the same name in a different
+  order. What pro buys is the distinctive word first, so the first few letters
+  reach the command rather than the category. If someone wants fewer keystrokes,
+  neither mode delivers that and saying so is kinder than switching them.
