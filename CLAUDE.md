@@ -82,9 +82,17 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   it exists to warn about — caught only because the naming round trip stopped
   coming back byte-identical. Describe the shape of the change in words instead
   of naming a command, and the rewriter has nothing to grab.
+- **Run `python check.py` before committing.** Every convention on this page that
+  can be checked mechanically, is: folder vs frontmatter names, the folder set
+  against the table, a type existing in the code but in neither doc, a skill
+  missing from one of the four places, a stated command count that went stale,
+  and an other-mode command literal waiting to be flattened. It is the only
+  thing standing over `bld-professional-settings`, which nothing else keeps in
+  sync. Two of the bugs it now catches are ones it was written after.
 - **Run the naming round trip before committing docs.** `switch-mode.py on`, then
   `off`, then `git status`. Anything but a clean tree means the pass is not
   reversible on your text, and the diff shows you exactly which sentence it ate.
+  `check.py` catches the known cause; the round trip catches the rest.
 - **The rename pass rewrites three shapes**, all in `switch-mode.py`: `/command`,
   `skills/<name>/` paths, and the `# <name>` H1 title. The H1 pattern was added
   after 16 of 21 skills were found still carrying their pre-rename titles, since

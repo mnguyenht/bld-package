@@ -137,8 +137,8 @@ Then, briefly:
 - Nothing is installed yet.
 - **`Runs code?`** is the column that matters. `md` rows are text and can only
   suggest things. `code` rows execute on their machine.
-- Section 7 is not installed. Codex needs a paid ChatGPT plan; Gemini has a free
-  tier, so "they cost money" is only true of one of them.
+- Section 7 is not installed. Both have working free tiers with low caps, so
+  neither is a paid tool; a paid plan raises a ceiling, it does not unlock one.
 - Uninstalling is deleting files in `~/.claude/`. Nothing touches their projects.
 
 Four lines, not four paragraphs.
@@ -497,7 +497,7 @@ Open with what is actually available to them, as a short table:
 
 Install only what they pick, then update `declined` and `done`. Nothing else.
 
-## Phase 7 — external coding agents (optional, cost money)
+## Phase 7 — external coding agents (optional, free but capped)
 
 `/bld-runtime-agents` is the one BLD skill needing an account elsewhere.
 **Offer, do not push.** Skipping costs exactly one skill.
@@ -505,8 +505,10 @@ Install only what they pick, then update `declined` and `done`. Nothing else.
 > **Claude never touches the credentials.** Print the commands; the user runs
 > them and logs in. If a flow asks for anything secret, hand it back.
 
-**Codex** needs a paid ChatGPT plan. **Gemini** has a free tier, so suggest it
-first to anyone not already paying OpenAI.
+**Both have free tiers that work**, with caps low enough to matter. A paid
+ChatGPT plan raises Codex's ceiling; it is not what makes Codex run. Suggest
+whichever they can sign into today, and let `/bld-runtime-agents` detect what is
+actually installed rather than promising either.
 
 ```bash
 npm install -g @openai/codex     # see github.com/openai/codex for your OS

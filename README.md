@@ -110,9 +110,11 @@ skill. `off` puts it back. Same skills either way, and the switch rewrites the
 folders, the frontmatter and every cross-reference together so nothing is left
 pointing at a command that no longer exists.
 
-Three commands never change name, because they are what you reach for when you
-are confused about your own setup: `/bld-setup`, `/bld-quiz`, and
-`/bld-professional-settings` itself.
+Four commands never change name. Two are **special** — what you reach for when
+you are confused about your own setup, and a command that renames itself is the
+worst thing to need at that moment: `/bld-setup` and `/bld-quiz`. The other two
+are **settings**, which stay fixed for a sharper reason: a switch named after its
+own state is a trap. `/bld-professional-settings` is one of them.
 
 ---
 
@@ -178,6 +180,17 @@ Everything in between. Not building, not optimizing.
 | `/bld-util-documentation` | Surveys the whole app and writes a `/docs` page inside it, in Simplified Technical English. Documents what the code actually does. Half-built features go under Known limits. |
 | `/bld-util-customize-component` | When tweaking an effect by prompt has failed twice, this builds real sliders in the browser, bound to the real component. You drag, the values get committed, the panel gets deleted. |
 
+### settings
+
+A package setting you turn on and off. **These never rename themselves.** A
+switch whose own name depends on which way it is switched is a trap, and one of
+these renames every other command in the package.
+
+| Command | What it does |
+|---|---|
+| `/bld-mcp-settings` | Toggle BLD's MCP servers between on-demand and always-on. Writes them into `.mcp.json` and takes them out again, without ever touching an entry it did not write. |
+| `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
+
 ### special
 
 Acts on BLD itself. These keep the same name in both naming modes.
@@ -186,8 +199,6 @@ Acts on BLD itself. These keep the same name in both naming modes.
 |---|---|
 | `/bld-setup` | Sets BLD up, or adds more of it later. Remembers where it got to. |
 | `/bld-quiz` | A learning checkpoint after a sprint. Sizes what was built, then quizzes you on it at matching depth. Small changes get a walkthrough instead. |
-| `/bld-mcp-settings` | Toggle BLD's MCP servers between on-demand and always-on. Writes them into `.mcp.json` and takes them out again, without ever touching an entry it did not write. |
-| `/bld-professional-settings` | Switches the naming scheme. `on` for short commands, `off` for the type-prefixed ones. |
 
 ---
 

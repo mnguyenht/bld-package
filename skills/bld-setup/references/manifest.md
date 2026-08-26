@@ -125,7 +125,7 @@ the server is connected for your whole session rather than for one batch.
 
 ---
 
-## 7. NOT installed — opt-in, and one of them costs money
+## 7. NOT installed — opt-in, and both are capped rather than paid
 
 Listed so you know they exist and know BLD did not put them on your machine.
 `/bld-setup` Phase 7 offers to walk you through Codex or Gemini if you want
@@ -133,8 +133,8 @@ Listed so you know they exist and know BLD did not put them on your machine.
 
 | Tool | Why it's separate | Verify at |
 |---|---|---|
-| **codex** (OpenAI CLI) | The delegation executor for `/bld-runtime-agents`. Needs a ChatGPT Plus login. Only worth it if you already pay for one. | https://github.com/openai/codex |
-| **gemini-cli** | Delegation fallback. Has a free tier, small enough to exhaust in a single handoff. Check the current quota for your auth method rather than trusting a number here. | https://github.com/google-gemini/gemini-cli |
+| **codex** (OpenAI CLI) | The delegation executor for `/bld-runtime-agents`. Runs on a ChatGPT account. The free tier works but is capped; a paid plan raises the ceiling rather than unlocking it. | https://github.com/openai/codex |
+| **gemini-cli** | Delegation fallback. Free tier, small enough to exhaust in a single handoff. Check the current quota for your auth method rather than trusting a number here. | https://github.com/google-gemini/gemini-cli |
 
 ---
 

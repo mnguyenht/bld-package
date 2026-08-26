@@ -48,6 +48,35 @@ allowance (command in `~/.claude/CLAUDE.md`) before assuming the spec was bad.
 CLI flags, model ids, and the delegation rules live in the `agent-delegation` block
 in `~/.claude/CLAUDE.md` — that file is always loaded. Don't restate it; follow it.
 
+## Step 0a — Is there an executor on this machine?
+
+**Run this before scoping a single workstream.** Everything below assumes a CLI
+that may not be installed, and finding that out after writing four specs wastes
+exactly the window this skill exists to protect.
+
+```bash
+codex --version; gemini --version
+```
+
+Route on what actually answered:
+
+| Result | Do |
+|---|---|
+| **Codex answers** | The default path. Presence is not authentication, so confirm it is signed in before planning around it. |
+| **Only Gemini answers** | Gemini is the executor for this run. Say so up front, and plan **fewer, larger** handoffs. |
+| **Neither answers** | **Stop. Do not plan work for an executor that is not here.** Offer the install commands, or offer to do the work in the main window and say that it spends the Claude window instead. |
+
+**Neither tool is strictly paid, and nothing here should imply it.** Both have a
+free tier that works. What free buys you is a **low cap**, not a locked door:
+Gemini's is small enough to exhaust in one handoff, and a paid ChatGPT plan
+raises Codex's ceiling rather than unlocking it.
+
+The cap, not the price, is the real constraint — and that is an argument for
+**batching**. One large, well-specced handoff beats ten small ones, especially
+since every `codex exec` spends roughly 15k input tokens before it reads a word
+of the prompt. Never tell the user a tool "costs money": tell them what this
+machine actually has, and what allowance it actually reports.
+
 ## Step 0 — The split
 
 The default is **Codex writes it.** Not just the bulky or repetitive work — the
