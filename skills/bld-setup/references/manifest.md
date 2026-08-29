@@ -74,7 +74,13 @@ Both are large. Both want to wire hooks. BLD installs them **skill-only**.
 > 🚩 **gstack's `setup` regenerates all 54 skill wrappers.** Re-run the prune
 > immediately after every `setup` or `/gstack-upgrade`, or the pruned 48 come
 > back. gstack's own README asks you to ban Claude's built-in browser tools in
-> favour of its browser skill. BLD does **not** do that.
+> favour of its browser skill. BLD does **not** do that. `setup` also downloads
+> about **700 MB** of Playwright Chromium outside `~/.claude/` to
+> `%LOCALAPPDATA%\ms-playwright` on Windows or `~/.cache/ms-playwright` on
+> macOS/Linux. It registers a `Stop` hook named `gstack-timeline-stop` in
+> `settings.json` and leaves `settings.json.bak.<timestamp>` beside it. Run
+> `gstack-settings-hook remove-source --source gstack-timeline-stop` to remove
+> that hook.
 
 ---
 

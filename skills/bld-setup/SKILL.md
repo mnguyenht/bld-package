@@ -139,7 +139,11 @@ Then, briefly:
   suggest things. `code` rows execute on their machine.
 - Section 7 is not installed. Both have working free tiers with low caps, so
   neither is a paid tool; a paid plan raises a ceiling, it does not unlock one.
-- Uninstalling is deleting files in `~/.claude/`. Nothing touches their projects.
+- Uninstalling is mostly deleting files in `~/.claude/`, but not only: it also
+  means `~/.agents/.skill-lock.json`, Playwright Chromium from
+  `%LOCALAPPDATA%\ms-playwright` (Windows) or `~/.cache/ms-playwright`
+  (macOS/Linux), and `react-doctor` / `react-scan` from the npm global prefix
+  (`npm root -g`). Nothing touches their projects.
 
 Four lines, not four paragraphs.
 
@@ -288,9 +292,31 @@ Run them one at a time. Chaining with `&&` lets one dead repo kill the batch.
 
 ### Plugins
 
-Plugins normally install through the interactive `/plugin` command, which Claude
-cannot run. Write the config and let startup fetch them. **Read
-`~/.claude/settings.json` first and merge. Never overwrite it.**
+Install through the headless CLI, then confirm all three say `enabled`:
+
+```bash
+claude plugin marketplace add https://github.com/DietrichGebert/ponytail.git
+claude plugin marketplace add https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
+claude plugin marketplace add https://github.com/anthropics/claude-plugins-official.git
+claude plugin install ponytail@ponytail
+claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill
+claude plugin install claude-code-setup@claude-plugins-official
+claude plugin list        # confirm all three say: enabled
+```
+
+- **Pass the full HTTPS URL, not `owner/repo`.** The short form resolves to SSH
+  and fails on a fresh machine with no GitHub SSH key: `No ED25519 host key is
+  known for github.com ... Host key verification failed`.
+- **`marketplace add` exits 0 even when the clone fails.** Judge it by the
+  `✔ Successfully added marketplace` line or by `claude plugin list`, never by
+  the exit code.
+- **On Windows, enable long paths once if ui-ux-pro-max fails to clone:**
+  `git config --global core.longpaths true`, then re-run the add. The failure is
+  `fatal: cannot create directory at '.claude/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs': Filename too long`.
+
+If the CLI path fails, hand-write the same config and let startup fetch the
+plugins. **Read `~/.claude/settings.json` first and merge. Never overwrite it.**
+If it is absent, create it with just the keys below.
 
 ```json
 {
@@ -301,14 +327,11 @@ cannot run. Write the config and let startup fetch them. **Read
   },
   "extraKnownMarketplaces": {
     "ponytail":            { "source": { "source": "github", "repo": "DietrichGebert/ponytail" } },
-    "ui-ux-pro-max-skill": { "source": { "source": "github", "repo": "nextlevelbuilder/ui-ux-pro-max-skill" } }
+    "ui-ux-pro-max-skill": { "source": { "source": "github", "repo": "nextlevelbuilder/ui-ux-pro-max-skill" } },
+    "claude-plugins-official": { "source": { "source": "github", "repo": "anthropics/claude-plugins-official" } }
   }
 }
 ```
-
-`claude-plugins-official` is built in and needs no marketplace entry. If plugins
-do not appear after restart, have them run
-`/plugin marketplace add DietrichGebert/ponytail` themselves.
 
 ### BLD itself
 
@@ -353,10 +376,14 @@ mkdir -p ~/.claude/hooks
 cp "<resolved path>/hooks/block-image-skills.py"  ~/.claude/hooks/
 ```
 
-Then register **that** copy in the project's `.claude/settings.local.json`, with
-an **absolute path** (it runs with an unpredictable working directory). Expand
-`~` yourself: the hook command is not run through a shell, so a literal `~` is
-looked up as a directory named `~` and never resolves.
+Then register **that** copy at the same scope BLD was installed at: a global
+install uses `~/.claude/settings.json`; a project-scoped install uses that
+project's `.claude/settings.local.json`. **Merge, do not overwrite.** By this
+point global settings already hold `enabledPlugins` and
+`extraKnownMarketplaces`; read them, add the `hooks` key, and write back. Use an
+**absolute path** because the hook runs with an unpredictable working directory.
+Expand `~` yourself: the hook command is not run through a shell, so a literal
+`~` is looked up as a directory named `~` and never resolves.
 
 ```json
 { "hooks": { "PreToolUse": [ { "matcher": "Skill", "hooks": [
@@ -366,9 +393,10 @@ looked up as a directory named `~` and never resolves.
 **`<PY>` here is not optional.** Substitute the interpreter Phase 0b found. A hook
 that names a missing interpreter still registers fine and then fails every single
 time it fires, printing nothing the user will see. The result is a security
-control that looks installed and is not running. After writing the file, fire it
-once on purpose to prove it works: ask Claude for an image-generation skill and
-confirm it is refused. A hook nobody tested is a hook nobody has.
+control that looks installed and is not running. After writing the file, run the
+cheaper check: `<PY> ~/.claude/hooks/block-image-skills.py --selftest` prints
+`selftest ok: 3 blocked, 4 allowed` and exits 0. A hook nobody tested is a hook
+nobody has.
 
 ### React tools
 
@@ -406,24 +434,39 @@ fi
 bash ~/.claude/skills/gstack/setup
 ```
 
-`setup` generates **54** skill wrappers. BLD keeps six. The other 48 are iOS,
-paid-provider, browser, deploy and team-process skills that duplicate what BLD
-does, and every one costs context on every session.
+gstack links its wrappers under **bare names** (`spec`, `review`, `cso`,
+`careful`, `investigate`), so they sit in `~/.claude/skills/` next to everything
+else and collide with generic names. BLD keeps six: `spec`, `investigate`, `cso`,
+`review`, `careful` and `gstack-upgrade`, plus the `gstack` root skill and the
+`_gstack-command` router. The rest are iOS, paid-provider, browser, deploy and
+team-process skills that duplicate what BLD does, and every one costs context on
+every session.
 
 ```bash
 cat > ~/.claude/skills/gstack-prune.sh <<'SH'
 #!/usr/bin/env bash
-# Deletes generated gstack wrappers in ~/.claude/skills. Idempotent.
-# The gstack repo is never touched, so re-running `setup` undoes this.
-keep="gstack _gstack-command gstack-spec gstack-investigate gstack-cso gstack-review gstack-careful gstack-upgrade"
-for d in ~/.claude/skills/gstack-*; do
-  n=$(basename "$d")
-  case " $keep " in *" $n "*) continue ;; esac
-  [ -d "$d" ] && rm -rf "$d" && echo "pruned $n"
+# Deletes generated gstack skill wrappers from ~/.claude/skills. Idempotent.
+# Matched by the gstack install path their body references, NOT by a name prefix:
+# gstack links wrappers under BARE names (spec, review, ship, connect-chrome), so
+# a `gstack-*` glob matches none of them and silently prunes nothing. The gstack
+# repo is never touched, so re-running `setup` restores everything removed here.
+keep=" gstack _gstack-command spec investigate cso review careful gstack-upgrade "
+n=0
+for d in ~/.claude/skills/*/; do
+  s=$(basename "$d")
+  case "$s" in bld-*) continue ;; esac          # never prune BLD's own skills
+  case "$keep" in *" $s "*) continue ;; esac
+  grep -q 'skills/gstack' "$d/SKILL.md" 2>/dev/null || continue
+  rm -rf "$d" && echo "pruned $s" && n=$((n+1))
 done
+echo "pruned $n gstack wrappers"
 SH
 bash ~/.claude/skills/gstack-prune.sh
 ```
+
+**The prune prints how many it removed. A run that prints
+`pruned 0 gstack wrappers` right after `setup` means the matcher is stale — do
+not treat it as success.**
 
 ⚠️ **`setup` un-prunes.** Re-run the prune after every `git pull` or
 `/gstack-upgrade`. Tell them once; it is the easiest way for a context budget to
@@ -434,9 +477,11 @@ quietly triple.
 ```bash
 rm -rf /tmp/impeccable ~/.claude/skills/impeccable
 git clone --depth 1 https://github.com/pbakaus/impeccable.git /tmp/impeccable
-cp -r /tmp/impeccable/skills/impeccable ~/.claude/skills/impeccable
+cp -r /tmp/impeccable/.claude/skills/impeccable ~/.claude/skills/impeccable
 rm -rf /tmp/impeccable
 ```
+
+**Verify `~/.claude/skills/impeccable/SKILL.md` exists before moving on.**
 
 **Both `rm -rf`s on the first line are load-bearing on a re-run**, and this skill
 is built to be re-run. The trailing cleanup only happens when the block succeeds,
@@ -545,7 +590,7 @@ Two layers:
 **If `~/.claude/CLAUDE.md` exists, do not overwrite it.** Show a diff of what BLD
 would add and let them choose. Their rules outrank yours.
 
-Four `<FILL IN>` blocks change behaviour and deserve their attention:
+Seven `<FILL IN>` blocks change behaviour. These four deserve the most attention:
 
 1. **Who they are** — decides how much gets explained.
 2. **GitHub username** — used by `/bld-util-deploy`.
