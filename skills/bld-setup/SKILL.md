@@ -248,7 +248,7 @@ not just a category.
 | Group | What you get |
 |---|---|
 | **Core skills** (11) | Design taste from a working design engineer, animation craft, marketing copy, WCAG accessibility audits, and draft terms/privacy pages. **9 are markdown and can only suggest. Two ship scripts that execute:** `a11y-audit` and `webapp-testing`, the latter driving a real browser through Playwright. |
-| **BLD** (22 commands) | What you cloned this for. Also adds a hook that blocks AI image generation. |
+| **BLD** (23 commands) | What you cloned this for. Also adds a hook that blocks AI image generation. |
 | **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Those two run code, and ui-ux-pro-max also ships image generation, which BLD blocks. **claude-code-setup** is Anthropic's official setup advisor: it reads a repo and suggests hooks, agents and skills. Markdown, so it can only suggest. |
 | **React tools** (2 CLIs) | react-doctor and react-scan find real bugs, hook misuse, and needless re-renders. They power `/bld-optimize-react`. Adds two commands you can run from anywhere. |
 | **Token monitor** | `/bld-runtime-tokens` shows how much Claude usage is left before a long session. Needs `uv`, one more installer. Skip it and you lose only that one command. |
@@ -645,3 +645,16 @@ Set `completed: true` in the state file.
 - **Asking a first-timer to choose global vs project scope.** Recommend global.
 - **Over-explaining.** See the voice rules at the top. Beginners need the
   unfamiliar explained, not everything.
+
+## Refining this skill
+
+Do not read `TESTING.md` during a normal run. It is for sessions working *on*
+this skill rather than *with* it.
+
+It holds the method that has found every real bug in here: walk a deliberately
+awkward machine through the phases and record what cannot happen. Three runs
+found nine bugs, including a security control that registered and then failed
+silently on every non-Windows machine. Reading the skill found none of them.
+
+Default to a quiet audit that reports only findings. Produce the full role-played
+transcript **only when the user asks for a simulation**.
