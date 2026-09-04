@@ -278,7 +278,7 @@ def main():
 
     print("\n  Optional, each unlocks one thing:\n")
     has_uv = bool(have("uv")) or bool(have("pipx"))
-    row("uv or pipx", has_uv, "" if has_uv else "needed for /bld-runtime-tokens only")
+    row("uv or pipx", has_uv, "" if has_uv else "needed for /bld-runtime-tokens only -> astral.sh/uv")
 
     # gstack's own `setup` is a bun script and refuses to run without it. Nothing
     # else in BLD needs bun, so it is optional - but a missing bun is worth

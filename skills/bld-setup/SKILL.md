@@ -822,6 +822,20 @@ These four deserve the most attention:
 until Claude Code restarts. Say this plainly. It is the number one reason a fresh
 setup looks broken.
 
+**There is a second restart, and it is not the same one.** A CLI installed into a
+directory that was not already on `PATH` stays invisible to *this* shell, and so
+to preflight, until a new shell starts. It hits `claude-monitor` and
+`jcodemunch-mcp` (uv puts them in `~/.local/bin`), and anything installed after
+an npm prefix change (`~/.npm-global/bin`). uv and npm both append the directory
+to `~/.profile` and `~/.bashrc`, which is enough for a human opening a terminal
+and not enough for a non-interactive shell, which reads neither. So a tool that
+installed perfectly reports `[--]` seconds later. Before treating that as a
+failed install, check the binary directly - `ls ~/.local/bin` and
+`ls ~/.npm-global/bin` - and if it is there, the install worked and only the
+`PATH` is stale. On Windows the same thing happens for a different reason: PATH
+comes from the environment block a process inherited at launch, so a running
+terminal never sees an installer's change.
+
 After restarting:
 
 ```bash
