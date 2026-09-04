@@ -223,6 +223,21 @@ def installed_plugins():
     return out
 
 
+def slist(state, key):
+    """A list field from the state file, defended against the shapes it arrives in.
+
+    The file is written by Claude, not by a schema, so `"chose": "bld"` is a
+    plausible slip and is valid JSON. Iterated straight, it reads out as three
+    groups named 'b', 'l' and 'd' and the resume branch dutifully offers to
+    install them. Anything that is not a list of strings is treated as absent,
+    which surfaces as FIRST RUN rather than as nonsense.
+    """
+    v = state.get(key, [])
+    if not isinstance(v, list):
+        return []
+    return [x for x in v if isinstance(x, str)]
+
+
 def row(label, ok, detail=""):
     mark = "[ok]  " if ok else "[--]  "
     print("  " + mark + label.ljust(20) + detail)
@@ -545,10 +560,29 @@ def main():
             print("  FIRST RUN. No prior setup recorded.")
             print("  -> Run the full flow from Phase 1.")
     elif not state.get("completed"):
-        done = state.get("done", [])
+        done = slist(state, "done")
         print("  RESUMING an unfinished setup.")
         print("  Done so far : " + (", ".join(done) if done else "nothing yet"))
-        print("  Chose       : " + ", ".join(state.get("chose", [])))
+        print("  Chose       : " + ", ".join(slist(state, "chose")))
+        # A group name Phase 4 has no step for can never leave "Still to do".
+        # That already happened once with a real slug (mcp, offered in Phase 3
+        # with no install step); a typo or an invented name does the same thing.
+        # A key that is present but not a list of strings has been dropped by
+        # slist(), so it reads as empty here rather than as whatever it was.
+        # Say which key, or the resume looks like it simply chose nothing.
+        malformed = [k for k in ("chose", "done", "declined")
+                     if k in state and not slist(state, k) and state[k]]
+        if malformed:
+            print("  !! UNREADABLE FIELDS: " + ", ".join(malformed))
+            print("     Present in the state file but not a list of strings,")
+            print("     so they were ignored. Rewrite the file from the disk")
+            print("     inventory above rather than trusting the lines below.")
+        unknown = [g for g in slist(state, "chose") + slist(state, "done")
+                   if g not in evidence and g != "prereqs"]
+        if unknown:
+            print("  !! NOT REAL GROUP NAMES: " + ", ".join(sorted(set(unknown))))
+            print("     Phase 4 has no step for these, so they can never")
+            print("     finish. Fix the state file before continuing.")
         # A crash between installing and writing leaves the state file lying in
         # both directions, so trust the disk over the claim.
         unproven = [g for g in done if evidence.get(g) is False]
@@ -557,9 +591,9 @@ def main():
         # forever, and the resume reinstalled it - re-cloning gstack, re-adding
         # plugin marketplaces. The comment above always claimed both directions;
         # only one was implemented.
-        already = [g for g in state.get("chose", [])
+        already = [g for g in slist(state, "chose")
                    if g not in done and evidence.get(g) is True]
-        remaining = [g for g in state.get("chose", [])
+        remaining = [g for g in slist(state, "chose")
                      if g not in done and g not in already] + unproven
         print("  Still to do : " + (named(remaining) if remaining else "finish up + restart"))
         if already:
@@ -572,7 +606,7 @@ def main():
             print("                file is wrong. Re-install these, do not skip them.")
         print("  -> Skip Phases 1-3. Pick up at the first item in 'Still to do'.")
     else:
-        declined = state.get("declined", [])
+        declined = slist(state, "declined")
         print("  RETURNING USER. Setup was completed on " + str(state.get("completed_on", "?")) + ".")
         print("  Previously declined: " + (", ".join(declined) if declined else "nothing"))
         gone = [g for g, ok in sorted(evidence.items())
