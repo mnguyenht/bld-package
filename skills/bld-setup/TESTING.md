@@ -3,11 +3,17 @@
 `/bld-setup` is the first thing a new user touches and the hardest thing to test,
 because the only honest test is a machine that does not have BLD on it yet.
 
-Simulated first-runs are the substitute. **Six of them have found thirty-seven
-real bugs**, including a security control that registered and then failed
-silently on every non-Windows machine, and a group offered in Phase 3 that
-Phase 4 never installed. None were found by reading the skill. Reading finds typos; walking a
+Simulated first-runs are the substitute. **Seven of them found thirty-seven real
+bugs**, including a security control that registered and then failed silently on
+every non-Windows machine, and a group offered in Phase 3 that Phase 4 never
+installed. None were found by reading the skill. Reading finds typos; walking a
 scenario finds the steps that cannot happen.
+
+**Then run 8 was an actual machine, and found seven more in an afternoon** - two
+of them severe enough to make a first install do nothing while reporting success.
+Every one of them was invisible to simulation for the same structural reason: a
+simulated machine has whatever the simulator assumes it has. Nobody imagined a
+missing `bun`, because the machine doing the imagining had bun.
 
 This file is the method. It generalises to any skill, but `/bld-setup` is where
 it earns its keep.
@@ -113,6 +119,7 @@ git-gated features**, **crash mid-group + resume**, **project scope + preflight*
 | 6 | "Let me choose" branch, walked Phases 2-9 | **The `mcp` group was offered in Phase 3 and Phase 6 and had no Phase 4 install step**, so it could never leave "Still to do" · the pip install it needs was not in the manifest, breaking the skill's own "never install anything not in the printed table" rule · a resume reinstalled groups the disk already had · "Nothing else" sat in a multi-select with no precedence rule · `LIMITED` dropped git-blocked groups but still offered bundles promising them · Phase 2 recorded neither an accepted nor a declined deploy · Phase 9's own verification prints `RESUMING an unfinished setup` after a successful install and nothing said that was expected · Phase 8 counted the placeholders in one template and highlighted items from the other · Phase 7 told you to prove Codex works and only mentioned below that it refuses to run outside a git repo · the "run these through the Bash tool" note sat on the one block that survives PowerShell, not on the gstack conditional or the prune heredoc, which do not · preflight enforced a Python floor but never checked Node's version, so an ancient Node failed inside `npx` looking like a broken package · the hook's selftest printed a hardcoded tally that a later edit would silently make wrong, and its Skill-only scope was never written down |
 
 | 7 | Windows, python.org install with "Add to PATH" unticked, so only the `py` launcher works | **Nothing.** Verified for real rather than reasoned: `py` satisfies the Phase 0b probe and the version gate, runs preflight, runs the hook selftest, and `py -m pip` covers the Phase 4 code-search step. `py.exe` lives in `C:\Windows`, which is always on PATH, so the registered hook command resolves. Recorded because a clean axis is worth knowing too - it stops the next session re-walking it. |
+| 8 | **Real run, not a simulation.** Ubuntu 26.04 in WSL2, installed clean, Windows PATH inheritance disabled, non-root user, executed for real | **`npx skills add` has its own `Proceed with installation?` prompt; with no TTY it reads EOF and exits 0 having installed nothing - all eleven core skills were silent no-ops** · **gstack's `setup` is a bun script and nothing checked for bun, so `setup` exited 1 and the prune's `pruned 0` was then blamed on a stale matcher** · `bld-util-copywriting` carried the same skills-add command · `python3 -m pip` answers `No module named pip` on a minimal image, never reaching the `externally-managed-environment` error the skill said to expect · hook registration assumed `settings.json` existed because plugins wrote it · a CLI installed into a new PATH directory reports `[--]` until the shell restarts, which Phase 9 warns about for Claude Code but not for PATH · preflight trusted `/mnt/c/...` Windows shims found through the WSL PATH · `uv or pipx` was the only prerequisite naming no source |
 
 Untested as of writing: a real Linux or macOS run rather than a reasoned walk,
 interruption between groups, and the thing that matters most - **an end-to-end
@@ -196,8 +203,12 @@ python skills/bld-professional-settings/scripts/switch-mode.py off >/dev/null
 
 ## Known limits of this method
 
-- **A simulation is not a run.** `/bld-setup` has still never been executed end to
-  end by a real user on a real machine. Everything here is a model of one.
+- **A simulation is not a run - and run 8 proved the gap is not small.** Seven
+  simulations found nothing that a single real cold machine then found seven of.
+  Simulate to explore an axis cheaply; run it for real before believing it works.
+  What is still untested: a real Windows machine that has never had BLD (the WSL
+  box only covers the Linux half), and the plugin phase end to end, which could
+  not be exercised because Claude Code segfaults on Ubuntu 26.04.
 - **You cannot simulate ignorance you do not have.** An OS nobody in the loop uses
   will not get an honest scenario.
 - **Returns have not diminished yet.** Six runs, thirty bugs, and run six found
