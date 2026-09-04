@@ -11,7 +11,12 @@ stdin   = JSON array of tool calls: [{"name":..., "arguments":{...}}, ...]
 """
 import atexit, json, os, signal, subprocess, sys, threading, time, queue, shutil
 
-_NPX = shutil.which("npx.cmd") or shutil.which("npx") or "npx"
+# npx on Windows is npx.cmd, because Python cannot exec the extensionless
+# shim - so prefer it THERE, and only there. Ungated, this also fires under
+# WSL, where the inherited Windows PATH offers /mnt/c/.../npx.cmd (a batch
+# file Linux cannot run) ahead of a perfectly good /usr/bin/npx.
+_NPX = ((shutil.which("npx.cmd") if sys.platform == "win32" else None)
+        or shutil.which("npx") or "npx")
 SERVERS = {
     "jcodemunch": ["jcodemunch-mcp", "serve"],
     # npx on Windows is npx.cmd; resolve at runtime
