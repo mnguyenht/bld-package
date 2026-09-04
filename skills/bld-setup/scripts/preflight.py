@@ -114,7 +114,7 @@ def have(cmd):
     # from Linux: they exec `node`, which resolves to the Windows binary they
     # cannot reach, and die with "exec: node: not found" long after this check
     # said ok. Report them as missing so the install offers them properly.
-    if found and found.startswith("/mnt/"):
+    if found and found.startswith("/mnt/") and _WSL:
         return None
     return found
 
@@ -238,14 +238,24 @@ def installed_plugins():
     return out
 
 
+# Only WSL inherits the Windows PATH, and only there is a /mnt/... hit a Windows
+# binary rather than an ordinary mounted disk. Gating on this keeps a Linux box
+# with tools under /mnt/data from having them declared missing.
+try:
+    with open("/proc/version") as _f:
+        _WSL = "microsoft" in _f.read().lower()
+except OSError:
+    _WSL = False
+
+
 def slist(state, key):
     """A list field from the state file, defended against the shapes it arrives in.
 
     The file is written by Claude, not by a schema, so `"chose": "bld"` is a
     plausible slip and is valid JSON. Iterated straight, it reads out as three
     groups named 'b', 'l' and 'd' and the resume branch dutifully offers to
-    install them. Anything that is not a list of strings is treated as absent,
-    which surfaces as FIRST RUN rather than as nonsense.
+    install them. Anything that is not a list of strings is treated as absent;
+    the verdict then names the dropped field rather than printing nonsense.
     """
     v = state.get(key, [])
     if not isinstance(v, list):
@@ -344,10 +354,14 @@ def main():
     gh_authed = False
     if gh_path:
         gh_authed, line = run([gh_path, "auth", "status"])
+        auth = "signed in" if gh_authed else "NOT SIGNED IN -> gh auth login"
         if not gh_on_path:
-            row("gh", True, "found at the default path but NOT on PATH -> restart the shell")
+            # Both facts matter and they are independent: Phase 2 needs to know
+            # whether they are authenticated, and every later step calls a bare
+            # `gh` that will not resolve until the shell is restarted.
+            row("gh", True, auth + ", but NOT on PATH -> restart the shell")
         else:
-            row("gh", True, "signed in" if gh_authed else "INSTALLED BUT NOT SIGNED IN -> gh auth login")
+            row("gh", True, auth if gh_authed else "INSTALLED BUT " + auth)
     else:
         row("gh", False, "not installed -> cli.github.com")
 
