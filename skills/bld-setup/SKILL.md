@@ -441,11 +441,33 @@ If it is absent, create it with just the keys below.
 has no project yet, so asking them to choose is asking about something they
 cannot evaluate.
 
+**On a re-run, check the naming mode FIRST.** Phase 0c prints it: `23 of 23
+(global, pro mode)`. The package ships friendly names, so copying it over a pro
+mode install adds a second full set beside the renamed one - measured, 42 folders
+and nineteen commands answering to two names each, at twice the context cost.
+Nothing errors and nothing reports it, because both sets are valid skills. A
+*clean* pro install looks perfectly healthy right up until this copy.
+
+If Phase 0c said pro mode, bracket the copy:
+
+```bash
+<PY> ~/.claude/skills/bld-professional-settings/scripts/switch-mode.py off
+```
+
 ```bash
 mkdir -p ~/.claude/skills ~/.claude/agents
 cp -r "<resolved path>/skills/"*  ~/.claude/skills/
 cp -r "<resolved path>/agents/"*  ~/.claude/agents/
 ```
+
+```bash
+<PY> ~/.claude/skills/bld-professional-settings/scripts/switch-mode.py on
+```
+
+Skip both bracketing commands if Phase 0c said friendly mode. If it reported
+folders in "the other naming mode", a rename stopped partway: finish that with
+`/bld-professional-settings` before copying anything, or this same doubling
+happens from the other direction.
 
 **The `mkdir -p` is not optional.** A fresh Claude Code install has no
 `~/.claude/agents/` directory, and `cp` into a missing target fails with
