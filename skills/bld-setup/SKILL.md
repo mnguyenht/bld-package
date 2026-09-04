@@ -304,12 +304,23 @@ reading it the obvious way.
 discussed. See Phase 5 - a group that is in neither list is reported as missing
 on every future run.
 
-**Skip any group git would block** if preflight said `LIMITED`, and say why
-rather than silently dropping it. **That includes the Question 1 labels**, not
-just the install step: "Everything, extras included" reads as a promise of gstack
-and impeccable, and offering a bundle you already know cannot install all of it
-is how a setup ends with someone asking where their tools went. Reword the option
-to what they will actually get, and name what git is holding back.
+**Skip any group a missing prerequisite would block**, and say why rather than
+silently dropping it. **That includes the Question 1 labels**, not just the
+install step: "Everything, extras included" reads as a promise of gstack and
+impeccable, and offering a bundle you already know cannot install all of it is
+how a setup ends with someone asking where their tools went. Reword the option to
+what they will actually get, and name what is holding the rest back.
+
+Two prerequisites do this, and Phase 0c reports both:
+
+- **git missing** (`LIMITED`) blocks `/bld-util-deploy`, gstack and impeccable.
+- **bun missing** blocks gstack alone, because its installer is a bun script.
+  impeccable is unaffected, so the extras bundle becomes "token monitor, code
+  search and impeccable" rather than disappearing.
+
+Neither is worth a detour to install mid-setup unless they ask. Offer the bundle
+you can actually deliver, name the one tool that is missing and where it comes
+from, and let them add it later.
 
 **Question 2 lets them deselect BLD.** Honour it, but say what it means first:
 without it there are no `/bld-*` commands at all, and the Phase 9 check will find
