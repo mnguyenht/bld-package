@@ -56,6 +56,7 @@ file holds only what's specific to this workspace.
 | App is live but invisible on Google | `/bld-optimize-seo-indexing` — audit the LIVE site with curl, add the crawl plumbing, hand over the account steps |
 | Securing an app before shipping something serious | `/bld-optimize-security` — final-boss STATIC pass over all 13 layers. Free + local |
 | App needs a user guide / docs / help page | `/bld-util-documentation` — survey the app → write a `/docs` subpage in Simplified Technical English |
+| App's words are placeholders, or the copy reads as AI-written | `/bld-util-copywriting` — rewrite through the copywriting skill, then apply the workspace's proof and voice constraints |
 | Bulky / repetitive / long generation | `/bld-runtime-agents` — Claude specs + reviews, an external agent writes the code |
 | A brain-dump of several independent pieces at once | `/bld-orchestrator-fable` — Claude plans + judges, `bld-executor` workers build in parallel |
 | Same loop but on Opus | `/bld-orchestrator-opus` |
@@ -64,7 +65,7 @@ file holds only what's specific to this workspace.
 | Long session, context rotting | `/bld-util-handoff` → `/clear` → "read handoff.md and continue" |
 | Session starts and `handoff.md` exists | offer to resume from it |
 | Want the MCP servers connected all session instead of per-query | `/bld-mcp-settings on <server>` — writes them into `.mcp.json`. `off` removes them. Enable `context-mode` only on its own, never in a bundle |
-| I keep forgetting which category a command is under | `/bld-professional-settings on` — pro mode moves the type segment to the END of all 22 names, so the distinctive word comes first and the first few letters reach the command. `off` puts the type back in front. Same length either way; this is about recall, not keystrokes |
+| I keep forgetting which category a command is under | `/bld-professional-settings on` — pro mode moves the type segment to the END of all 23 names, so the distinctive word comes first and the first few letters reach the command. `off` puts the type back in front. Same length either way; this is about recall, not keystrokes |
 | Change done & user explicitly says ship it | `/bld-util-deploy` (established app = just commit + push) — NOT after every edit |
 | App about to **charge users** | install a Stripe skill |
 | App needs **accounts/DB/backend** | install a Supabase skill |

@@ -1,7 +1,7 @@
 # bld-package — the BLD skillset, packaged for other people
 
 This repo is **not an app.** It is the distributable copy of the `bld-*` skillset:
-22 skills, one agent, one hook, two CLAUDE.md templates. Almost all of it is
+23 skills, one agent, one hook, two CLAUDE.md templates. Almost all of it is
 markdown read by Claude Code on someone else's machine. The exceptions are the
 five helper scripts below, which do execute, and the manifest lists them as such
 because that column is the one users decide on.
@@ -16,6 +16,11 @@ because that column is the one users decide on.
   `skills/bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader),
   `skills/bld-runtime-activate-mcps/run.py` (MCP runner),
   plus `hooks/block-image-skills.py`, which is a hook rather than a helper.
+
+  `bld-setup/scripts/scenarios.py` is a seventh Python file but not a helper: it
+  is the regression suite for `preflight.py`, run by people working on this
+  package, never by a user's session. It ships anyway, because the install copies
+  `skills/` wholesale, so the manifest declares it.
 
 ## The rule that matters here
 
@@ -44,7 +49,7 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 ## Conventions
 
 - **Folder name and frontmatter `name` must match.** They drifted apart
-  historically and the frontmatter won, but every one of the 22 now agrees, and
+  historically and the frontmatter won, but every one of the 23 now agrees, and
   `switch-mode.py` relies on that: `detect_mode` treats a BLD skill whose folder
   and declared name disagree as evidence of an interrupted rename, and refuses to
   toggle. Renaming a folder by hand without its frontmatter now jams the mode
@@ -89,6 +94,13 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   and an other-mode command literal waiting to be flattened. It is the only
   thing standing over `bld-professional-settings`, which nothing else keeps in
   sync. Two of the bugs it now catches are ones it was written after.
+- **Run `python skills/bld-setup/scripts/scenarios.py` after touching
+  `preflight.py`.** 26 scenarios, each one a bug that was real once: a corrupt
+  state file, a scoped install whose project was deleted, a naming switch that
+  stopped partway, a Node too old for `npx`. It builds a fake machine per case
+  under a temp dir and asserts on the verdict. A green run is a regression net,
+  not evidence the skill is sound - the walks in `bld-setup/TESTING.md` are what
+  find design flaws, and they found nine tenths of these on a passing suite.
 - **Run the naming round trip before committing docs.** `switch-mode.py on`, then
   `off`, then `git status`. Anything but a clean tree means the pass is not
   reversible on your text, and the diff shows you exactly which sentence it ate.
@@ -100,7 +112,7 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 
 ## Status
 
-22 skills. **There are exactly two naming conventions and no third:**
+23 skills. **There are exactly two naming conventions and no third:**
 prefix-type-skill (default) and prefix-skill-type (pro). Pro reorders; it never
 drops a segment. A name missing its type belongs to neither convention — pro mode
 shipped that way once, and every one of those names is now in `LEGACY`.
@@ -108,6 +120,8 @@ shipped that way once, and every one of those names is now in `LEGACY`.
 byte-identical.
 
 Verified: `lh-report.mjs` against a live Lighthouse v13.4.1 report, `preflight.py`
-on a real machine, `switch-mode.py` across two full round trips.
+on a real machine and across 26 scripted scenarios, `switch-mode.py` across two
+full round trips, `block-image-skills.py` against the sub-skills of
+ui-ux-pro-max 2.6.2 (exactly two touch image generation; both are blocked).
 
 Not yet run end to end by a real new user: `/bld-setup`. MIT licensed.

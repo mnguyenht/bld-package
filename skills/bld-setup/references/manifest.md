@@ -111,11 +111,14 @@ fires one batch of queries, and kills the process, so **nothing is written to
 opt-in, per-server, and reversible. Read the trust column first: always-on means
 the server is connected for your whole session rather than for one batch.
 
-| Server | What it does | Trust weight | Verify at |
-|---|---|---|---|
-| **jcodemunch** | Token-cheap code search via tree-sitter. Read-only. Blind to CSS. | low, read-only | https://github.com/jgravelle/jcodemunch-mcp |
-| **context-mode** | Heavier code context server. Its `ctx_execute` **runs real shell commands** with your logged-in `gh` / `aws` / `vercel`. | **high** | https://github.com/mksglu/context-mode |
-| **shadcn** | Real shadcn/ui registry data so components aren't guessed from memory. Official. | low | https://github.com/shadcn-ui/ui |
+| Server | What it does | Trust weight | Install | Verify at |
+|---|---|---|---|---|
+| **jcodemunch** | Token-cheap code search via tree-sitter. Read-only. Blind to CSS. | low, read-only | `pip install jcodemunch-mcp`, or `pipx` / `uv tool` where pip is externally managed | https://github.com/jgravelle/jcodemunch-mcp |
+| **context-mode** | Heavier code context server. Its `ctx_execute` **runs real shell commands** with your logged-in `gh` / `aws` / `vercel`. | **high** | `npx -y context-mode`, never installed | https://github.com/mksglu/context-mode |
+| **shadcn** | Real shadcn/ui registry data so components aren't guessed from memory. Official. | low | `npx -y shadcn@latest mcp`, never installed | https://github.com/shadcn-ui/ui |
+
+**Only jcodemunch puts anything on disk.** The other two are fetched by `npx` at
+query time and leave nothing behind but an npm cache entry.
 
 ---
 
@@ -123,9 +126,9 @@ the server is connected for your whole session rather than for one batch.
 
 | Piece | What it does | Runs code? |
 |---|---|---|
-| **22 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. Free, with one exception: /bld-runtime-agents drives an external coding agent and needs either a paid ChatGPT subscription for Codex or Gemini's free tier. Every other command costs nothing beyond your own Claude usage. | md, except **five helper scripts**: `bld-setup/scripts/preflight.py` (reads your machine, installs nothing), `bld-professional-settings/scripts/switch-mode.py` (renames BLD's own files), `bld-mcp-settings/scripts/mcp-settings.py` (edits your `.mcp.json`, and refuses to remove entries it did not write), `skills/bld-runtime-activate-mcps/run.py` (spawns an MCP server, then kills it), and `skills/bld-optimize-app/scripts/lh-report.mjs` (node, reads a Lighthouse JSON report). All five are ours and short enough to read. |
+| **23 `bld-*` skills** | The workflow set: init → refine → deploy, plus review, security, SEO, docs, planning, delegation. Free, with one exception: /bld-runtime-agents drives an external coding agent and needs either a paid ChatGPT subscription for Codex or Gemini's free tier. Every other command costs nothing beyond your own Claude usage. | md, except **five helper scripts**: `bld-setup/scripts/preflight.py` (reads your machine, installs nothing), `bld-professional-settings/scripts/switch-mode.py` (renames BLD's own files), `bld-mcp-settings/scripts/mcp-settings.py` (edits your `.mcp.json`, and refuses to remove entries it did not write), `skills/bld-runtime-activate-mcps/run.py` (spawns an MCP server, then kills it), and `skills/bld-optimize-app/scripts/lh-report.mjs` (node, reads a Lighthouse JSON report). All five are ours and short enough to read. A sixth file, `bld-setup/scripts/scenarios.py`, is copied with the rest but is the test harness for `preflight.py` and never runs during setup or during any command. |
 | **`bld-executor` agent** | The worker the orchestrator skills fan out to. | md |
-| **`block-image-skills.py` hook** | PreToolUse hook that **blocks** `ui-ux-pro-max:design` and `banner-design`. BLD never generates images with AI; it finds existing assets. Claude Code's own top-level `design` skill is not blocked: it lays out HTML artboards and generates nothing. | code (yours, ~40 lines, read it) |
+| **`block-image-skills.py` hook** | PreToolUse hook that **blocks** `ui-ux-pro-max:design` and `banner-design`. BLD never generates images with AI; it finds existing assets. Claude Code's own top-level `design` skill is not blocked: it lays out HTML artboards and generates nothing. It matches the `Skill` tool only, so it is a guardrail on skill invocation rather than a sandbox. | code (yours, under 80 lines, read it) |
 | **`CLAUDE.md` templates** | The global + workspace rule layers. Sanitised, no personal data. | md |
 | **6 vendored ECC checklists** | Security checklists inside `/bld-optimize-security`, copied from a third party rather than written here. Markdown only, they execute nothing. Source and full MIT license ship beside them in `references/ecc/`. | md, third-party ([affaan-m/ECC](https://github.com/affaan-m/ECC)) |
 

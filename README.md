@@ -3,7 +3,7 @@
 **A lightweight agent skillset for every step of the building process.**
 
 Ask Claude Code to build something and it will. Ask it twice and you get two
-different processes. BLD gives the process a shape: 22 slash commands, one per
+different processes. BLD gives the process a shape: 23 slash commands, one per
 step, each carrying the checklist and the gotchas for that step.
 
 Decide what is worth building with `/bld-sprint-planning`. Build it with
@@ -183,6 +183,7 @@ Everything in between. Not building, not optimizing.
 | `/bld-util-handoff` | Snapshots the session to `handoff.md` so you can `/clear` and pick up in a fresh context before it rots. |
 | `/bld-util-documentation` | Surveys the whole app and writes a `/docs` page inside it, in Simplified Technical English. Documents what the code actually does. Half-built features go under Known limits. |
 | `/bld-util-customize-component` | When tweaking an effect by prompt has failed twice, this builds real sliders in the browser, bound to the real component. You drag, the values get committed, the panel gets deleted. |
+| `/bld-util-copywriting` | Writes or rewrites app copy through the installed copywriting skill, then applies workspace rules for pre-launch proof, litotes, irony, and AI-sounding phrasing. |
 
 ### settings
 
@@ -232,17 +233,18 @@ every app you build with it.
 ```
 bld-package/
 ├── README.md
-├── skills/                         22 commands, one folder each
+├── skills/                         23 commands, one folder each
 │   ├── bld-setup/
 │   │   ├── SKILL.md
 │   │   ├── references/manifest.md  every tool, with source links
-│   │   └── scripts/preflight.py    what is installed, what is missing
+│   │   ├── scripts/preflight.py    what is installed, what is missing
+│   │   └── scripts/scenarios.py    regression tests for preflight
 │   ├── bld-sprint-*/               planning · init · refine
 │   ├── bld-optimize-*/             app · react · security · seo-indexing
 │   ├── bld-find-*/                 21st · spline
 │   ├── bld-runtime-*/              agents · tokens · activate-mcps
 │   ├── bld-orchestrator-*/         fable · opus
-│   ├── bld-util-*/                 deploy · handoff · documentation · customize-component
+│   ├── bld-util-*/                 deploy · handoff · documentation · customize-component · copywriting
 │   ├── bld-quiz/
 │   └── bld-professional-settings/
 │       └── scripts/switch-mode.py  renames every command between modes

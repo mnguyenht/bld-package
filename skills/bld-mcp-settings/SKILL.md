@@ -57,10 +57,10 @@ absolute path, and name the project with `--root`:
 ```bash
 PY=~/.claude/skills/bld-mcp-settings/scripts/mcp-settings.py   # or the scoped path
 
-python3 "$PY" status                          --root "<project>"
-python3 "$PY" on  jcodemunch shadcn           --root "<project>"
-python3 "$PY" off jcodemunch                  --root "<project>"
-python3 "$PY" off --all                       --root "<project>"
+python "$PY" status                          --root "<project>"
+python "$PY" on  jcodemunch shadcn           --root "<project>"
+python "$PY" off jcodemunch                  --root "<project>"
+python "$PY" off --all                       --root "<project>"
 ```
 
 `--root` defaults to the current directory, so it can be omitted when you are

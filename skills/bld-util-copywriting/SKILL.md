@@ -27,25 +27,31 @@ Invoke the copywriting skill for the craft  →  apply everything below on top
 Do not silently freestyle the frameworks; the whole point of this file is that it
 is a thin layer over a good source.
 
-**Where this file and the source disagree, this file wins.** That happens in
-three places, all of them deliberate, all of them below.
+**Where this file and the source disagree, this file wins.** It only disagrees in
+two places, both about voice: the two bans below. Everything else here is
+pre-filled answers to questions the source already asks.
 
-## The setting the source does not assume
+## Standing answers to the source's opening questions
 
-The source skill is written for a company with customers. It reaches for case
-studies, metrics, testimonials and logo walls, because for its usual reader those
-exist.
+The source opens by gathering context, and it **asks** rather than assumes. Its
+own wording is *"**Any** proof points (numbers, testimonials, case studies)?"*,
+Social Proof is one optional row in its Core Sections table, and its formality
+options run from casual to enterprise. It is written to fit an indie builder and a
+company equally.
 
-**Ours usually do not.** The apps in this workspace are pre-launch or days old.
-They have no users to quote, no numbers to cite, and no press. That single fact
-drives most of the adaptation:
+For apps in this workspace the answers come out the same way nearly every time.
+Give them up front rather than interviewing the user for them again:
 
-| The source suggests | Here instead |
+| The source asks | Our standing answer |
 |---|---|
-| Social proof, logos, testimonials | Leave the slot out entirely. An empty testimonial section is worse than no section. |
-| Concrete metrics ("cut costs 40%") | Describe the mechanism instead: what the app does, in what order, and how long it takes. |
-| "Trusted by 10,000 teams" | Nothing. This is the single fastest way to lose a reader who can tell. |
-| Founder story / About page depth | One honest line about why it exists, if the user wants an About page at all. |
+| Any proof points: numbers, testimonials, case studies? | **None.** These apps are pre-launch or days old. |
+| Voice-of-customer from reviews, interviews, support tickets? | **Does not exist yet.** Use the user's own words for the problem instead, from `planning.md` or the conversation. |
+| Where is traffic coming from? | A link the user sent by hand. Assume a cold visitor who knows nothing. |
+| Formality: casual, professional, or enterprise? | Casual to professional. Enterprise register is almost never right here. |
+
+**Leave the Social Proof section out** rather than filling it. The source already
+treats it as optional; an empty testimonial block is worse than no block, and a
+logo wall with nothing in it is the clearest possible sign the page is a template.
 
 **Never invent a statistic, a testimonial, a customer name, a rating, or a user
 count.** The source already says fabricated proof erodes trust and creates legal

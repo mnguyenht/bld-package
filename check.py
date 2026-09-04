@@ -25,6 +25,11 @@ EXEMPT = "bld-professional-settings"
 
 problems = []
 
+# Phase 8 spells its counts as words, so the check has to read both forms.
+_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six",
+          7: "seven", 8: "eight", 9: "nine", 10: "ten", 11: "eleven",
+          12: "twelve", 13: "thirteen", 14: "fourteen"}
+
 
 def fail(what):
     problems.append(what)
@@ -163,6 +168,36 @@ def main():
                         fail("%s:%d writes the path %s/ without a skills/ prefix, so "
                              "the rename pass cannot see it and it goes stale on the "
                              "next mode switch." % (rel, i, m.group(1)))
+
+    # The <FILL IN> tally in bld-setup Phase 8 is a prose claim about two files
+    # that nothing else keeps honest. It was already ambiguous once: the number
+    # counted the global template only, while the items it highlighted spanned
+    # both, so a user could fill in "the seven" and still ship a workspace file
+    # titled "<FILL IN: workspace name>". Mentions inside the opening HTML
+    # comment are the convention being explained, not a blank to fill.
+    fills = {}
+    for name in ("CLAUDE.global.md", "CLAUDE.workspace.md"):
+        path = os.path.join(ROOT, "templates", name)
+        if not os.path.isfile(path):
+            fail("templates/%s is missing; bld-setup Phase 8 installs it." % name)
+            continue
+        n, in_comment = 0, False
+        for line in io.open(path, encoding="utf-8", errors="replace"):
+            if "<!--" in line:
+                in_comment = True
+            if not in_comment and "FILL IN" in line:
+                n += line.count("FILL IN")
+            if "-->" in line:
+                in_comment = False
+        fills[name] = n
+    if len(fills) == 2:
+        g, w = fills["CLAUDE.global.md"], fills["CLAUDE.workspace.md"]
+        phase8 = read("skills", "bld-setup", "SKILL.md").lower()
+        for want, label in ((g + w, "total"), (g, "global"), (w, "workspace")):
+            if str(want) not in phase8 and (_WORDS.get(want) or "!!absent!!") not in phase8:
+                fail("bld-setup Phase 8 never states the %s <FILL IN> count (%d). "
+                     "Templates hold %d global + %d workspace = %d."
+                     % (label, want, g, w, g + w))
 
     print("%d skills, %d types, %d problems" % (len(folders), len(types), len(problems)))
     for p in problems:

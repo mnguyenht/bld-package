@@ -31,15 +31,30 @@ def blocks(skill):
     return skill in BLOCKED or skill.split(":")[-1] in BLOCKED_BARE
 
 
+# Ceiling, named rather than implied: this matcher sees the Skill tool only. The
+# image models are actually reached by `python .../skills/design/scripts/logo/
+# generate.py`, so a Bash call straight to those scripts is NOT blocked here -
+# the no-image-generation rule in CLAUDE.md is what covers that path. Verified
+# against ui-ux-pro-max 2.6.2, where exactly two of its seven sub-skills touch
+# image generation (design, banner-design) and both are listed above. Add a Bash
+# matcher only if the CLAUDE.md rule stops being enough.
+
+
 # `python block-image-skills.py --selftest` proves the matcher still does what it
 # claims. Worth having: this hook fails silently by nature, so a broken matcher
 # looks exactly like a working one until someone checks.
 if "--selftest" in sys.argv:
-    for name in ("ui-ux-pro-max:design", "ui-ux-pro-max:banner-design", "banner-design"):
+    must_block = ("ui-ux-pro-max:design", "ui-ux-pro-max:banner-design", "banner-design")
+    must_allow = ("design", "ui-ux-pro-max:ui-styling", "ui-ux-pro-max:brand",
+                  "slides", "bld-sprint-init")
+    for name in must_block:
         assert blocks(name), "should block: " + name
-    for name in ("design", "ui-ux-pro-max:ui-styling", "slides", "bld-sprint-init"):
+    for name in must_allow:
         assert not blocks(name), "should allow: " + name
-    print("selftest ok: 3 blocked, 4 allowed")
+    # Counted, not typed. A hardcoded tally goes stale the first time someone
+    # adds a case, and then a security control's only test reports a number that
+    # is not what it checked.
+    print("selftest ok: %d blocked, %d allowed" % (len(must_block), len(must_allow)))
     sys.exit(0)
 
 try:

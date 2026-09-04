@@ -106,12 +106,25 @@ exist at all, so guessing it silently breaks things that never report an error.
 
 Read-only: it installs nothing.
 
-**If they want BLD scoped to one project rather than global, pass that project:**
-`<PY> "<resolved path>/skills/bld-setup/scripts/preflight.py" --project "<project dir>"`.
-Without it preflight looks for a project-scoped install in the *current*
-directory, which during setup is the package folder, so a real install sitting
-in their project reads as absent and the verdict says to install it all again.
-Global installs need no flag. The line it prints names the directory it checked.
+**On a first run, do not ask about scope here.** Nothing is installed yet, so
+the answer cannot change what preflight finds, and scope is a Phase 4 question.
+Run it bare.
+
+**On any later run it matters, and preflight handles it itself:** Phase 5 records
+the project path in the state file, and preflight reads it back. The line it
+prints says where it looked and whether that came from the file:
+`project scope checked: ... (remembered from your last setup)`.
+
+Only pass `--project "<project dir>"` when that line points somewhere wrong, or
+when the state file is gone:
+
+```
+<PY> "<resolved path>/skills/bld-setup/scripts/preflight.py" --project "<project dir>"
+```
+
+Without either, preflight looks in the *current* directory, which during setup is
+the package folder, so a real install in their project reads as absent and the
+verdict says to install it all again.
 
 It prints prerequisites, deploy tooling, what BLD already installed, and a
 **verdict**. Route on the verdict:
@@ -121,7 +134,9 @@ It prints prerequisites, deploy tooling, what BLD already installed, and a
 | `BLOCKED` | Stop. Only node and npm are truly required. Give the links it printed. |
 | `LIMITED` | **Keep going.** git is missing, which removes only deploy, gstack and impeccable. Say what is unavailable, do not treat it as a failure. **Skip Phase 2 entirely**, and skip those groups in Phase 3. |
 | `FIRST RUN` | Full flow, Phase 1 onward. |
-| `RESUMING` | **Skip Phases 1-3.** Pick up at the first item in "Still to do". Do not re-ask what they already chose. |
+| `NO STATE FILE, but BLD is already on this machine` | **Not a first run.** BLD is on disk with no record of it: a hand install, or a deleted state file. Go to **Phase 6** and read its no-state note. |
+| `STATE FILE UNREADABLE` | A setup interrupted while writing it. Same as the row above: **Phase 6**. Never run the full flow over it, and never delete their install to "start clean". |
+| `RESUMING` | **Skip Phases 1-3.** Pick up at the first item in "Still to do". Do not re-ask what they already chose. Anything under `ALREADY DONE` is on disk already - record it, do not reinstall it. Anything under `RECHECK` is the opposite: claimed, absent, reinstall it. |
 | `RETURNING USER` | Skip to **Phase 6**. Do not re-run the flow. |
 
 Show the user the preflight output. It is short, and it is the honest picture of
@@ -135,6 +150,10 @@ source links intact.
 Then, briefly:
 
 - Nothing is installed yet.
+- **Most of this installs machine-wide**, under `~/.claude/`. BLD's own commands
+  can be scoped to a single project instead - say so and it will be. The other
+  groups have no per-project form, so scoping BLD does not make the install
+  machine-free. See "What scoping does and does not cover" below.
 - **`Runs code?`** is the column that matters. `md` rows are text and can only
   suggest things. `code` rows execute on their machine.
 - Section 7 is not installed. Both have working free tiers with low caps, so
@@ -145,7 +164,7 @@ Then, briefly:
   (macOS/Linux), and `react-doctor` / `react-scan` from the npm global prefix
   (`npm root -g`). Nothing touches their projects.
 
-Four lines, not four paragraphs.
+Lines, not paragraphs.
 
 ### Three kinds of thing, and users conflate them
 
@@ -185,6 +204,27 @@ If yes, and preflight showed them missing:
 npm install -g vercel
 ```
 
+**If this dies with `EACCES ... mkdir /usr/local/lib/node_modules`**, it is the
+first thing in the whole flow they see fail, and it will take react-doctor and
+react-scan down with it later. The Node they have puts its global prefix
+somewhere they do not own. Judge it by the error, not by the OS: a distro
+`apt install nodejs npm` and the nodejs.org `.pkg` on macOS both land there,
+while Homebrew, nvm, Volta, fnm and Windows do not.
+
+**The fix is a user-owned prefix, not `sudo`.** `sudo npm install -g` succeeds
+once and leaves root-owned files in `~/.npm` that make later non-sudo installs
+fail in a way nobody connects back to this:
+
+```bash
+mkdir -p ~/.npm-global
+npm config set prefix ~/.npm-global
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc   # or ~/.bashrc
+```
+
+Then re-open the shell and re-run the install. This is npm's own documented
+remedy. Do not raise it pre-emptively: on most machines it never happens, and it
+is one more thing to hold for someone who does not need it.
+
 `gh` has no npm package, so it installs per-platform. **Give them the one line for
 their OS, not all four** — a beginner reading a menu of package managers they do
 not have will pick the wrong one:
@@ -196,7 +236,15 @@ not have will pick the wrong one:
 | Debian / Ubuntu | `sudo apt install gh` |
 | Anything else | [cli.github.com](https://cli.github.com) |
 
-If `brew` or `winget` is itself missing, send them to `cli.github.com` rather than
+**`apt install gh` fails on a lot of Debian and Ubuntu machines.** `gh` only
+reached Ubuntu's own repos in 23.04 and is not in Debian's at all, so on Ubuntu
+22.04 LTS - still one of the most common - it answers
+`Unable to locate package gh`. When it does, send them to
+[cli.github.com](https://cli.github.com). Do **not** walk them through adding
+GitHub's apt repository: that is a keyring-and-sources-list detour in the middle
+of a setup, for a CLI they can install from a page in one step.
+
+If `brew` or `winget` is itself missing, same answer: `cli.github.com` rather than
 starting a second install project. Setting up a package manager is not this
 skill's job.
 
@@ -210,6 +258,15 @@ vercel login
 
 Wait, then confirm with `preflight.py` rather than assuming. **An installed CLI
 is not a signed-in CLI**, and `--version` passes on both.
+
+**Record the answer either way, before moving on (Phase 5).** Yes puts `deploy`
+in `done` once both CLIs are signed in; no puts it in `declined`.
+
+**If they say no, `declined` is the half that matters.**
+An unrecorded decline is not neutral: preflight has no way to tell "did not want
+it" from "had it and lost it", so every future run lists `deploy` under
+`MISSING NOW` with "Uninstalled, or a fresh machine", and Phase 6 offers it back
+to someone who already said no.
 
 ## Phase 3 — pick what to install
 
@@ -237,8 +294,27 @@ If they pick "Let me choose", ask these two, both multi-select, four options eac
 **Question 3 — the extras.** Token monitor · Code search servers · gstack +
 impeccable · Nothing else.
 
+**"Nothing else" sits in a multi-select, so it can be ticked alongside a real
+pick.** That is not an error to bounce back at them: the specific picks win and
+"Nothing else" means "and nothing beyond these". Say which way you read it in one
+line and carry on. Re-asking a question they already answered is worse than
+reading it the obvious way.
+
+**Everything not chosen goes into `declined`**, not just the groups they
+discussed. See Phase 5 - a group that is in neither list is reported as missing
+on every future run.
+
 **Skip any group git would block** if preflight said `LIMITED`, and say why
-rather than silently dropping it.
+rather than silently dropping it. **That includes the Question 1 labels**, not
+just the install step: "Everything, extras included" reads as a promise of gstack
+and impeccable, and offering a bundle you already know cannot install all of it
+is how a setup ends with someone asking where their tools went. Reword the option
+to what they will actually get, and name what git is holding back.
+
+**Question 2 lets them deselect BLD.** Honour it, but say what it means first:
+without it there are no `/bld-*` commands at all, and the Phase 9 check will find
+nothing. One line, then do as they asked - they may genuinely want only the
+plugins.
 
 ### What each group actually is
 
@@ -264,6 +340,13 @@ interrupted run knows what they wanted.
 Cheap and safe first, slow last, so a late failure does not block the rest.
 
 **Explain each command the first time it appears.** One block, then move on.
+
+**Every block below is bash. Run them through the Bash tool**, which exists on
+Windows, macOS and Linux. This is not a style note: the gstack block is a shell
+`if` and the prune is a heredoc, so in PowerShell they are syntax errors rather
+than near misses. If the user is typing commands themselves in a PowerShell
+window, translate before handing them over - the `cp` / `mkdir` forms are under
+**BLD itself**, and `rm -rf` becomes `Remove-Item -Recurse -Force`.
 
 ### Core skills
 
@@ -361,8 +444,38 @@ needs `-Recurse` instead of `-r`, and `mkdir -p` becomes
 `New-Item -ItemType Directory -Force`. Give them that form rather than watching
 it fail.
 
-Project-scoped (`<project>/.claude/skills/`) also works and wins on a name clash.
-One line about it; do not turn it into a decision.
+#### Project-scoped instead
+
+Only if they asked for it. Same two directories, rooted in their project, which
+wins over the global copy on a name clash:
+
+```bash
+mkdir -p "<project>/.claude/skills" "<project>/.claude/agents"
+cp -r "<resolved path>/skills/"*  "<project>/.claude/skills/"
+cp -r "<resolved path>/agents/"*  "<project>/.claude/agents/"
+```
+
+Resolve `<project>` to an absolute path the same way as the package path in
+Phase 0a, and record it in the state file (Phase 5) so later runs find it
+without being told.
+
+**What scoping does and does not cover.** Say this plainly rather than letting
+them discover it. Only the block above is scoped. Everything else in Phase 4 is
+machine-wide and has no per-project form:
+
+| Group | Where it actually goes |
+|---|---|
+| BLD skills + `bld-executor` | the project, if scoped |
+| Core skills (11) | global - `npx skills add` is run with `-g` |
+| Plugins (3) | global - Claude Code installs plugins per machine |
+| React tools | global - `npm install -g` |
+| gstack, impeccable | global - both clone into `~/.claude/skills/` |
+| The image-gen hook file | global - `~/.claude/hooks/`, so it outlives the project |
+
+Someone who picks project scope to keep a shared machine clean is not getting
+that, and should hear it before the install rather than after. If that is their
+actual goal, the honest answer is "scope BLD, and take Just the essentials", not
+"scoped install".
 
 **Copy the hook out of the package first.** The two `cp` lines above move
 `skills/` and `agents/` but not `hooks/`, so registering the package's own copy
@@ -395,7 +508,7 @@ that names a missing interpreter still registers fine and then fails every singl
 time it fires, printing nothing the user will see. The result is a security
 control that looks installed and is not running. After writing the file, run the
 cheaper check: `<PY> ~/.claude/hooks/block-image-skills.py --selftest` prints
-`selftest ok: 3 blocked, 4 allowed` and exits 0. A hook nobody tested is a hook
+`selftest ok: N blocked, M allowed` and exits 0. A hook nobody tested is a hook
 nobody has.
 
 ### React tools
@@ -409,6 +522,36 @@ projects.
 
 **Lighthouse is deliberately not installed.** `/bld-optimize-app` runs it through
 `npx` so the version is never stale.
+
+### Code search servers (only if chosen)
+
+**Only one of the three installs anything.** `context-mode` and `shadcn` are
+launched with `npx -y` at query time by `/bld-runtime-activate-mcps`, so there is
+nothing to do for them now. `jcodemunch` is a Python package and has to exist on
+PATH before that skill can start it:
+
+```bash
+<PY> -m pip install jcodemunch-mcp
+```
+
+The package name is `jcodemunch-mcp`, and it is also the command it installs.
+
+**If pip answers `error: externally-managed-environment`**, that Python belongs
+to the OS or to Homebrew and will not take packages directly (PEP 668). It is not
+a BLD problem, and **do not force it with `--break-system-packages`** - that is
+how a system Python gets quietly broken for everything else on the machine. Use
+the same tools the token monitor uses:
+
+```bash
+pipx install jcodemunch-mcp     # or: uv tool install jcodemunch-mcp
+```
+
+Expect this on Debian and Ubuntu, and on Homebrew Python 3.11+. A python.org
+install on Windows or macOS takes the plain `pip install` fine.
+
+Nothing is written to `.mcp.json`. These stay on-demand unless the user later
+runs `/bld-mcp-settings on`. Confirm with the `jcodemunch-mcp` row in preflight
+rather than by starting a server, which would sit and wait for input.
 
 ### Token monitor (only if chosen)
 
@@ -506,19 +649,33 @@ setup that recorded nothing is a setup that starts over.
 
 ```json
 {
+  "scope": "global",
+  "project": null,
   "chose": ["core-skills", "bld", "plugins", "react-tools"],
-  "declined": ["gstack", "impeccable", "mcp", "token-monitor", "agents"],
-  "done": ["prereqs", "deploy", "core-skills", "plugins"],
+  "declined": ["deploy", "gstack", "impeccable", "mcp", "token-monitor", "agents"],
+  "done": ["prereqs", "core-skills", "plugins"],
   "completed": false,
   "completed_on": null,
   "notes": { "uv": "declined, /bld-runtime-tokens unavailable" }
 }
 ```
 
+- **`scope` and `project` are how a scoped install survives.** `"scope": "project"`
+  with `"project": "C:/Users/you/code/your-app"` (absolute) lets preflight find it
+  on every later run without anyone remembering `--project`. Leave `project` null
+  for a global install. Omit them and a healthy scoped install reports as
+  `MISSING NOW: bld ... Uninstalled, or a fresh machine reusing an old state file`,
+  which is alarming and wrong.
 - Append to `done` after each group finishes.
-- `declined` is what they said no to. It is the difference between *not yet* and
-  *not wanted*, and Phase 6 depends on it.
+- **`declined` is every group they did not choose**, not just the ones they
+  argued about: a declined deploy, the extras they skipped in Phase 3, `agents`
+  if they skipped Phase 7. It is the difference between *not yet* and *not
+  wanted*. Anything left out of both `chose` and `declined` reappears under
+  `MISSING NOW` on every future run, and Phase 6 offers it back forever.
 - Set `completed: true` and `completed_on` only after the restart reminder.
+- **Never write this file by hand from memory on a resume.** Preflight has
+  already compared it to the disk; take `ALREADY DONE` into `done` and drop
+  anything under `RECHECK` back out of it.
 
 ## Phase 6 — returning user
 
@@ -542,6 +699,19 @@ Open with what is actually available to them, as a short table:
 
 Install only what they pick, then update `declined` and `done`. Nothing else.
 
+### When there is no state file to read
+
+`NO STATE FILE, but BLD is already on this machine` and `STATE FILE UNREADABLE`
+land here too, with one difference that changes how you talk: **there is no
+`declined` list.** Preflight's "On disk now" is what they have; "Not here" is
+everything else, and it cannot tell *not wanted* from *not yet*.
+
+So do not open with "three things you skipped" - you do not know that they
+skipped anything. Show what is there, ask what they want from the rest, and write
+the state file (Phase 5) so the next run does not have to ask again. Reinstalling
+what is already on disk is the one clear mistake here: it re-clones gstack and
+re-adds plugin marketplaces for no gain.
+
 ## Phase 7 — external coding agents (optional, free but capped)
 
 `/bld-runtime-agents` is the one BLD skill needing an account elsewhere.
@@ -563,11 +733,19 @@ npm install -g @google/gemini-cli
 gemini                           # first run prompts for auth; THE USER signs in
 ```
 
-Prove it works rather than assuming: `codex exec "reply with one word: ready"`.
+Prove it works rather than assuming, **from inside a git repo** - Codex refuses to
+start anywhere else, and running the proof from a home directory reports a working
+install as broken:
+
+```bash
+codex exec "reply with one word: ready"
+```
 
 Four things that have actually bitten:
 
-- **Codex refuses to run outside a git repo.** `git init` first.
+- **Codex refuses to run outside a git repo.** `git init` first. This is the one
+  above, and it bites hardest on the verification step, where the error looks
+  like the install failed.
 - **Each `codex exec` costs ~15k input tokens before reading your prompt.** Batch
   work; many small handoffs are mostly floor.
 - **Gemini exits 255 even on success.** Judge by the diff, not the exit code.
@@ -590,11 +768,18 @@ Two layers:
 **If `~/.claude/CLAUDE.md` exists, do not overwrite it.** Show a diff of what BLD
 would add and let them choose. Their rules outrank yours.
 
-Seven `<FILL IN>` blocks change behaviour. These four deserve the most attention:
+**Twelve `<FILL IN>` blocks across the two files: seven in the global template,
+five in the workspace one.** Count both. Someone who fills in "the seven" leaves
+the workspace file with `<FILL IN: workspace name>` as its title and no GitHub
+account for `/bld-util-deploy`, because that one lives in the workspace file, not
+the global one. (Each file also mentions `<FILL IN>` once inside its opening HTML
+comment. Those are explaining the convention, not asking for anything.)
 
-1. **Who they are** — decides how much gets explained.
-2. **GitHub username** — used by `/bld-util-deploy`.
-3. **Delegation** — mark unavailable if they skipped Phase 7.
+These four deserve the most attention:
+
+1. **Who they are** — decides how much gets explained. *(global)*
+2. **GitHub username** — used by `/bld-util-deploy`. *(workspace)*
+3. **Delegation** — mark unavailable if they skipped Phase 7. *(global)*
 4. **The dev loop** — server stays up, localhost link instead of opening their
    browser, and **never push without being asked**. Worth reading, not skimming.
 
@@ -610,10 +795,19 @@ After restarting:
 <PY> "<resolved path>/skills/bld-setup/scripts/preflight.py"
 ```
 
-Same `--project <project dir>` rule as Phase 0c if the install was scoped to one
-project. Getting it wrong here is worse than getting it wrong in 0c: this run
-happens seconds after a successful install, so a false "none installed" reads as
-"setup failed" at the exact moment they are already primed to believe it.
+A scoped install needs no flag here, as long as Phase 5 wrote `project`. Confirm
+it did by reading the line preflight prints: `project scope checked: ...
+(remembered from your last setup)`. If that names the wrong directory, pass
+`--project` and fix the state file. Getting this wrong is worse here than in 0c:
+the run happens seconds after a successful install, so a false "none installed"
+reads as "setup failed" at the exact moment they are primed to believe it.
+
+**Expect the verdict to say `RESUMING an unfinished setup`, and do not report
+that as a problem.** `completed` is still `false` at this point - it is set at
+the end of this phase, after the restart reminder - so a completely successful
+install lands in the resume branch by design. What matters is the line below it:
+`Still to do : finish up + restart` means everything installed. A list of real
+group names there does not, and that is the failure worth reading out.
 
 Then have them type `/bld-` and confirm the commands appear. A skill on disk but
 missing from the list means its frontmatter did not parse.
@@ -642,6 +836,11 @@ Set `completed: true` in the state file.
 - **Claiming success before a restart.**
 - **Chaining installs with `&&`.** One dead repo kills the batch.
 - **Re-running the full flow for a returning user.** That is Phase 6.
+- **Reading "no state file" as "nothing installed".** They are different, and
+  preflight now says which. A hand install or a deleted dotfile is not a first
+  run, and reinstalling over it wastes their time and re-clones what is there.
+- **Finishing a scoped install without writing `scope` and `project`.** The
+  install works; every later run then reports it as vanished.
 - **Asking a first-timer to choose global vs project scope.** Recommend global.
 - **Over-explaining.** See the voice rules at the top. Beginners need the
   unfamiliar explained, not everything.
@@ -652,9 +851,14 @@ Do not read `TESTING.md` during a normal run. It is for sessions working *on*
 this skill rather than *with* it.
 
 It holds the method that has found every real bug in here: walk a deliberately
-awkward machine through the phases and record what cannot happen. Three runs
-found nine bugs, including a security control that registered and then failed
-silently on every non-Windows machine. Reading the skill found none of them.
+awkward machine through the phases and record what cannot happen. Six runs found
+thirty-seven bugs, including a security control that registered and then failed
+silently on every non-Windows machine, and a group offered in Phase 3 that
+Phase 4 never installed. Reading the skill found none of them.
+
+`scripts/scenarios.py` is the regression net that grew out of those runs. It is
+worth running after any change to `preflight.py`, and it is not a substitute for
+a walk: every bug above was found by walking, on a suite that was passing.
 
 Default to a quiet audit that reports only findings. Produce the full role-played
 transcript **only when the user asks for a simulation**.

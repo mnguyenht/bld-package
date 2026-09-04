@@ -51,6 +51,32 @@ CORE_SKILLS = [
 ]
 PLUGINS = ["ponytail", "ui-ux-pro-max", "claude-code-setup"]
 
+# Groups whose presence on disk PROVES BLD was installed here, used when there
+# is no state file to consult. react-tools, deploy, token-monitor and agents are
+# deliberately absent: react-doctor, gh, vercel, uv and codex are ordinary tools
+# a developer may already have for unrelated reasons, so finding them proves
+# nothing about BLD and would turn a genuine first run into "already installed".
+BLD_PROOF = ("bld", "core-skills", "plugins", "gstack", "impeccable")
+
+# Group slugs are what the state file stores and what Phase 4 keys off, so they
+# stay first on every line. The gloss is for the human reading the same output:
+# "agents" meaning the external Codex/Gemini CLIs sat two lines below a row
+# literally called "bld-executor agent", which is a different thing entirely.
+# Only the slugs that are actually ambiguous get a gloss. Glossing all of them
+# pushed these lines past 150 characters, which in a terminal is worse than the
+# jargon it was fixing.
+LABEL = {
+    "deploy": "gh + vercel",
+    "agents": "Codex/Gemini",
+    "mcp":    "MCP servers",
+}
+
+
+def named(groups):
+    """'slug (what it is)' for output a beginner has to act on."""
+    return ", ".join((g + " (" + LABEL[g] + ")") if g in LABEL else g
+                     for g in groups)
+
 
 def have(cmd):
     """Resolve a command to a path we can actually execute.
@@ -104,6 +130,37 @@ def project_dir(argv):
                      "usage: preflight.py [--project <dir>]" % a)
         i += 1
     return path, explicit
+
+
+def read_state():
+    """Return (state_dict, status) where status is "none", "ok" or "broken".
+
+    A corrupt state file used to be indistinguishable from no state file at
+    all: both produced {} and a "FIRST RUN. No prior setup recorded" verdict,
+    followed by a "state file: none yet" line naming a path sitting right there
+    on disk. Phase 5 writes this file incrementally *during* the install, so a
+    crash mid-write is its designed failure mode rather than an exotic one, and
+    the result was a silent full reinstall over a half-finished one.
+    """
+    if not os.path.isfile(STATE):
+        return {}, "none"
+    try:
+        data = json.load(io.open(STATE, encoding="utf-8"))
+    except Exception:
+        return {}, "broken"
+    # A file holding a bare list or string parses fine and then fails on every
+    # .get() below, so type-check here rather than crashing 200 lines later.
+    if not isinstance(data, dict):
+        return {}, "broken"
+    return data, "ok"
+
+
+def disk_summary(evidence):
+    """What the machine itself proves, for when the state file cannot be read."""
+    on = sorted(g for g, ok in evidence.items() if ok)
+    off = sorted(g for g, ok in evidence.items() if not ok)
+    print("  On disk now : " + (named(on) if on else "nothing"))
+    print("  Not here    : " + (named(off) if off else "nothing"))
 
 
 def expected_bld_names():
@@ -168,6 +225,17 @@ def main():
     # got its OWN argv parsed and sys.exit'd out from under it.
     project, project_given = project_dir(sys.argv[1:])
 
+    # Read before anything else. The state file sits at a fixed path, and it
+    # remembers which project a scoped install went into. Without that, anyone
+    # who scoped BLD to one project had to remember --project on every future
+    # run, and forgetting it reported a healthy install as
+    # "MISSING NOW: bld, core-skills, plugins ... Uninstalled, or a fresh
+    # machine reusing an old state file."
+    state, state_status = read_state()
+    project_from_state = False
+    if not project_given and isinstance(state.get("project"), str) and state["project"]:
+        project, project_from_state = os.path.abspath(state["project"]), True
+
     # ── 1. prerequisites ────────────────────────────────────────────────
     print("\nPREREQUISITES")
     print("  Without these the install cannot start.\n")
@@ -175,8 +243,27 @@ def main():
     blockers = []
     for cmd, why in [("node", "runs the skill installer"),
                      ("npm", "installs the CLI tools")]:
-        if not row(cmd, bool(have(cmd)), why if not have(cmd) else ""):
+        found = have(cmd)
+        if not row(cmd, bool(found), why if not found else ""):
             blockers.append(cmd)
+        elif cmd == "node":
+            # Present is not the same as usable, which is why there is a Python
+            # floor at the top of this file. Node had no equivalent: `npx -y`
+            # needs npm 7 (Node 15+) and the skills installer assumes 18, so an
+            # ancient Node passed this check and then failed inside npx with an
+            # error that reads like a broken third-party package rather than an
+            # old runtime. Printed here, under its own row, rather than after
+            # the loop, where it read as a note about npm.
+            ok, line = run([found, "--version"])
+            major = 0
+            if ok and line.startswith("v"):
+                head = line[1:].split(".")[0]
+                major = int(head) if head.isdigit() else 0
+            if major and major < 18:
+                print("        this is %s, and Node 18+ is expected. `npx -y`" % line)
+                print("        needs npm 7 and the skills installer assumes 18.")
+                print("        Upgrade at nodejs.org first, or every failure")
+                print("        lands inside npx looking like someone else's bug.")
 
     # git is NOT a hard blocker. Core skills, plugins, BLD itself and the React
     # tools all install without it. It only gates deploy and the two suites that
@@ -231,10 +318,21 @@ def main():
             present |= found
             if any(s.startswith("bld-") for s in found):
                 scopes.append(label)
-    print("  project scope checked: " + os.path.join(project, ".claude"))
-    if project_given and not os.path.isdir(project):
+    scope_src = ""
+    if project_from_state:
+        scope_src = "  (remembered from your last setup)"
+    elif project_given:
+        scope_src = "  (--project)"
+    print("  project scope checked: " + os.path.join(project, ".claude") + scope_src)
+    project_missing = (project_given or project_from_state) and not os.path.isdir(project)
+    if project_missing:
         print("  !! that directory does not exist. Everything below will read as")
-        print("     'not installed' whether it is or not. Check the --project path.")
+        print("     'not installed' whether it is or not.")
+        if project_from_state:
+            print("     It came from the state file, so the project was moved or")
+            print("     deleted since setup. Re-run with --project <new path>.")
+        else:
+            print("     Check the --project path.")
 
     core_have = [s for s in CORE_SKILLS if s in present]
     bld_names = set(s for s in present if s.startswith("bld-"))
@@ -244,6 +342,7 @@ def main():
     # machine is in. Comparing sets rather than counts is the point: a count let
     # any unrelated bld-* folder cover for a skill that never copied.
     expected = expected_bld_names()
+    bld_strays = []
     bld_missing = []
     bld_expected = 0
     mode_note = ""
@@ -255,6 +354,13 @@ def main():
         bld_missing = sorted(expected[best] - bld_names)
         bld_expected = len(expected[best])
         mode_note = best
+        # Folders belonging to the OTHER mode are the tell. Without naming them
+        # the row reads "13 of 23 MISSING ..." on a machine that has all 23
+        # folders, and the obvious remedy - re-copy BLD - restores the missing
+        # names while leaving these, so the user ends up with both sets and
+        # double the context cost.
+        other = "pro" if best == "friendly" else "friendly"
+        bld_strays = sorted((bld_names & expected[other]) - expected[best])
     gstack_have = "gstack" in present
     impec_have = "impeccable" in present
 
@@ -284,6 +390,14 @@ def main():
         bld_note = "%d found (%s), expected names unknown" % (
             len(bld_have), "+".join(scopes))
     row("bld-* skills", bld_ok, bld_note)
+    if bld_strays:
+        print("        %d folder(s) use the other naming mode: %s%s"
+              % (len(bld_strays), ", ".join(bld_strays[:3]),
+                 ", ..." if len(bld_strays) > 3 else ""))
+        print("        That is a naming switch that stopped partway. Finish it")
+        print("        with /bld-professional-settings. Do NOT re-copy BLD: that")
+        print("        restores the missing names and leaves these, giving you")
+        print("        both sets and twice the context cost.")
     row("gstack", gstack_have, "")
     row("impeccable", impec_have, "")
 
@@ -310,7 +424,7 @@ def main():
     row("plugins", len(plug_have) == len(PLUGINS), plug_note)
 
     cli_have = {}
-    for cli in ("react-doctor", "react-scan", "claude-monitor"):
+    for cli in ("react-doctor", "react-scan", "claude-monitor", "jcodemunch-mcp"):
         cli_have[cli] = bool(have(cli))
         row(cli, cli_have[cli], "")
 
@@ -324,8 +438,8 @@ def main():
 
     # What the disk actually proves, keyed by the group slugs written to
     # .bld-setup.json. Used below to catch a state file that claims a group
-    # finished when it did not. Groups with no reliable on-disk signature
-    # (prereqs, mcp, agents) are deliberately absent rather than guessed at.
+    # finished when it did not. Only `prereqs` has no reliable on-disk
+    # signature and is deliberately absent rather than guessed at.
     evidence = {
         "core-skills":   len(core_have) == len(CORE_SKILLS),
         "bld":           bld_ok,
@@ -335,6 +449,12 @@ def main():
         "gstack":        gstack_have,
         "impeccable":    impec_have,
         "deploy":        bool(gh_path) and bool(have("vercel")),
+        # Two of the three code-search servers run through `npx -y` at query
+        # time and install nothing, so the whole group reduces to jcodemunch,
+        # which does put a binary on PATH. This was listed as having no on-disk
+        # signature, which meant a group offered in Phase 3 could never be
+        # confirmed and sat in "Still to do" forever.
+        "mcp":           cli_have["jcodemunch-mcp"],
         # The "agents" group is the EXTERNAL executor CLIs (Codex or Gemini)
         # that /bld-runtime-agents drives. It is NOT the bundled bld-executor
         # subagent file, which arrives with the bld group. Checking that file
@@ -344,14 +464,18 @@ def main():
     }
 
     # ── 4. verdict ──────────────────────────────────────────────────────
-    state = {}
-    if os.path.isfile(STATE):
-        try:
-            state = json.load(io.open(STATE, encoding="utf-8"))
-        except Exception:
-            state = {}
+    # state was read at the top of main(), before the project path was needed.
 
     print("\nVERDICT")
+    # Every branch below reasons from what it could see. If the project it was
+    # told to look in is not there, it saw nothing, and each branch has its own
+    # confident wrong explanation for that ("Uninstalled, or a fresh machine").
+    # Say it once, up front, rather than in five places.
+    if project_missing:
+        print("  !! The project directory checked above does not exist, so any")
+        print("     project-scoped install is invisible to this run. Treat every")
+        print("     'missing' below as unproven until that path is fixed.")
+        print("")
     if blockers:
         print("  BLOCKED: install " + ", ".join(blockers) + " first, then re-run.")
         print("    node + npm : nodejs.org (npm ships with node)")
@@ -363,9 +487,35 @@ def main():
         print("    Everything else installs fine. Add git later: git-scm.com")
         print("")
 
-    if not state:
-        print("  FIRST RUN. No prior setup recorded.")
-        print("  -> Run the full flow from Phase 1.")
+    if state_status == "broken":
+        print("  STATE FILE UNREADABLE. It exists, but is not valid JSON:")
+        print("    " + STATE)
+        print("  Most likely a setup that was interrupted while writing it.")
+        print("  This is NOT a fresh machine. Do not run the full flow blind.")
+        disk_summary(evidence)
+        print("  -> Treat 'On disk now' as done. Ask about the rest rather")
+        print("     than installing it: the record of what they declined went")
+        print("     with the file. Then rewrite the state file from disk.")
+    elif not state:
+        # No state file is not the same as nothing installed. A hand install, a
+        # deleted dotfile, or a state file that never got written all land here,
+        # and the old code told every one of them to reinstall a working setup.
+        proof = [g for g in BLD_PROOF if evidence.get(g)]
+        # status "ok" here means the file parsed but held {}. Saying "no state
+        # file" about a file that exists sends someone looking for the wrong
+        # thing, so name what actually happened.
+        empty = state_status == "ok"
+        if proof:
+            print("  %s, but BLD is already on this machine."
+                  % ("STATE FILE IS EMPTY" if empty else "NO STATE FILE"))
+            print("  Installed by hand, or the state file was %s."
+                  % ("emptied" if empty else "deleted"))
+            disk_summary(evidence)
+            print("  -> Do NOT re-run the full flow. Offer what is not here,")
+            print("     ask rather than assume, then write the state file.")
+        else:
+            print("  FIRST RUN. No prior setup recorded.")
+            print("  -> Run the full flow from Phase 1.")
     elif not state.get("completed"):
         done = state.get("done", [])
         print("  RESUMING an unfinished setup.")
@@ -374,10 +524,22 @@ def main():
         # A crash between installing and writing leaves the state file lying in
         # both directions, so trust the disk over the claim.
         unproven = [g for g in done if evidence.get(g) is False]
-        remaining = [g for g in state.get("chose", []) if g not in done] + unproven
-        print("  Still to do : " + (", ".join(remaining) if remaining else "finish up + restart"))
+        # The disk can also be AHEAD of the state file. A crash after a group
+        # installed but before `done` was appended left it looking unfinished
+        # forever, and the resume reinstalled it - re-cloning gstack, re-adding
+        # plugin marketplaces. The comment above always claimed both directions;
+        # only one was implemented.
+        already = [g for g in state.get("chose", [])
+                   if g not in done and evidence.get(g) is True]
+        remaining = [g for g in state.get("chose", [])
+                     if g not in done and g not in already] + unproven
+        print("  Still to do : " + (named(remaining) if remaining else "finish up + restart"))
+        if already:
+            print("  ALREADY DONE: " + named(already))
+            print("                installed, but the state file never recorded")
+            print("                it. Skip these and just add them to `done`.")
         if unproven:
-            print("  RECHECK     : " + ", ".join(unproven))
+            print("  RECHECK     : " + named(unproven))
             print("                marked done, but not found on disk. The state")
             print("                file is wrong. Re-install these, do not skip them.")
         print("  -> Skip Phases 1-3. Pick up at the first item in 'Still to do'.")
@@ -388,12 +550,17 @@ def main():
         gone = [g for g, ok in sorted(evidence.items())
                 if ok is False and g not in declined]
         if gone:
-            print("  MISSING NOW : " + ", ".join(gone))
+            print("  MISSING NOW : " + named(gone))
             print("                completed once, absent today. Uninstalled, or a")
             print("                fresh machine reusing an old state file.")
         print("  -> Do NOT re-run the full flow. Offer only what is missing or was declined.")
 
-    print("\n  state file: " + (STATE if state else "none yet (" + STATE + ")"))
+    if state_status == "ok":
+        print("\n  state file: " + STATE)
+    elif state_status == "broken":
+        print("\n  state file: " + STATE + "   <- UNREADABLE, see verdict")
+    else:
+        print("\n  state file: none yet (" + STATE + ")")
 
 
 if __name__ == "__main__":

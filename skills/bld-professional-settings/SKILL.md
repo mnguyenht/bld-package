@@ -13,7 +13,7 @@ behaviour, different thing to type.
 | **friendly** (default) | `bld-<type>-<skill>` | `/bld-sprint-init` | Learning the set. Typing `/bld-` groups everything by type, so the list teaches you the taxonomy. |
 | **pro** | `bld-<skill>-<type>` | `/bld-init-sprint` | Knowing the set. You already know the category, so leading with it buries the word you are reaching for. |
 
-Neither is better. Friendly is the default because a first-timer facing 22
+Neither is better. Friendly is the default because a first-timer facing 23
 unfamiliar commands benefits from the grouping, and a pro can switch in one
 command.
 

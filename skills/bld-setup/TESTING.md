@@ -3,10 +3,11 @@
 `/bld-setup` is the first thing a new user touches and the hardest thing to test,
 because the only honest test is a machine that does not have BLD on it yet.
 
-Simulated first-runs are the substitute. **Three of them found nine real bugs**,
-including a security control that registered and then failed silently on every
-non-Windows machine. None of the nine were found by reading the skill. Reading
-finds typos; walking a scenario finds the steps that cannot happen.
+Simulated first-runs are the substitute. **Six of them have found thirty-seven
+real bugs**, including a security control that registered and then failed
+silently on every non-Windows machine, and a group offered in Phase 3 that
+Phase 4 never installed. None were found by reading the skill. Reading finds typos; walking a
+scenario finds the steps that cannot happen.
 
 This file is the method. It generalises to any skill, but `/bld-setup` is where
 it earns its keep.
@@ -52,7 +53,7 @@ user*, *walk me through it*, or *let's test the setup*. Otherwise stay quiet.
    tool limits, and check for things Claude must never do (enter credentials,
    run an interactive login, launch a terminal-dialog slash command).
 5. **Stop as soon as you have findings.** Running to completion for its own sake
-   burns output and finds nothing extra. Two of the three runs stopped early.
+   burns output and finds nothing extra. Four of the six runs stopped early.
 
 ---
 
@@ -107,9 +108,15 @@ git-gated features**, **crash mid-group + resume**, **project scope + preflight*
 | 1 | Fresh Windows, nothing installed | No prerequisite check at all · `gh` needs a login the skill never mentions · "global or project?" is unanswerable for someone with no project · `uv` appeared in the survey but nowhere in the install steps |
 | 2 | Windows, no Python, no git, ZIP download | **Prerequisite checker written in Python** could not report that Python was missing · `git` hard-blocked everything when it only gates three features · **picker specified 8 options into a 4-option tool** · `<BLD>` placeholder shown to a user who cannot substitute it · `cp -r` breaks in PowerShell |
 | 3 | macOS (`python3` only), git present, crash mid-install | **Hook registration hardcodes `python`, so the image-gen block registers and fails silently on every fire** · `gh` install instructions were Windows-only · other skills hardcode `python` too · resume trusted the state file without checking disk |
+| 4 | Windows, **project-scoped install** (shared family machine) | **The verdict ignored the inventory it had just printed**, so a complete install was told to run the full flow · a truncated state file reported as "FIRST RUN … state file: none yet" while sitting on disk · **scope and project path were never recorded**, so a healthy scoped install read as `MISSING NOW: bld … Uninstalled, or a fresh machine` · Phase 4 had no project-scoped commands at all, only a sentence saying it "also works" · scoping was silently partial: core skills, plugins, gstack, impeccable and the hook all stay global · `--project` was required at Phase 0c but scope is not asked until Phase 4 |
+| 5 | Ubuntu 24.04, distro Node, everything else normal | **`npm install -g` dies with `EACCES` on a distro-packaged Node**, which blocks vercel, react-doctor and react-scan, and it is the first install in the flow · `sudo apt install gh` fails on Ubuntu 22.04 LTS and on Debian, where `gh` is not in the repos at all · `bld-mcp-settings` told users `python` was the Windows spelling and then ran `python3` in every command |
+| 6 | "Let me choose" branch, walked Phases 2-9 | **The `mcp` group was offered in Phase 3 and Phase 6 and had no Phase 4 install step**, so it could never leave "Still to do" · the pip install it needs was not in the manifest, breaking the skill's own "never install anything not in the printed table" rule · a resume reinstalled groups the disk already had · "Nothing else" sat in a multi-select with no precedence rule · `LIMITED` dropped git-blocked groups but still offered bundles promising them · Phase 2 recorded neither an accepted nor a declined deploy · Phase 9's own verification prints `RESUMING an unfinished setup` after a successful install and nothing said that was expected · Phase 8 counted the placeholders in one template and highlighted items from the other · Phase 7 told you to prove Codex works and only mentioned below that it refuses to run outside a git repo · the "run these through the Bash tool" note sat on the one block that survives PowerShell, not on the gstack conditional or the prune heredoc, which do not · preflight enforced a Python floor but never checked Node's version, so an ancient Node failed inside `npx` looking like a broken package · the hook's selftest printed a hardcoded tally that a later edit would silently make wrong, and its Skill-only scope was never written down |
 
-Untested as of writing: Linux, `py` launcher, corrupt state file, project-scoped
-install, declined-deploy path, "let me choose" branch, interruption at a question.
+| 7 | Windows, python.org install with "Add to PATH" unticked, so only the `py` launcher works | **Nothing.** Verified for real rather than reasoned: `py` satisfies the Phase 0b probe and the version gate, runs preflight, runs the hook selftest, and `py -m pip` covers the Phase 4 code-search step. `py.exe` lives in `C:\Windows`, which is always on PATH, so the registered hook command resolves. Recorded because a clean axis is worth knowing too - it stops the next session re-walking it. |
+
+Untested as of writing: a real Linux or macOS run rather than a reasoned walk,
+interruption between groups, and the thing that matters most - **an end-to-end
+run on a machine that has never had BLD.**
 
 ---
 
@@ -143,6 +150,21 @@ hypotheticals you did not actually walk into.
 ### The mechanical checks
 
 Not a substitute for a scenario walk. These catch regressions, not design flaws.
+
+Run the scenario suite first. It builds a fake machine under a temp directory for
+each case, runs preflight against it, and checks the verdict, so it covers the
+states that are tedious to reach by hand: a corrupt state file, a scoped install
+whose project was deleted, a naming switch that stopped partway. Every case in it
+is a bug that was real once.
+
+```bash
+python skills/bld-setup/scripts/scenarios.py        # all of them
+python skills/bld-setup/scripts/scenarios.py -v C07 # one, with full output
+```
+
+It is a regression net, not a walk: it can only fail on behaviour someone already
+thought to encode. **A green suite is not evidence the skill is fine** - runs 4
+to 6 found twenty bugs on a suite that was passing.
 
 ```bash
 cd <bld-package>
@@ -178,8 +200,20 @@ python skills/bld-professional-settings/scripts/switch-mode.py off >/dev/null
   end by a real user on a real machine. Everything here is a model of one.
 - **You cannot simulate ignorance you do not have.** An OS nobody in the loop uses
   will not get an honest scenario.
-- **Returns have not diminished yet.** Three runs, nine bugs, and run three found
-  the worst one. Do not treat "we did a few" as done.
+- **Returns have not diminished yet.** Six runs, thirty bugs, and run six found
+  a group that was offered to users and never installed. Do not treat "we did a
+  few" as done.
+- **The fix round needs its own audit, every time.** Runs 4-6 introduced ten
+  fresh defects while fixing others. A representative few: a "directory does not
+  exist" warning that fired for `--project` but not for the path remembered from
+  the state file; a valid-but-empty state file described as a missing one; an
+  assertion in SKILL.md pinning an output string the hook had stopped printing;
+  two new install notes scoped to "on Linux" when Homebrew Python and the macOS
+  Node `.pkg` hit exactly the same wall; a new script that shipped to users'
+  machines without being added to the manifest, which is the one promise this
+  skill actually makes. Nine of the ten were caught by re-reading the diff as an
+  adversary or by walking a second OS. **One was caught by the tests.** Write the
+  tests anyway, but do not expect them to find this class.
 - **The quiet mode can drift into reading rather than walking.** If you have not
   asked "would this command run" at least once per phase, you are reviewing, not
   testing.
