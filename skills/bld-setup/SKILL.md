@@ -469,6 +469,12 @@ folders in "the other naming mode", a rename stopped partway: finish that with
 `/bld-professional-settings` before copying anything, or this same doubling
 happens from the other direction.
 
+**`cp` adds and overwrites; it never removes.** A skill that was dropped from the
+package since their last install stays on their disk forever, and every session
+keeps paying for it. Phase 0c lists what it did not expect to find - if it names
+a `bld-*` folder the package no longer ships, say so and let them decide. Do not
+delete it for them: on a project-scoped install that folder may be theirs.
+
 **The `mkdir -p` is not optional.** A fresh Claude Code install has no
 `~/.claude/agents/` directory, and `cp` into a missing target fails with
 `No such file or directory`. Every first-time user is in exactly that state,

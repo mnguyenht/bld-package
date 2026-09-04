@@ -386,6 +386,7 @@ def main():
     # any unrelated bld-* folder cover for a skill that never copied.
     expected = expected_bld_names()
     bld_strays = []
+    bld_unknown = []
     bld_missing = []
     bld_expected = 0
     mode_note = ""
@@ -404,6 +405,11 @@ def main():
         # double the context cost.
         other = "pro" if best == "friendly" else "friendly"
         bld_strays = sorted((bld_names & expected[other]) - expected[best])
+        # A third category, and the one nothing used to catch: a bld-* folder in
+        # NEITHER naming mode. `cp` adds and overwrites but never removes, so a
+        # skill dropped from the package since their last install sits there
+        # forever, costing context every session, and every re-run walks past it.
+        bld_unknown = sorted(bld_names - expected["friendly"] - expected["pro"])
     gstack_have = "gstack" in present
     impec_have = "impeccable" in present
 
@@ -433,6 +439,13 @@ def main():
         bld_note = "%d found (%s), expected names unknown" % (
             len(bld_have), "+".join(scopes))
     row("bld-* skills", bld_ok, bld_note)
+    if bld_unknown:
+        print("        %d bld-* folder(s) the package does not ship: %s%s"
+              % (len(bld_unknown), ", ".join(bld_unknown[:3]),
+                 ", ..." if len(bld_unknown) > 3 else ""))
+        print("        Dropped from BLD since their last install, or their own.")
+        print("        Copying BLD again will not remove them. Say so and let")
+        print("        them choose; do not delete anything on their behalf.")
     if bld_strays:
         print("        %d folder(s) use the other naming mode: %s%s"
               % (len(bld_strays), ", ".join(bld_strays[:3]),
