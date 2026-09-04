@@ -122,6 +122,7 @@ git-gated features**, **crash mid-group + resume**, **project scope + preflight*
 
 | 7 | Windows, python.org install with "Add to PATH" unticked, so only the `py` launcher works | **Nothing.** Verified for real rather than reasoned: `py` satisfies the Phase 0b probe and the version gate, runs preflight, runs the hook selftest, and `py -m pip` covers the Phase 4 code-search step. `py.exe` lives in `C:\Windows`, which is always on PATH, so the registered hook command resolves. Recorded because a clean axis is worth knowing too - it stops the next session re-walking it. |
 | 8 | **Real run, not a simulation.** Ubuntu 26.04 in WSL2, installed clean, Windows PATH inheritance disabled, non-root user, executed for real | **`npx skills add` has its own `Proceed with installation?` prompt; with no TTY, Linux reads EOF and exits 0 having installed nothing - all eleven core skills were silent no-ops. Windows was then measured on the same command and installs fine, so this is a Linux/macOS bug, not the cross-platform one it first looked like** · **gstack's `setup` is a bun script and nothing checked for bun, so `setup` exited 1 and the prune's `pruned 0` was then blamed on a stale matcher** · `bld-util-copywriting` carried the same skills-add command · `python3 -m pip` answers `No module named pip` on a minimal image, never reaching the `externally-managed-environment` error the skill said to expect · hook registration assumed `settings.json` existed because plugins wrote it · a CLI installed into a new PATH directory reports `[--]` until the shell restarts, which Phase 9 warns about for Claude Code but not for PATH · preflight trusted `/mnt/c/...` Windows shims found through the WSL PATH · `uv or pipx` was the only prerequisite naming no source |
+| 9 | **Real run on Windows**, the actual target platform. HOME/USERPROFILE/CLAUDE_CONFIG_DIR redirected to a throwaway directory, real npx and real `claude plugin` against it | **The plugin phase, never cold-tested before, passes end to end**: three marketplaces added, three plugins installed, three enabled · 11 of 11 core skills and 23 of 23 bld skills install, hook selftest passes · **two severities from run 8 were wrong and got corrected here** - the skills-add prompt does not bite on Windows, and the ui-ux-pro-max long-path failure was the test rig's own 262-character path, not a user's 141 · `gh` resolved through its default-path fallback reported a plain "signed in" while a bare `gh` would still fail, so the row now says which way it was found. Isolation verified throughout: real skills count and both config hashes unchanged. |
 
 Untested as of writing: a real Linux or macOS run rather than a reasoned walk,
 interruption between groups, and the thing that matters most - **an end-to-end
@@ -208,9 +209,21 @@ python skills/bld-professional-settings/scripts/switch-mode.py off >/dev/null
 - **A simulation is not a run - and run 8 proved the gap is not small.** Seven
   simulations found nothing that a single real cold machine then found eight of.
   Simulate to explore an axis cheaply; run it for real before believing it works.
-  What is still untested: a real Windows machine that has never had BLD (the WSL
-  box only covers the Linux half), and the plugin phase end to end, which could
-  not be exercised because Claude Code segfaults on Ubuntu 26.04.
+- **One platform is not a platform.** Two of run 8's findings were written up at
+  the wrong severity because they were only ever measured on Linux. Run 9 put the
+  same commands on Windows and both changed: one bug does not occur there at all,
+  and the other was an artefact of the test rig's own directory depth. Measure a
+  claim on the platform your users are on before you write down how bad it is.
+- **Redirecting HOME is most of a cold machine, and it is nearly free.** Run 9
+  needed no VM: HOME, USERPROFILE and CLAUDE_CONFIG_DIR pointed at a throwaway
+  directory gave a genuine first-run home on Windows, including a working
+  `claude plugin` phase that WSL could not run at all. Verify isolation while you
+  do it - hash the real config before and after - and keep the fake path SHORT,
+  because a deep one manufactures Windows path-length failures that no real user
+  would see.
+- **What is still untested:** the OS-level installers themselves (nothing here
+  ever ran the node.js or gh installer), and a machine whose Claude Code has
+  never been authenticated.
 - **You cannot simulate ignorance you do not have.** An OS nobody in the loop uses
   will not get an honest scenario.
 - **Returns have not diminished yet.** Six runs, thirty bugs, and run six found
