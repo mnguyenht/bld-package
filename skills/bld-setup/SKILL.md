@@ -370,14 +370,16 @@ Flags that matter:
   it entirely and skills land in `~/.agents/`, where Claude Code never looks.
 - **`-g`** installs globally, so every project sees them.
 - **`--copy`** writes real files instead of symlinks. Windows symlinks are flaky.
-- **The trailing `-y` is a different flag from the leading one, and it is the one
-  that matters most.** `npx -y` only auto-confirms npx's own package download.
-  The `skills` CLI then asks its *own* `Proceed with installation?` question.
-  Run through the Bash tool there is no TTY to answer it, so the prompt reads EOF
-  and the command **exits 0 having installed nothing** - no error, and `skills
-  add` still reports success. Without the trailing `-y`, every line below is a
-  silent no-op. Verify by count, not by exit code: `ls ~/.claude/skills` should
-  gain 11 entries.
+- **The trailing `-y` is a different flag from the leading one.** `npx -y` only
+  auto-confirms npx's own package download; the `skills` CLI then asks its *own*
+  `Proceed with installation?` question. What happens with no TTY to answer it is
+  **platform-dependent**, which is why this went unnoticed for so long. Measured
+  2026-09-04, same command, same repo, fresh home, stdin from `/dev/null`:
+  **Linux exits 0 having installed nothing**; **Windows proceeds and installs
+  normally**. So the flag is load-bearing on Linux, presumably on macOS (untested),
+  and harmless on Windows. Pass it everywhere rather than reasoning about which
+  box you are on. Either way, verify by count and not by exit code:
+  `ls ~/.claude/skills` should gain 11 entries.
 
 Run them one at a time. Chaining with `&&` lets one dead repo kill the batch.
 
@@ -401,9 +403,18 @@ claude plugin list        # confirm all three say: enabled
 - **`marketplace add` exits 0 even when the clone fails.** Judge it by the
   `✔ Successfully added marketplace` line or by `claude plugin list`, never by
   the exit code.
-- **On Windows, enable long paths once if ui-ux-pro-max fails to clone:**
-  `git config --global core.longpaths true`, then re-run the add. The failure is
-  `fatal: cannot create directory at '.claude/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs': Filename too long`.
+- **On Windows, ui-ux-pro-max can hit the 260-character path limit.** The fix is
+  `git config --global core.longpaths true`, then re-run the add. Two things to
+  know before chasing it. **The clone does not fail** - it succeeds and the
+  *checkout* fails, so the message to look for is
+  `error: unable to create file src/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-react-exports.json: Filename too long`
+  followed by `warning: Clone succeeded, but checkout failed`, which leaves a
+  half-populated marketplace directory rather than no directory at all. And **it
+  is unlikely at a normal install path**: measured 2026-09-04, that deepest file
+  lands at 141 characters under `C:\Users\<name>`, and 166 even with a
+  thirty-character username, both well under the limit. It was only reproducible
+  from a deliberately deep directory totalling 262. Treat it as a remedy for a
+  custom or deeply-nested install location, not something to expect.
 
 If the CLI path fails, hand-write the same config and let startup fetch the
 plugins. **Read `~/.claude/settings.json` first and merge. Never overwrite it.**
