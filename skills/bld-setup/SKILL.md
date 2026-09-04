@@ -259,6 +259,15 @@ vercel login
 Wait, then confirm with `preflight.py` rather than assuming. **An installed CLI
 is not a signed-in CLI**, and `--version` passes on both.
 
+**A `vercel` you just installed can still report missing here, and it is not a
+failed install.** They signed in from their own terminal; preflight runs in this
+session's shell, which still has the `PATH` it started with. That is the second
+restart described in Phase 9, arriving early. Before treating it as a problem,
+check whether the binary exists - `ls "$(npm prefix -g)/bin"` on macOS and Linux,
+`ls "$(npm prefix -g)"` on Windows. If it is there, the install worked and only
+this shell is stale. `gh` shows the same thing from the other direction: Phase 0c
+says `found at the default path but NOT on PATH` when it resolved the fallback.
+
 **Record the answer either way, before moving on (Phase 5).** Yes puts `deploy`
 in `done` once both CLIs are signed in; no puts it in `declined`.
 
@@ -779,6 +788,17 @@ Open with what is actually available to them, as a short table:
 | gstack + impeccable | Engineering specs, security review, deep design audits |
 | Code search MCPs | Cheaper exploration once a codebase gets big |
 | Codex or Gemini | Makes `/bld-runtime-agents` work |
+
+**Check the prerequisites before offering that first row, the same way Phase 3
+does.** It is a pair, and the two halves fail differently: no `git` blocks both,
+no `bun` blocks gstack alone and leaves impeccable perfectly installable. Phase
+0c reports both. Offering "gstack + impeccable" to someone who can only receive
+half of it recreates, on the returning path, the exact problem Phase 3 exists to
+prevent - and a returning user is *more* likely to hit it, because they declined
+these once already and may have declined them for this very reason.
+
+Split the row or drop the half they cannot have, name the missing tool and where
+it comes from, and leave it in `declined` rather than silently marking it done.
 
 Install only what they pick, then update `declined` and `done`. Nothing else.
 
