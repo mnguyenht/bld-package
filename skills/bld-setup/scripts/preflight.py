@@ -91,7 +91,17 @@ def have(cmd):
             found = shutil.which(cmd + ext)
             if found:
                 return found
-    return shutil.which(cmd)
+        return shutil.which(cmd)
+
+    found = shutil.which(cmd)
+    # Under WSL the Windows PATH is inherited by default, so /mnt/c/... shims for
+    # npm-installed tools resolve here and look installed. They are not runnable
+    # from Linux: they exec `node`, which resolves to the Windows binary they
+    # cannot reach, and die with "exec: node: not found" long after this check
+    # said ok. Report them as missing so the install offers them properly.
+    if found and found.startswith("/mnt/"):
+        return None
+    return found
 
 
 def run(args, timeout=15):
