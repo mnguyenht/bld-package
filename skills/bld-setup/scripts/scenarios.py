@@ -92,6 +92,10 @@ def build(spec, root):
 
     if spec.get("global_bld"):
         put_bld(claude)
+    # A bld-* folder in NEITHER naming mode - a skill dropped from the package
+    # since their last install, which cp never removes.
+    for s in spec.get("stray_skills", []):
+        os.makedirs(os.path.join(claude, "skills", s), exist_ok=True)
     if spec.get("project_bld"):
         put_bld(os.path.join(proj, ".claude"))
 
@@ -267,6 +271,34 @@ CASES = [
  ({"id": "C25", "desc": "Node too old for the skills installer",
    "bin": [("node", 0, "v12.22.12"), "npm", "git"]},
   ["Node 18+ is expected", "!BLOCKED"], 0),
+
+ ({"id": "C27", "desc": "bun missing is named, with a source",
+   "global_bld": 1}, ["bun                 needed for gstack only -> bun.sh"], 0),
+
+ ({"id": "C28", "desc": "bun present is not nagged about",
+   "global_bld": 1, "bin": ["node", "npm", "git", "bun"]},
+  ["!needed for gstack only"], 0),
+
+ ({"id": "C29", "desc": "a bld-* folder the package no longer ships",
+   "global_bld": 1, "stray_skills": ["bld-dropped-thing"]},
+  ["the package does not ship", "bld-dropped-thing", "!not on PATH"], 0),
+
+ ({"id": "C30", "desc": "state file field is a string, not a list",
+   "global_bld": 1,
+   "state": {"chose": "bld", "declined": [], "done": [], "completed": False}},
+  ["UNREADABLE FIELDS: chose", "!Chose       : b, l, d"], 0),
+
+ ({"id": "C31", "desc": "state file names a group Phase 4 cannot install",
+   "global_bld": 1,
+   "state": {"chose": ["bld", "not-a-group"], "declined": [], "done": [],
+             "completed": False}},
+  ["NOT REAL GROUP NAMES: not-a-group"], 0),
+
+ ({"id": "C32", "desc": "a healthy state file triggers neither warning",
+   "global_bld": 1,
+   "state": {"chose": ["bld"], "declined": [], "done": ["prereqs"],
+             "completed": False}},
+  ["!UNREADABLE FIELDS", "!NOT REAL GROUP NAMES"], 0),
 
  ({"id": "C26", "desc": "current Node is not warned about",
    "bin": [("node", 0, "v22.11.0"), "npm", "git"]},
