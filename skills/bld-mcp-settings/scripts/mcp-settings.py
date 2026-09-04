@@ -30,6 +30,15 @@ if sys.version_info[:2] < (3, 7):
     )
     sys.exit(1)
 
+# This prints the project path back at the user three times, and on Windows a
+# console still defaults to cp1252, so a project living under a non-Latin name
+# would kill the script on its own status line. Same guard as preflight.py.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, OSError, ValueError):
+        pass
+
 import io
 import json
 import os

@@ -32,6 +32,21 @@ if sys.version_info[:2] < (3, 7):
     )
     sys.exit(1)
 
+# The docstring above promises ASCII-only output, and every literal in this file
+# keeps it. The USER'S PATH does not: it is interpolated into the report, and a
+# home like C:\Users\<a non-Latin name> cannot be encoded to cp1252, which is what a
+# Windows console still defaults to. Observed there - the whole report printed,
+# then the closing "state file:" line raised UnicodeEncodeError and the script
+# exited non-zero, which reads as "BLD is broken" from the one command that
+# exists to say what is. Latin-1 names survive cp1252 and hid this for a long
+# time. errors="replace" matters as much as the encoding: a console that truly
+# cannot render the characters then shows placeholders instead of dying.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, OSError, ValueError):
+        pass
+
 import io
 import json
 import os
