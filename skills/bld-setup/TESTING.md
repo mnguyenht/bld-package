@@ -9,7 +9,7 @@ every non-Windows machine, and a group offered in Phase 3 that Phase 4 never
 installed. None were found by reading the skill. Reading finds typos; walking a
 scenario finds the steps that cannot happen.
 
-**Then run 8 was an actual machine, and found seven more in an afternoon** - two
+**Then run 8 was an actual machine, and found eight more in an afternoon** - two
 of them severe enough to make a first install do nothing while reporting success.
 Every one of them was invisible to simulation for the same structural reason: a
 simulated machine has whatever the simulator assumes it has. Nobody imagined a
@@ -204,7 +204,7 @@ python skills/bld-professional-settings/scripts/switch-mode.py off >/dev/null
 ## Known limits of this method
 
 - **A simulation is not a run - and run 8 proved the gap is not small.** Seven
-  simulations found nothing that a single real cold machine then found seven of.
+  simulations found nothing that a single real cold machine then found eight of.
   Simulate to explore an axis cheaply; run it for real before believing it works.
   What is still untested: a real Windows machine that has never had BLD (the WSL
   box only covers the Linux half), and the plugin phase end to end, which could
