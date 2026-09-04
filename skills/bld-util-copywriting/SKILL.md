@@ -23,7 +23,9 @@ Invoke the copywriting skill for the craft  →  apply everything below on top
 ```
 
 **If `copywriting` is not installed**, say so and offer
-`npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy`.
+`npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy -y`.
+The trailing `-y` answers the `skills` CLI's own confirmation prompt - without it the
+command exits 0 through the Bash tool and installs nothing.
 Do not silently freestyle the frameworks; the whole point of this file is that it
 is a thin layer over a good source.
 

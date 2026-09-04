@@ -499,9 +499,12 @@ cp "<resolved path>/hooks/block-image-skills.py"  ~/.claude/hooks/
 
 Then register **that** copy at the same scope BLD was installed at: a global
 install uses `~/.claude/settings.json`; a project-scoped install uses that
-project's `.claude/settings.local.json`. **Merge, do not overwrite.** By this
-point global settings already hold `enabledPlugins` and
-`extraKnownMarketplaces`; read them, add the `hooks` key, and write back. Use an
+project's `.claude/settings.local.json`. **Merge, do not overwrite.** If plugins
+were installed, global settings already hold `enabledPlugins` and
+`extraKnownMarketplaces`; read them, add the `hooks` key, and write back. **If
+the file does not exist, create it with just the `hooks` key** - a user who
+declined plugins on a fresh Claude Code install has no `settings.json` yet, and
+reading one that is not there is not a reason to skip the hook. Use an
 **absolute path** because the hook runs with an unpredictable working directory.
 Expand `~` yourself: the hook command is not run through a shell, so a literal
 `~` is looked up as a directory named `~` and never resolves.
@@ -544,18 +547,26 @@ PATH before that skill can start it:
 
 The package name is `jcodemunch-mcp`, and it is also the command it installs.
 
-**If pip answers `error: externally-managed-environment`**, that Python belongs
-to the OS or to Homebrew and will not take packages directly (PEP 668). It is not
-a BLD problem, and **do not force it with `--break-system-packages`** - that is
-how a system Python gets quietly broken for everything else on the machine. Use
-the same tools the token monitor uses:
+**Two different errors land here, and both mean the same thing: use pipx or uv.**
+
+- `error: externally-managed-environment` - that Python belongs to the OS or to
+  Homebrew and will not take packages directly (PEP 668). **Do not force it with
+  `--break-system-packages`**, which is how a system Python gets quietly broken
+  for everything else on the machine.
+- `No module named pip` - a minimal Debian/Ubuntu image ships `python3` without
+  `pip` at all, so the command above fails before PEP 668 can even apply. Do not
+  send them to `apt install python3-pip` for this; the pipx route below needs no
+  system pip.
+
+Neither is a BLD problem. Use the same tools the token monitor uses:
 
 ```bash
 pipx install jcodemunch-mcp     # or: uv tool install jcodemunch-mcp
 ```
 
-Expect this on Debian and Ubuntu, and on Homebrew Python 3.11+. A python.org
-install on Windows or macOS takes the plain `pip install` fine.
+Expect one of the two on Debian and Ubuntu, and `externally-managed-environment`
+on Homebrew Python 3.11+. A python.org install on Windows or macOS takes the
+plain `pip install` fine, which is where most users will be.
 
 Nothing is written to `.mcp.json`. These stay on-demand unless the user later
 runs `/bld-mcp-settings on`. Confirm with the `jcodemunch-mcp` row in preflight
