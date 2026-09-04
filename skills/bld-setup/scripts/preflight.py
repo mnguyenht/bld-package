@@ -280,6 +280,15 @@ def main():
     has_uv = bool(have("uv")) or bool(have("pipx"))
     row("uv or pipx", has_uv, "" if has_uv else "needed for /bld-runtime-tokens only")
 
+    # gstack's own `setup` is a bun script and refuses to run without it. Nothing
+    # else in BLD needs bun, so it is optional - but a missing bun is worth
+    # naming HERE, because the failure downstream is misleading: setup exits 1,
+    # the prune that follows finds no wrappers to remove, and prints
+    # "pruned 0 gstack wrappers" - which the skill reads as a stale matcher
+    # rather than a runtime that was never installed.
+    has_bun = bool(have("bun"))
+    row("bun", has_bun, "" if has_bun else "needed for gstack only -> bun.sh")
+
     # ── 2. deploy accounts ──────────────────────────────────────────────
     print("\nDEPLOY TOOLING")
     print("  Needed only if you want /bld-util-deploy (private repo + live URL).\n")

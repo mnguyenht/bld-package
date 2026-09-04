@@ -351,17 +351,17 @@ window, translate before handing them over - the `cp` / `mkdir` forms are under
 ### Core skills
 
 ```bash
-npx -y skills add emilkowalski/skills --skill emil-design-eng      -g -a claude-code --copy
-npx -y skills add emilkowalski/skills --skill animation-vocabulary -g -a claude-code --copy
-npx -y skills add emilkowalski/skills --skill review-animations    -g -a claude-code --copy
-npx -y skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines -g -a claude-code --copy
-npx -y skills add vercel-labs/skills --skill find-skills          -g -a claude-code --copy
-npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy
-npx -y skills add alirezarezvani/claude-skills@a11y-audit         -g -a claude-code --copy
-npx -y skills add dylantarre/animation-principles --skill framer-motion -g -a claude-code --copy
-npx -y skills add anthropics/skills@webapp-testing                -g -a claude-code --copy
-npx -y skills add shawnpang/startup-founder-skills@terms-of-service -g -a claude-code --copy
-npx -y skills add shawnpang/startup-founder-skills@privacy-policy   -g -a claude-code --copy
+npx -y skills add emilkowalski/skills --skill emil-design-eng      -g -a claude-code --copy -y
+npx -y skills add emilkowalski/skills --skill animation-vocabulary -g -a claude-code --copy -y
+npx -y skills add emilkowalski/skills --skill review-animations    -g -a claude-code --copy -y
+npx -y skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines -g -a claude-code --copy -y
+npx -y skills add vercel-labs/skills --skill find-skills          -g -a claude-code --copy -y
+npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy -y
+npx -y skills add alirezarezvani/claude-skills@a11y-audit         -g -a claude-code --copy -y
+npx -y skills add dylantarre/animation-principles --skill framer-motion -g -a claude-code --copy -y
+npx -y skills add anthropics/skills@webapp-testing                -g -a claude-code --copy -y
+npx -y skills add shawnpang/startup-founder-skills@terms-of-service -g -a claude-code --copy -y
+npx -y skills add shawnpang/startup-founder-skills@privacy-policy   -g -a claude-code --copy -y
 ```
 
 Flags that matter:
@@ -370,6 +370,14 @@ Flags that matter:
   it entirely and skills land in `~/.agents/`, where Claude Code never looks.
 - **`-g`** installs globally, so every project sees them.
 - **`--copy`** writes real files instead of symlinks. Windows symlinks are flaky.
+- **The trailing `-y` is a different flag from the leading one, and it is the one
+  that matters most.** `npx -y` only auto-confirms npx's own package download.
+  The `skills` CLI then asks its *own* `Proceed with installation?` question.
+  Run through the Bash tool there is no TTY to answer it, so the prompt reads EOF
+  and the command **exits 0 having installed nothing** - no error, and `skills
+  add` still reports success. Without the trailing `-y`, every line below is a
+  silent no-op. Verify by count, not by exit code: `ls ~/.claude/skills` should
+  gain 11 entries.
 
 Run them one at a time. Chaining with `&&` lets one dead repo kill the batch.
 
@@ -564,7 +572,13 @@ Say that plainly rather than pushing.
 
 ### gstack (only if chosen) — install, then immediately prune
 
+**gstack's `setup` is a bun script, not a node one.** Check for bun BEFORE the
+clone: without it `setup` exits 1 and leaves a cloned repo with no wrappers
+generated, which is the confusing half-state the prune below then misreports.
+
 ```bash
+command -v bun >/dev/null || { echo "gstack needs bun: https://bun.sh - skip gstack or install bun first"; exit 1; }
+
 # git clone into an existing directory fails outright, and this skill is built to
 # be re-run. Three states to handle, not two: a real clone (pull it), a leftover
 # directory from a clone that died partway (clear it), or nothing (clone).
@@ -608,8 +622,15 @@ bash ~/.claude/skills/gstack-prune.sh
 ```
 
 **The prune prints how many it removed. A run that prints
-`pruned 0 gstack wrappers` right after `setup` means the matcher is stale — do
-not treat it as success.**
+`pruned 0 gstack wrappers` right after `setup` is a failure, not a success — but
+check the cause in this order, because the second one is far more common than the
+first looks:**
+
+1. **`setup` never ran.** Scroll up. `Error: bun is required but not installed.`
+   means there are no wrappers to prune and the count is correctly zero. Install
+   bun, re-run `setup`, then re-run the prune.
+2. **The matcher is stale.** Only if `setup` actually succeeded. gstack changed
+   its wrapper layout and `grep 'skills/gstack'` no longer matches them.
 
 ⚠️ **`setup` un-prunes.** Re-run the prune after every `git pull` or
 `/gstack-upgrade`. Tell them once; it is the easiest way for a context budget to
