@@ -324,12 +324,13 @@ Two prerequisites do this, and Phase 0c reports both:
 
 - **git missing** (`LIMITED`) blocks `/bld-util-deploy`, gstack and impeccable.
 - **bun missing** blocks gstack alone, because its installer is a bun script.
-  impeccable is unaffected, so the extras bundle becomes "token monitor, code
-  search and impeccable" rather than disappearing.
+  impeccable is unaffected.
 
-Neither is worth a detour to install mid-setup unless they ask. Offer the bundle
-you can actually deliver, name the one tool that is missing and where it comes
-from, and let them add it later.
+These two are not the same size of problem. git is a real detour and genuinely
+gates three things, so reshape the bundle around it. **bun is one npm install**
+(`npm install -g bun`, official package), and npm is already a prerequisite - so
+keep gstack in the offer and mention the extra line, rather than quietly dropping
+it. Only reshape the bundle if they decline the install.
 
 **Question 2 lets them deselect BLD.** Honour it, but say what it means first:
 without it there are no `/bld-*` commands at all, and the Phase 9 check will find
@@ -646,8 +647,18 @@ Say that plainly rather than pushing.
 clone: without it `setup` exits 1 and leaves a cloned repo with no wrappers
 generated, which is the confusing half-state the prune below then misreports.
 
+**This is a one-line prerequisite, not a wall.** bun publishes an official npm
+package (`oven-sh/bun`, maintained by its author), and npm is already required
+before any of this runs, so there is no new toolchain to explain and no install
+script to pipe into a shell. Say what it is for - gstack's installer, nothing
+else in BLD - and install it if they want gstack:
+
 ```bash
-command -v bun >/dev/null || { echo "gstack needs bun: https://bun.sh - skip gstack or install bun first"; exit 1; }
+npm install -g bun
+```
+
+```bash
+command -v bun >/dev/null || { echo "gstack needs bun: run 'npm install -g bun', or skip gstack"; exit 1; }
 
 # git clone into an existing directory fails outright, and this skill is built to
 # be re-run. Three states to handle, not two: a real clone (pull it), a leftover

@@ -337,7 +337,7 @@ def main():
     # "pruned 0 gstack wrappers" - which the skill reads as a stale matcher
     # rather than a runtime that was never installed.
     has_bun = bool(have("bun"))
-    row("bun", has_bun, "" if has_bun else "needed for gstack only -> bun.sh")
+    row("bun", has_bun, "" if has_bun else "needed for gstack only -> npm i -g bun")
 
     # ── 2. deploy accounts ──────────────────────────────────────────────
     print("\nDEPLOY TOOLING")

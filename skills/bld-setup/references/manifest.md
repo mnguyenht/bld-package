@@ -63,7 +63,7 @@ Both are large. Both want to wire hooks. BLD installs them **skill-only**.
 
 | Tool | What it does | Runs code? | Verify at |
 |---|---|---|---|
-| **gstack** | Garry Tan's engineering framework. 54 skills upstream; BLD keeps **6** (`spec`, `investigate`, `cso`, `review`, `careful`, `upgrade`) and prunes the rest. **Needs `bun`** - its installer is a bun script, so without it the clone succeeds and `setup` then fails. | code (binaries, hooks, telemetry) | https://github.com/garrytan/gstack |
+| **gstack** | Garry Tan's engineering framework. 54 skills upstream; BLD keeps **6** (`spec`, `investigate`, `cso`, `review`, `careful`, `upgrade`) and prunes the rest. **Needs `bun`** (`npm install -g bun`, official package) - its installer is a bun script, so without it the clone succeeds and `setup` then fails. | code (binaries, hooks, telemetry) | https://github.com/garrytan/gstack |
 | **impeccable** | Design craft + audit, 23 sub-commands (`craft`, `audit`, `polish`, `harden`…). | code (node scripts) | https://github.com/pbakaus/impeccable |
 
 > 🚩 **Never run `/impeccable live`.** It forwards `ANTHROPIC_API_KEY` /

@@ -273,7 +273,7 @@ CASES = [
   ["Node 18+ is expected", "!BLOCKED"], 0),
 
  ({"id": "C27", "desc": "bun missing is named, with a source",
-   "global_bld": 1}, ["bun                 needed for gstack only -> bun.sh"], 0),
+   "global_bld": 1}, ["bun                 needed for gstack only -> npm i -g bun"], 0),
 
  ({"id": "C28", "desc": "bun present is not nagged about",
    "global_bld": 1, "bin": ["node", "npm", "git", "bun"]},
