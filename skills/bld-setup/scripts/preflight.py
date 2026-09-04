@@ -303,12 +303,21 @@ def main():
     print("\nDEPLOY TOOLING")
     print("  Needed only if you want /bld-util-deploy (private repo + live URL).\n")
 
-    gh_path = have("gh") or (r"C:\Program Files\GitHub CLI\gh.exe"
-                             if os.path.exists(r"C:\Program Files\GitHub CLI\gh.exe") else None)
+    # winget installs gh here and does not always put it on PATH straight away, so
+    # the absolute path is a legitimate fallback. Say when it was the only hit,
+    # though: every later step calls a bare `gh`, which still fails until the
+    # shell picks up the new PATH. Reporting a plain "ok" there sends people to
+    # debug `gh auth login` instead of restarting their terminal.
+    gh_on_path = have("gh")
+    gh_fallback = r"C:\Program Files\GitHub CLI\gh.exe"
+    gh_path = gh_on_path or (gh_fallback if os.path.exists(gh_fallback) else None)
     gh_authed = False
     if gh_path:
         gh_authed, line = run([gh_path, "auth", "status"])
-        row("gh", True, "signed in" if gh_authed else "INSTALLED BUT NOT SIGNED IN -> gh auth login")
+        if not gh_on_path:
+            row("gh", True, "found at the default path but NOT on PATH -> restart the shell")
+        else:
+            row("gh", True, "signed in" if gh_authed else "INSTALLED BUT NOT SIGNED IN -> gh auth login")
     else:
         row("gh", False, "not installed -> cli.github.com")
 
