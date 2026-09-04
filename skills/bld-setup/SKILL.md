@@ -618,18 +618,19 @@ quietly triple.
 ### impeccable (only if chosen) — skill files only
 
 ```bash
-rm -rf /tmp/impeccable ~/.claude/skills/impeccable
-git clone --depth 1 https://github.com/pbakaus/impeccable.git /tmp/impeccable
-cp -r /tmp/impeccable/.claude/skills/impeccable ~/.claude/skills/impeccable
-rm -rf /tmp/impeccable
+rm -rf ~/.claude/skills/impeccable
+tmp=$(mktemp -d)
+git clone --depth 1 https://github.com/pbakaus/impeccable.git "$tmp/impeccable"
+cp -r "$tmp/impeccable/.claude/skills/impeccable" ~/.claude/skills/impeccable
+rm -rf "$tmp"
 ```
 
 **Verify `~/.claude/skills/impeccable/SKILL.md` exists before moving on.**
 
-**Both `rm -rf`s on the first line are load-bearing on a re-run**, and this skill
-is built to be re-run. The trailing cleanup only happens when the block succeeds,
-so an interrupted setup leaves `/tmp/impeccable` behind and the retry dies on
-`destination path already exists`. Worse, `cp -r src dest` copies *into* `dest`
+**The `rm -rf` on the first line is load-bearing on a re-run**, and this skill is
+built to be re-run. `mktemp -d` gives the clone a fresh directory every time, so
+an interrupted run cannot leave one behind for the retry to collide with. The
+target still has to go first: `cp -r src dest` copies *into* `dest`
 when `dest` already exists, so a second pass produces
 `~/.claude/skills/impeccable/impeccable/SKILL.md`. That path never registers as a
 skill, and nothing reports an error: impeccable simply is not there.
