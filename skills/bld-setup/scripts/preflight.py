@@ -519,7 +519,13 @@ def main():
     row("bld-executor agent", agent_have,
         "" if agent_have else "MISSING - the orchestrator skills cannot run without it")
 
-    row("~/.claude/CLAUDE.md", os.path.isfile(os.path.join(CLAUDE, "CLAUDE.md")), "")
+    # Phase 8 offers these two rather than installing them, so they are groups
+    # like any other: recorded in done/declined, and re-offered by Phase 6 only
+    # when they are in neither. Two slugs, not one - the picker lets someone take
+    # the machine-wide rules and skip the workspace ones, or the reverse.
+    claudemd_global  = os.path.isfile(os.path.join(CLAUDE, "CLAUDE.md"))
+    claudemd_project = os.path.isfile(os.path.join(project, "CLAUDE.md"))
+    row("~/.claude/CLAUDE.md", claudemd_global, "")
 
     # What the disk actually proves, keyed by the group slugs written to
     # .bld-setup.json. Used below to catch a state file that claims a group
@@ -546,6 +552,8 @@ def main():
         # here made a resume conclude Codex was installed because an unrelated
         # markdown file had been copied.
         "agents":        bool(have("codex")) or bool(have("gemini")),
+        "claude-md-global":    claudemd_global,
+        "claude-md-workspace": claudemd_project,
     }
 
     # ── 4. verdict ──────────────────────────────────────────────────────

@@ -57,6 +57,21 @@ Pure markdown unless noted. These are the cheapest, safest things on the list.
 
 ---
 
+## 2b. Rule files (offered at the end, never automatic)
+
+Two markdown files of opinionated defaults. **Phase 8 asks before installing
+either, and "neither" is a supported answer** - every `/bld-*` command works
+without them. An existing file at the same path is renamed to `CLAUDE.old.md`,
+never overwritten or merged.
+
+| File | What it holds | Runs code? | Installed to |
+|---|---|---|---|
+| `CLAUDE.global.md` | How you like to be worked with, security defaults, the dev loop | md | `~/.claude/CLAUDE.md` |
+| `CLAUDE.workspace.md` | Workspace mission, routing table, guardrails, deploy conventions | md | `<workspace>/CLAUDE.md` |
+
+Both carry `<FILL IN>` blanks you complete during setup, and both say in their own
+text that they are living documents Claude should revise as it learns how you work.
+
 ## 3. Skills with their own installer
 
 Both are large. Both want to wire hooks. BLD installs them **skill-only**.

@@ -870,24 +870,101 @@ Four things that have actually bitten:
 Then update the delegation block in `~/.claude/CLAUDE.md` to name what they
 installed, or mark it unavailable so Claude stops offering it.
 
-## Phase 8 — the CLAUDE.md rules
+## Phase 8 — offer the CLAUDE.md rules (opt-in, never automatic)
 
-Two layers:
+BLD ships two opinionated rule files. **They are an offer, not part of the
+install.** Someone already running Claude Code has their own way of working, and
+a CLAUDE.md is the most personal file in the whole toolkit - it decides how every
+answer is written. Installing one uninvited is the rudest thing this skill could
+do.
 
 | File | Holds | From |
 |---|---|---|
 | `~/.claude/CLAUDE.md` | Machine-wide: who you are, security drill, dev loop | `templates/CLAUDE.global.md` |
 | `<workspace>/CLAUDE.md` | Mission, routing table, guardrails, deploy conventions | `templates/CLAUDE.workspace.md` |
 
-**If `~/.claude/CLAUDE.md` exists, do not overwrite it.** Show a diff of what BLD
-would add and let them choose. Their rules outrank yours.
+### Ask, with the stakes stated
 
-**Twelve `<FILL IN>` blocks across the two files: seven in the global template,
-five in the workspace one.** Count both. Someone who fills in "the seven" leaves
-the workspace file with `<FILL IN: workspace name>` as its title and no GitHub
-account for `/bld-util-deploy`, because that one lives in the workspace file, not
-the global one. (Each file also mentions `<FILL IN>` once inside its opening HTML
-comment. Those are explaining the convention, not asking for anything.)
+Say what each file changes before asking, in two lines - not everyone knows what
+a CLAUDE.md does. Then one `AskUserQuestion`, single select:
+
+| Option | Installs |
+|---|---|
+| **Both** | The machine-wide rules and this workspace's rules. |
+| **Global only** | Machine-wide rules; leaves the workspace alone. |
+| **This workspace only** | Workspace rules; leaves their global file alone. |
+| **Neither** | Nothing. BLD's commands all work without these files. |
+
+**"Neither" is a real answer, and the skill works fine after it.** Every `/bld-*`
+command runs without either file. What is lost is the *defaults* - the dev loop,
+the deploy conventions, the who-am-I block that decides how much gets explained.
+Say that in one line and take the answer.
+
+**Show them what they would be getting** if they ask, or if they hesitate: the
+templates are plain markdown and reading one takes a minute. Never install
+something this opinionated on a shrug.
+
+### Installing: rename theirs, never overwrite it
+
+**A file already at either path is theirs and outranks anything BLD ships.** Move
+it aside under a name they will recognise; do not merge, do not diff-and-patch,
+do not delete.
+
+```bash
+if [ -e ~/.claude/CLAUDE.md ]; then
+  if [ -e ~/.claude/CLAUDE.old.md ]; then
+    echo "STOP: ~/.claude/CLAUDE.old.md already exists - not clobbering it"; exit 1
+  fi
+  mv ~/.claude/CLAUDE.md ~/.claude/CLAUDE.old.md
+  echo "their file kept at ~/.claude/CLAUDE.old.md"
+fi
+cp "<resolved path>/templates/CLAUDE.global.md" ~/.claude/CLAUDE.md
+```
+
+```bash
+if [ -e "<workspace>/CLAUDE.md" ]; then
+  if [ -e "<workspace>/CLAUDE.old.md" ]; then
+    echo "STOP: <workspace>/CLAUDE.old.md already exists - not clobbering it"; exit 1
+  fi
+  mv "<workspace>/CLAUDE.md" "<workspace>/CLAUDE.old.md"
+  echo "their file kept at <workspace>/CLAUDE.old.md"
+fi
+cp "<resolved path>/templates/CLAUDE.workspace.md" "<workspace>/CLAUDE.md"
+```
+
+**The `CLAUDE.old.md` guard is the important half of that block, not padding.**
+On a second run the file at `CLAUDE.md` is BLD's copy and `CLAUDE.old.md` is
+their original - renaming again would overwrite the only copy of the thing this
+whole phase exists to protect. Refusing is correct; tell them the path and let
+them decide.
+
+**Tell them the backup path in the same breath as "done".** A rule file that
+silently stopped applying is indistinguishable from Claude behaving oddly, and
+nobody thinks to look for `CLAUDE.old.md` a week later. Also say they can merge
+the two by hand at any time - their old rules are text, not lost.
+
+Record the answer in the state file (Phase 5) either way, as two independent
+groups - someone can take the machine-wide rules and skip the workspace ones:
+
+| Slug | The file |
+|---|---|
+| `claude-md-global` | `~/.claude/CLAUDE.md` |
+| `claude-md-workspace` | `<workspace>/CLAUDE.md` |
+
+Installed goes in `done`, declined goes in `declined`. Left out of both, Phase 6
+re-offers it on every future run - which is the wrong outcome for someone who has
+already said no once.
+
+### Filling in the blanks
+
+Only for the file(s) they took.
+
+**Twelve `<FILL IN>` blocks across the two templates: seven in the global one,
+five in the workspace one.** Count the ones you installed. Someone who takes both
+and fills in "the seven" ships a workspace file titled `<FILL IN: workspace name>`
+with no GitHub account for `/bld-util-deploy`, because that one lives in the
+workspace file. (Each file also mentions `<FILL IN>` once inside its opening HTML
+comment. Those explain the convention; they are not blanks.)
 
 These four deserve the most attention:
 
@@ -896,6 +973,10 @@ These four deserve the most attention:
 3. **Delegation** — mark unavailable if they skipped Phase 7. *(global)*
 4. **The dev loop** — server stays up, localhost link instead of opening their
    browser, and **never push without being asked**. Worth reading, not skimming.
+
+**Both files carry a block saying they are living documents.** Point at it once:
+the who-they-are answer is a starting guess Claude is expected to revise as it
+learns how they actually work, not a form filled in once and obeyed forever.
 
 ## Phase 9 — restart, then verify
 

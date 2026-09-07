@@ -119,6 +119,8 @@ def build(spec, root):
             json.dumps(reg))
     if spec.get("claudemd"):
         io.open(os.path.join(claude, "CLAUDE.md"), "w").write("# rules")
+    if spec.get("proj_claudemd"):
+        io.open(os.path.join(proj, "CLAUDE.md"), "w").write("# workspace rules")
 
     st = spec.get("state")
     sp = os.path.join(claude, ".bld-setup.json")
@@ -271,6 +273,24 @@ CASES = [
  ({"id": "C25", "desc": "Node too old for the skills installer",
    "bin": [("node", 0, "v12.22.12"), "npm", "git"]},
   ["Node 18+ is expected", "!BLOCKED"], 0),
+
+ ({"id": "C33", "desc": "claude-md groups are real, not flagged as typos",
+   "global_bld": 1, "claudemd": 1,
+   "state": {"chose": ["bld", "claude-md-global"], "declined": ["claude-md-workspace"],
+             "done": ["bld", "claude-md-global"], "completed": False}},
+  ["!NOT REAL GROUP NAMES", "!RECHECK"], 0),
+
+ ({"id": "C34", "desc": "state claims the global rule file that is not on disk",
+   "global_bld": 1,
+   "state": {"chose": ["bld", "claude-md-global"], "declined": [],
+             "done": ["bld", "claude-md-global"], "completed": False}},
+  ["RECHECK", "claude-md-global"], 0),
+
+ ({"id": "C35", "desc": "workspace rule file counts independently of the global one",
+   "global_bld": 1, "proj_claudemd": 1, "pass_project": 1,
+   "state": {"chose": ["bld", "claude-md-workspace"], "declined": ["claude-md-global"],
+             "done": ["bld", "claude-md-workspace"], "completed": False}},
+  ["!NOT REAL GROUP NAMES", "!RECHECK"], 0),
 
  ({"id": "C27", "desc": "bun missing is named, with a source",
    "global_bld": 1}, ["bun                 needed for gstack only -> npm i -g bun"], 0),
