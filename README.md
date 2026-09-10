@@ -233,12 +233,6 @@ bld-package/
     └── CLAUDE.workspace.md         workspace rules
 ```
 
----
-
----
-
----
-
 ## License
 
 MIT. 
