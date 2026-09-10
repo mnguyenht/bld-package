@@ -3,11 +3,11 @@
 **A lightweight Claude agent skillset, for every step of the ```building``` process.**
 
 # Background
-Many skillsets nowadays ship with excessive amounts of skills, subagents, hooks, etc. Clogging up hundreds of thousands of tokens every session for skills you'll probably never use.
+Many skillsets nowadays ship with excessive amounts of skills, subagents, etc. Some clogging up to ***80% of your context*** every session, for skills you'll probably never use.
 
 *BLD is the simplest skillset you'll ever need*. Providing 23 skills for every part of the ```web-development``` process. 
 
-From planning to deployment and SEO, it has it all. Including many utility commands to save you hundreds of thousands of tokens every run. 
+From planning to deployment, it has it all. Including many utility commands ***saving up to 75% of your tokens***. 
 
 ---
 
@@ -17,7 +17,7 @@ From planning to deployment and SEO, it has it all. Including many utility comma
 - [Installing on macOS or Linux](#installing-on-macos-or-linux)
 - [How commands are named](#how-commands-are-named)
 - [What BLD will not do](#what-bld-will-not-do)
-- [The commands](#the-commands)
+- [Commands List](#the-commands)
   - [sprint](#sprint) · [optimize](#optimize) · [find](#find) · [runtime](#runtime)
   - [orchestrator](#orchestrator) · [util](#util) · [settings](#settings) · [special](#special)
 - [Repo layout](#repo-layout)
