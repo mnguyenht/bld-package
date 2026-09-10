@@ -47,11 +47,9 @@ cd bld-package
 claude
 ```
 
-**3. Run the setup command.**
+**3. Ask it to set BLD up.**
 
-```bash
-/bld-setup
-```
+> read skills/bld-setup/SKILL.md and set BLD up
 
 That is the whole install. Claude reads the file, checks your machine, shows you
 what it could install, and puts on only what you pick.
