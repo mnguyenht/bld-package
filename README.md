@@ -3,33 +3,105 @@
 **A lightweight agent skillset for every step of the building process.**
 
 Ask Claude Code to build something and it will. Ask it twice and you get two
-different processes. BLD gives the process a shape: 23 slash commands, one per
-step, each carrying the checklist and the gotchas for that step.
+different processes.
 
-Decide what is worth building with `/bld-sprint-planning`. Build it with
-`/bld-sprint-init`. Measure it with `/bld-optimize-app`. Ship it with
-`/bld-util-deploy`. You pick the step. The skill brings everything else.
+BLD gives the process a shape: 23 slash commands, one per step, each carrying the
+checklist and the gotchas for that step. Decide what is worth building with
+`/bld-sprint-planning`. Build it with `/bld-sprint-init`. Measure it with
+`/bld-optimize-app`. Ship it with `/bld-util-deploy`.
 
----
-
-## Contents
-
-- [Setup](#setup)
-- [What "lightweight" actually means](#what-lightweight-actually-means)
-- [How commands are named](#how-commands-are-named)
-- [The commands](#the-commands)
-- [What BLD will not do](#what-bld-will-not-do)
-- [Repo layout](#repo-layout)
-- [License](#license)
-- [Credits](#credits)
+You pick the step. The skill brings everything else.
 
 ---
 
-## Setup
+## The commands
 
-**You need:** [Claude Code](https://claude.com/claude-code), plus `node`, `npm`
+### sprint
+
+*You give Claude a goal and it builds toward it.*
+
+| Command | What it does |
+|---|---|
+| `/bld-sprint-planning` | Decides what should exist before anything gets built. Plan mode answers *how to build*. This answers *whether to*. |
+| `/bld-sprint-init` | Idea to a working, deployed base in one sprint. Asks your time budget and design direction, then scaffolds and ships. |
+| `/bld-sprint-refine` | Base to feels-alive. The craft passes init skipped. Run it per screen, once a screen is basically done. |
+
+### optimize
+
+*Improves an app that already exists.*
+
+| Command | What it does |
+|---|---|
+| `/bld-optimize-app` | Lighthouse against the shipped app, three runs and a median, because one run is a sample and not a measurement. |
+| `/bld-optimize-react` | Static scan of your source with react-doctor and your own eslint. Findings are hypotheses, so it triages before it fixes. |
+| `/bld-optimize-security` | A static security pass, 13 layers deep. Free, local, and it reports rather than auto-fixing. |
+| `/bld-optimize-seo-indexing` | Gets an app found on Google. Audits the live site with curl instead of trusting the source. |
+
+### find
+
+*Locates a ready-made asset.*
+
+| Command | What it does |
+|---|---|
+| `/bld-find-21st` | Browses [21st.dev](https://21st.dev) for shadcn components. Coming back empty-handed is a valid outcome. |
+| `/bld-find-spline` | Same idea for 3D scenes from [Spline](https://spline.design). Heavy, so it only suggests one that earns its weight. |
+
+### runtime
+
+*Applies to how the session runs, not to what gets built.*
+
+| Command | What it does |
+|---|---|
+| `/bld-runtime-agents` | Boss mode over an external coding agent. Claude specs and reviews, the agent writes. Needs a Codex or Gemini account. |
+| `/bld-runtime-tokens` | How much of your Claude window is left, and what to do about it. |
+| `/bld-runtime-activate-mcps` | Spawns a code-search server, fires one batch of queries, kills it. |
+
+### orchestrator
+
+*Claude bosses other agents instead of writing code.*
+
+| Command | What it does |
+|---|---|
+| `/bld-orchestrator-fable` | Plan, execute in parallel, judge each report as a skeptic, re-spec until it passes. |
+| `/bld-orchestrator-opus` | The same loop with Opus in the boss seat. |
+
+### util
+
+*Everything in between.*
+
+| Command | What it does |
+|---|---|
+| `/bld-util-deploy` | Private GitHub repo plus Vercel, auto-deploy on push. After the first run, shipping is a commit and a push. |
+| `/bld-util-handoff` | Snapshots the session so you can `/clear` and pick up in fresh context before it rots. |
+| `/bld-util-documentation` | Writes a `/docs` page inside your app, in Simplified Technical English. Half-built features go under Known limits. |
+| `/bld-util-customize-component` | Builds real sliders in the browser, bound to the real component. You drag, the values get committed, the panel gets deleted. |
+| `/bld-util-copywriting` | App copy, with workspace rules for pre-launch proof, litotes, irony, and phrasing that reads as machine-written. |
+
+### settings
+
+*A package setting you turn on and off.*
+
+| Command | What it does |
+|---|---|
+| `/bld-mcp-settings` | Switches BLD's MCP servers between on-demand and always-on, without touching an entry it did not write. |
+| `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
+
+### special
+
+*Acts on BLD itself.*
+
+| Command | What it does |
+|---|---|
+| `/bld-setup` | Sets BLD up, or adds more of it later. Remembers where it got to. |
+| `/bld-quiz` | A learning checkpoint after a sprint, at matching depth. Small changes get a walkthrough instead. |
+
+---
+
+## Install
+
+**You need** [Claude Code](https://claude.com/claude-code), plus `node`, `npm`
 and `git`. Everything else is optional, and BLD tells you what each optional
-piece unlocks before you decide.
+piece gives you before you decide.
 
 ```bash
 git clone https://github.com/<you>/bld-package.git
@@ -42,53 +114,52 @@ Then, inside Claude Code:
 /bld-setup
 ```
 
-### What that does
-
 | Step | What happens |
 |---|---|
-| **1. Preflight** | Checks what you already have. Read-only. Stops with install links if a prerequisite is missing. |
-| **2. The manifest** | Prints every tool, plugin, CLI and MCP server it could install, with a source link for each and a column saying whether it runs code on your machine. |
-| **3. Deploy accounts** | Asks whether you want `/bld-util-deploy`. If yes, GitHub and Vercel get set up first, since those need logins only you can do. |
-| **4. You choose** | Multi-select, with an "everything recommended" option. Nothing is installed until you pick. |
-| **5. Install** | Cheap and safe first, slow last. |
-| **6. Restart** | Skills register at startup, so Claude Code has to restart before anything works. |
+| **Preflight** | Checks what you already have. Read-only. Stops with install links if something required is missing. |
+| **The manifest** | Prints every tool it could install, with a source link and a column saying whether it runs code on your machine. |
+| **Deploy accounts** | Asks whether you want `/bld-util-deploy`, since GitHub and Vercel need logins only you can do. |
+| **You choose** | Nothing is installed until you pick. |
+| **Install** | Cheap and safe first, slow last. |
+| **Restart** | Skills register at startup, so Claude Code has to restart before anything works. |
 
-`/bld-setup` records what you chose and what you skipped. That means:
-
-- **An interrupted setup resumes** where it stopped instead of starting over.
-- **Running it again later** does not repeat the whole flow. It shows you what
-  you skipped last time and what is new.
+`/bld-setup` records what you chose and what you skipped, so an interrupted setup
+resumes where it stopped, and running it again later shows you what you passed on
+rather than repeating the whole flow.
 
 Nothing is installed silently, and nothing is installed that was not on the
 printed list.
 
+> **On macOS or Linux?** `/bld-setup` has been executed and verified on Windows
+> only. The commands are written to be cross-platform and preflight checks for
+> the usual differences, but if you would rather not be the first to run it,
+> [MANUAL-INSTALL.md](MANUAL-INSTALL.md) is the same install written out linearly
+> with macOS and Linux spellings. Same end state either way.
+
 ---
 
-## What "lightweight" actually means
+## How it stays light
 
 Every skillset claims to be lightweight. Here is what BLD does to earn it.
 
-**Nothing runs in the background by default.** No `.mcp.json` is created unless
-you ask for one with `/bld-mcp-settings`. Code
-search servers get spawned for one batch of queries and killed. No third-party
-process sits idle with a view of your codebase.
+**Nothing runs in the background.** No `.mcp.json` is created unless you ask for
+one. Code search servers get spawned for one batch of queries and killed. No
+third-party process sits idle with a view of your codebase.
 
-**You can read the whole thing.** BLD is instructions, not a framework. Four
-small helper scripts do real work; the rest is markdown you could get through in
-an afternoon and disagree with in specific places.
+**You can read the whole thing.** BLD is instructions, not a framework. Five small
+helper scripts do real work; the rest is markdown you could get through in an
+afternoon and disagree with in specific places.
 
 **It ships less than it could.** BLD bundles
 [gstack](https://github.com/garrytan/gstack) at 6 skills instead of 54. The other
 48 were iOS, paid-provider and team-process skills that duplicated what BLD
-already did, and every one cost context on every session. Cutting them took the
-load from roughly 1.5k tokens to 160.
+already did, and every one cost context on every session.
 
-**One hook, and you can read it too.** It blocks AI image generation, because BLD
-finds existing assets instead of inventing them.
+**One hook, and you can read that too.** It blocks AI image generation, because
+BLD finds existing assets instead of inventing them.
 
 **Skills call skills.** `/bld-sprint-init` drives the design engine, the
-scaffolder and the deploy skill rather than reimplementing any of them. Less to
-maintain, and fewer places for the three to disagree.
+scaffolder and the deploy skill rather than reimplementing any of them.
 
 ---
 
@@ -104,106 +175,17 @@ kind of thing it is before you have learned the set.
  └────────────── the prefix
 ```
 
-Once you know the set, leading with the type buries the word you are actually
-reaching for. `/bld-professional-settings on` moves the type to the end, so the
-distinctive word comes first and typing the first few letters lands on the
-command instead of the category. `off` puts it back in front.
+Once you know the set, leading with the type buries the word you are reaching
+for. `/bld-professional-settings on` moves the type to the end, so typing the
+first few letters lands on the command instead of the category. `off` puts it
+back. Both orders keep all three parts, and the switch rewrites folders,
+frontmatter and every cross-reference together, so nothing is left pointing at a
+command that no longer exists.
 
-Both orders keep all three parts. Pro is **not** the shorter one — it is the same
-name, reordered — and nothing is ever dropped. Same skills either way, and the
-switch rewrites the folders, the frontmatter and every cross-reference together
-so nothing is left pointing at a command that no longer exists.
-
-Four commands never change name. Two are **special** — what you reach for when
-you are confused about your own setup, and a command that renames itself is the
-worst thing to need at that moment: `/bld-setup` and `/bld-quiz`. The other two
-are **settings**, which stay fixed for a sharper reason: a switch named after its
-own state is a trap. `/bld-professional-settings` is one of them.
-
----
-
-## The commands
-
-### sprint
-
-You give Claude a goal and it builds toward it.
-
-| Command | What it does |
-|---|---|
-| `/bld-sprint-planning` | Decides what should exist before anything gets built. Interviews the idea, pressure-tests the assumption it rests on, cuts it to a shippable v1, and leaves three durable files behind. Plan mode answers *how to build*. This answers *whether to*. |
-| `/bld-sprint-init` | Idea to a good-looking, working, deployed base in one sprint. Asks your time budget and design direction first, generates a design system, scaffolds, builds the core screens, ships. |
-| `/bld-sprint-refine` | Base to feels-alive. The craft passes init skipped: micro-interactions, motion review, a design audit. Run it per screen, once a screen is basically done. |
-
-### optimize
-
-Improves an app that already exists.
-
-| Command | What it does |
-|---|---|
-| `/bld-optimize-app` | Runs Google Lighthouse against the shipped app, then triages. Three runs and a median, because one run is a sample and not a measurement. Knows the difference between a real regression and a cold edge cache. |
-| `/bld-optimize-react` | Static scan of the source with react-doctor plus your own eslint. Findings are hypotheses, so it triages before it fixes. |
-| `/bld-optimize-security` | A static security pass, 13 layers deep. Combines Claude's built-in review, the gstack security skills and vendored checklists. Free, local, and it reports rather than auto-fixing. |
-| `/bld-optimize-seo-indexing` | Gets an app found on Google. Audits the live site with curl instead of trusting the source, adds the crawl plumbing, then hands you the account steps only a human can do. |
-
-### find
-
-Locates a ready-made asset on an external surface.
-
-| Command | What it does |
-|---|---|
-| `/bld-find-21st` | Browses [21st.dev](https://21st.dev) for ready-made shadcn components, shortlists them, installs the one you pick. Coming back empty-handed is a valid outcome. |
-| `/bld-find-spline` | Same idea for 3D scenes from [Spline](https://spline.design). Heavy, so it only suggests one when it genuinely earns its weight. |
-
-### runtime
-
-Applies to how the session runs, not to what gets built.
-
-| Command | What it does |
-|---|---|
-| `/bld-runtime-agents` | Boss mode over an external coding agent. Claude specs and reviews, the agent writes the code. For work that is bulky, repetitive, or a long generation. Needs a Codex or Gemini account. |
-| `/bld-runtime-tokens` | One-shot check of how much of your Claude window is left, and what to do about it: keep going, batch, delegate, or hand off. |
-| `/bld-runtime-activate-mcps` | Spawns a code-search MCP server, fires one batch of queries, kills it. For big sprints where you would otherwise read twenty files. |
-
-### orchestrator
-
-Claude bosses other agents instead of writing code.
-
-| Command | What it does |
-|---|---|
-| `/bld-orchestrator-fable` | Plan, execute in parallel, judge each report as a skeptic, re-spec until it passes. Claude never writes the code itself. |
-| `/bld-orchestrator-opus` | The same loop with Opus in the boss seat. |
-
-### util
-
-Everything in between. Not building, not optimizing.
-
-| Command | What it does |
-|---|---|
-| `/bld-util-deploy` | Private GitHub repo plus Vercel, auto-deploy on push. First run is full setup; after that, shipping is a commit and a push. |
-| `/bld-util-handoff` | Snapshots the session to `handoff.md` so you can `/clear` and pick up in a fresh context before it rots. |
-| `/bld-util-documentation` | Surveys the whole app and writes a `/docs` page inside it, in Simplified Technical English. Documents what the code actually does. Half-built features go under Known limits. |
-| `/bld-util-customize-component` | When tweaking an effect by prompt has failed twice, this builds real sliders in the browser, bound to the real component. You drag, the values get committed, the panel gets deleted. |
-| `/bld-util-copywriting` | Writes or rewrites app copy through the installed copywriting skill, then applies workspace rules for pre-launch proof, litotes, irony, and AI-sounding phrasing. |
-
-### settings
-
-A package setting you turn on and off. **These never rename themselves.** A
-switch whose own name depends on which way it is switched is a trap, and one of
-these renames every other command in the package.
-
-| Command | What it does |
-|---|---|
-| `/bld-mcp-settings` | Toggle BLD's MCP servers between on-demand and always-on. Writes them into `.mcp.json` and takes them out again, without ever touching an entry it did not write. |
-| `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
-
-### special
-
-Acts on BLD itself. These keep the same name in both naming modes.
-
-| Command | What it does |
-|---|---|
-| `/bld-setup` | Sets BLD up, or adds more of it later. Remembers where it got to. |
-| `/bld-quiz` | A learning checkpoint after a sprint. Sizes what was built, then quizzes you on it at matching depth. Small changes get a walkthrough instead. |
+Four commands never rename themselves. `/bld-setup` and `/bld-quiz` are what you
+reach for when you are confused about your own setup, and a command that renames
+itself is the worst thing to need at that moment. The two settings commands stay
+fixed for a sharper reason: a switch named after its own state is a trap.
 
 ---
 
@@ -213,16 +195,15 @@ These are the opinions. They live in the CLAUDE.md templates, so they apply to
 every app you build with it.
 
 - **It will not push your code.** Finishing a change is not a reason to ship one.
-  Deploying happens when you ask, and not before.
 - **It will not fix what you did not mention.** Not the padding next to the thing
-  you asked about, not the easing curve it read on the way past. Spots a real
-  problem? It tells you and leaves it alone.
+  you asked about, not the easing curve it read on the way past. If it spots a
+  real problem, it tells you and leaves it alone.
 - **It will not take over your scrolling.** Wheel and trackpad motion stays
   exactly what your OS would do. Click a nav link and it can glide, because you
   asked to go somewhere.
 - **It will not invent a number.** No made-up prices, testimonials, or proof.
-  Gaps get marked and handed back to you, because a plausible fake price ends up
-  quoted to a real customer.
+  Gaps get marked and handed back, because a plausible fake price ends up quoted
+  to a real customer.
 - **It will not trust a scanner.** Every audit in here returns a tempting list of
   things nobody asked for. BLD reads the code before believing any of it.
 
@@ -233,6 +214,7 @@ every app you build with it.
 ```
 bld-package/
 ├── README.md
+├── MANUAL-INSTALL.md               the install written out by hand
 ├── skills/                         23 commands, one folder each
 │   ├── bld-setup/
 │   │   ├── SKILL.md
@@ -276,8 +258,8 @@ ECC's own MIT license, included in full beside them.
 ## Credits
 
 BLD is mostly glue. The people below wrote the parts that do the hard work, and
-every one of these is worth a look on its own terms. This is the same table
-`/bld-setup` shows you before it installs anything.
+every one is worth a look on its own terms. This is the same table `/bld-setup`
+shows you before it installs anything.
 
 ### Claude Code plugins
 
