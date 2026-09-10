@@ -14,6 +14,7 @@ From planning to deployment and SEO, it has it all. Including many utility comma
 ## Contents
 
 - [Install](#install)
+- [Installing on macOS or Linux](#installing-on-macos-or-linux)
 - [How commands are named](#how-commands-are-named)
 - [What BLD will not do](#what-bld-will-not-do)
 - [The commands](#the-commands)
@@ -68,20 +69,35 @@ to install or not, and apply any fixes during the way.***
 
 (Once finished, if you'd like to install any tools / skills in the future, simply re-run /bld-setup.)
 
-> **Want the real slash command instead?** Copy the one skill in first and
-> restart Claude Code, then `/bld-setup` exists:
->
-> ```bash
-> mkdir -p ~/.claude/skills && cp -r skills/bld-setup ~/.claude/skills/
-> ```
->
-> Same flow either way. The trade is that this puts one file on your machine
-> before you have read the manifest.
+### Prefer the real slash command?
 
-> **On macOS or Linux?** `/bld-setup` has been executed and verified on Windows
-> and Linux, but never on macOS. If you would rather not be the first,
-> [MANUAL-INSTALL.md](MANUAL-INSTALL.md) is the same install written out linearly
-> with macOS and Linux spellings. Same end state either way.
+Copy the one skill in first and restart Claude Code, and `/bld-setup` exists:
+
+```bash
+mkdir -p ~/.claude/skills && cp -r skills/bld-setup ~/.claude/skills/
+```
+
+Same flow either way. The trade is that this puts one file on your machine before
+you have read the manifest.
+
+---
+
+## Installing on macOS or Linux
+
+Same install, same end state. Two things are worth knowing before you start.
+
+**`/bld-setup` has been executed and verified on Windows and on Linux, but never
+on macOS.** The commands are written to be cross-platform and preflight checks for
+the usual differences, so it should work. Nobody has proven it.
+
+**[MANUAL-INSTALL.md](MANUAL-INSTALL.md) is the same install written out
+linearly**, with `python3` and `brew` spellings and no interactive picker. Use it
+if you would rather read a list than answer questions, or if you would rather not
+be the first to run the guided flow on a Mac.
+
+It also carries the two things the Linux runs measured that catch people out: the
+`npm` prefix remedy that Debian and Ubuntu silently ignore, and the check that
+your `bun` is the Linux one rather than a Windows shim inherited through WSL.
 
 ---
 
@@ -233,9 +249,11 @@ bld-package/
     └── CLAUDE.workspace.md         workspace rules
 ```
 
+---
+
 ## License
 
-MIT. 
+MIT.
 
 The security checklists in `skills/bld-optimize-security/references/ecc/` are
 vendored from [affaan-m/ECC](https://github.com/affaan-m/ECC) and stay under
