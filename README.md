@@ -35,16 +35,34 @@ You pick the step. The skill brings everything else.
 and `git`. Everything else is optional, and BLD tells you what each optional
 piece gives you before you decide.
 
+**1. Clone it.**
+
 ```bash
-git clone https://github.com/<you>/bld-package.git
+git clone https://github.com/mnguyenht/bld-package.git
+```
+
+**2. Open that folder in Claude Code.** Use the app's folder picker, or start it
+from inside the folder:
+
+```bash
 cd bld-package
+claude
 ```
 
-Then, inside Claude Code:
+**3. Ask it to set BLD up.**
 
-```
-/bld-setup
-```
+> read skills/bld-setup/SKILL.md and set BLD up
+
+That is the whole install. Claude reads the file, checks your machine, shows you
+what it could install, and puts on only what you pick.
+
+**Why you ask instead of typing a slash command.** `/bld-setup` is a slash
+command, and slash commands come from skills that are already installed. A fresh
+clone has not installed anything yet, so the command does not exist until BLD
+does. Pointing Claude at the file skips that chicken and egg, and it means
+nothing reaches your machine before you have seen the list.
+
+### What it does
 
 | Step | What happens |
 |---|---|
@@ -62,9 +80,18 @@ rather than repeating the whole flow.
 Nothing is installed silently, and nothing is installed that was not on the
 printed list.
 
+> **Want the real slash command instead?** Copy the one skill in first and
+> restart Claude Code, then `/bld-setup` exists:
+>
+> ```bash
+> mkdir -p ~/.claude/skills && cp -r skills/bld-setup ~/.claude/skills/
+> ```
+>
+> Same flow either way. The trade is that this puts one file on your machine
+> before you have read the manifest.
+
 > **On macOS or Linux?** `/bld-setup` has been executed and verified on Windows
-> only. The commands are written to be cross-platform and preflight checks for
-> the usual differences, but if you would rather not be the first to run it,
+> and Linux, but never on macOS. If you would rather not be the first,
 > [MANUAL-INSTALL.md](MANUAL-INSTALL.md) is the same install written out linearly
 > with macOS and Linux spellings. Same end state either way.
 
