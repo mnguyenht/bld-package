@@ -1,16 +1,12 @@
 # BLD
 
-**A lightweight agent skillset for every step of the building process.**
+**A lightweight Claude agent skillset, for every step of the ```building``` process.**
 
-Ask Claude Code to build something and it will. Ask it twice and you get two
-different processes.
+# Background
+Many skillsets nowadays ship with excessive amounts of skills, subagents, hooks, etc. Clogging up hundreds of thousands of tokens every session for skills you'll probably never use.
 
-BLD gives the process a shape: 23 slash commands, one per step, each carrying the
-checklist and the gotchas for that step. Decide what is worth building with
-`/bld-sprint-planning`. Build it with `/bld-sprint-init`. Measure it with
-`/bld-optimize-app`. Ship it with `/bld-util-deploy`.
-
-You pick the step. The skill brings everything else.
+BLD was made to address the needs of *the simple builder*. 23 slash commands for every part of the ```web-development``` process, from planning and prototype, into deployment and even SEO. With many utility
+commands to save you hundreds of thousands of tokens every run. 
 
 ---
 
@@ -49,16 +45,12 @@ claude
 
 **3. Ask it to set BLD up.**
 
+```
 > read skills/bld-setup/SKILL.md and set BLD up
+```
 
-That is the whole install. Claude reads the file, checks your machine, shows you
-what it could install, and puts on only what you pick.
-
-**Why you ask instead of typing a slash command.** `/bld-setup` is a slash
-command, and slash commands come from skills that are already installed. A fresh
-clone has not installed anything yet, so the command does not exist until BLD
-does. Pointing Claude at the file skips that chicken and egg, and it means
-nothing reaches your machine before you have seen the list.
+Claude should now execute `/bld-setup`, in which it'll install all the dependencies and
+underlying tools. 
 
 ### What it does
 
@@ -71,12 +63,10 @@ nothing reaches your machine before you have seen the list.
 | **Install** | Cheap and safe first, slow last. |
 | **Restart** | Skills register at startup, so Claude Code has to restart before anything works. |
 
-`/bld-setup` records what you chose and what you skipped, so an interrupted setup
-resumes where it stopped, and running it again later shows you what you passed on
-rather than repeating the whole flow.
+***Be sure to keep an eye on the installation, read over what you want
+to install or not, and apply any fixes during the way.***
 
-Nothing is installed silently, and nothing is installed that was not on the
-printed list.
+(Once finished, if you'd like to install any tools / skills in the future, simply re-run /bld-setup.)
 
 > **Want the real slash command instead?** Copy the one skill in first and
 > restart Claude Code, then `/bld-setup` exists:
@@ -92,15 +82,6 @@ printed list.
 > and Linux, but never on macOS. If you would rather not be the first,
 > [MANUAL-INSTALL.md](MANUAL-INSTALL.md) is the same install written out linearly
 > with macOS and Linux spellings. Same end state either way.
-
----
-
-## How it stays light
-
-Every skillset claims to be lightweight. Here is what BLD does to earn it.
-
-**Skills call skills.** Skills such as `/bld-sprint-refine` compiles 4 different skills into one.
-All serving the same purpose of UI refinement, why call each one every time?
 
 ---
 
