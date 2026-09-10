@@ -114,9 +114,6 @@ afternoon and disagree with in specific places.
 48 were iOS, paid-provider and team-process skills that duplicated what BLD
 already did, and every one cost context on every session.
 
-**One hook, and you can read that too.** It blocks AI image generation, because
-BLD finds existing assets instead of inventing them.
-
 **Skills call skills.** `/bld-sprint-init` drives the design engine, the
 scaffolder and the deploy skill rather than reimplementing any of them.
 
@@ -191,8 +188,6 @@ bld-package/
 │       └── scripts/switch-mode.py  renames every command between modes
 ├── agents/
 │   └── bld-executor.md             the worker the orchestrators fan out to
-├── hooks/
-│   └── block-image-skills.py       blocks AI image generation
 └── templates/
     ├── CLAUDE.global.md            machine-wide rules
     └── CLAUDE.workspace.md         workspace rules

@@ -86,7 +86,8 @@ regardless of tier.
 - Make it as good as the chosen time budget allows — never a deliberately bare
   base. But respect the budget: don't silently balloon a Quick job into an hour.
   The exhaustive strict craft passes still belong to `/bld-sprint-refine`.
-- Never invoke image-generation skills (`design`, `banner-design`) — blocked.
+- Never invoke image-generation skills (`design`, `banner-design`). BLD finds
+  existing assets rather than generating them.
 - MCP tools default to on-demand via `/bld-runtime-activate-mcps`. Always-on is
   a deliberate opt-in through `/bld-mcp-settings`, never a hand-edited `.mcp.json`.
 - Explain approval-required commands in beginner terms before running them.

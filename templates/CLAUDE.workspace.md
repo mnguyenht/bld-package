@@ -15,6 +15,10 @@ file holds only what's specific to this workspace.
 
 ## What we're doing & why
 
+> These three lines are **defaults, not fixed facts** - a starting guess, expected
+> to change. Revise them as the work reveals otherwise, and say so. See
+> "Maintenance" at the bottom for when to rewrite them.
+
 - **Situation:** <FILL IN — who is building here and in what context.>
 - **Goal:** <FILL IN — e.g. "ship multiple small web apps, each potentially able to
   make money. Monetization is TBD per app; when an app gets serious, proactively
@@ -121,10 +125,10 @@ write, and editing around it loses that protection.
   prop nobody mentioned), or deleting a rule that a change happened to orphan.
   Adjacent ≠ in scope. If the ask truly can't work without a second change, **say so
   first and wait**. Spot something else wrong? Report it, don't fix it.
-- 🚫 **No AI image generation** — `design` / `banner-design` are blocked by the
-  PreToolUse hook at `~/.claude/hooks/block-image-skills.py` (loads at startup).
-  `/bld-setup` copies it there deliberately, out of the cloned package, so deleting
-  the clone cannot silently disable it.
+- 🚫 **No AI image generation.** Never invoke `design` / `banner-design` from
+  ui-ux-pro-max. Find existing assets instead. This is a convention, not an
+  enforced one: nothing blocks those sub-skills, so it holds only as long as it
+  is followed.
 - 🔒 **MCP defaults to on-demand.** Always-on is a deliberate choice made through
   `/bld-mcp-settings`, never by hand-editing `.mcp.json`. **`context-mode` gets
   enabled on its own or not at all** — its `ctx_execute` runs shell commands with
@@ -186,6 +190,30 @@ interchangeable:
   the same session.** Stale rules are worse than missing ones.
 - New gotcha learned? Procedure detail goes in the relevant SKILL.md; add a line here
   only if *every* session needs it. Each fact lives in exactly one place.
+
+### This file is meant to drift toward its user
+
+**It is not a spec written once at setup. Keep it matching the person you are
+actually working with, and edit it yourself rather than waiting to be asked.** A
+workspace guide that still describes the first week is worse than a short one,
+because every session trusts it.
+
+Rewrite something here when a session produces evidence that contradicts it:
+
+| You notice | Update |
+|---|---|
+| They already knew a term you stopped to define, or used one fluently first | the profile block at the top - they are ahead of it |
+| A correction that shows deeper knowledge than the profile assumes | same, and say which line you changed |
+| A preference stated twice, or a correction repeated | add it as a rule, so it stops needing to be said |
+| A convention that has quietly changed in practice | the rule, to what is actually done now |
+| A routing choice that keeps being wrong | the routing table row |
+| A tool or account named here that no longer exists | cut it, or restate it as the rule it stood for |
+
+**Two limits.** Record the *rule*, never the identifying detail - a policy ("the
+user's personal account, never an org") survives being shared; a username does not.
+And a preference is not a fact until it has held twice: once is a mood, twice is a
+pattern. Say what you changed and why in the same turn, so a wrong inference is
+cheap to reverse.
 
 ## Key files & conventions
 

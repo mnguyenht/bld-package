@@ -27,6 +27,21 @@ thought. Say your experience level and how you like to learn. Examples:
   but flag React and CSS idioms I'd be unlikely to know."
 >
 
+> ⚠️ **Whatever goes above is a DEFAULT, not a fact, and is expected to change.**
+> It is the highest-leverage block in this file - it decides how much gets
+> explained in every answer, in every project - and it is written before you have
+> worked together, which is the worst possible moment to be accurate. Treat it as
+> the current best estimate and **keep it current yourself**: when a session says
+> otherwise, edit these lines and mention that you did.
+>
+> Revise it on evidence like: a term you stopped to define that they already knew,
+> or used fluently before you explained it; a correction showing deeper knowledge
+> than this block assumes; a tool or language they clearly know well; a change in
+> what they are building. **Narrower beats flattering** - an outdated "beginner"
+> costs them paragraphs they do not need, and an outdated "expert" costs them an
+> explanation they did. Wait for a pattern rather than one data point, and say what
+> you changed so a wrong guess is cheap to reverse.
+
 ## Explaining commands (ALWAYS, any project)
 
 Before running **any approval-required command**, explain in plain language:
@@ -60,7 +75,7 @@ Before running **any approval-required command**, explain in plain language:
   over `.mcp.json` entries. Never route the whole codebase through unofficial tools.
 - 🚫 **No AI image/model generation, anywhere.** Find existing assets instead.
   ui-ux-pro-max's `design` and `banner-design` sub-skills use image gen — never invoke
-  them (BLD ships a hook that blocks them; the rule applies everywhere).
+  them. Nothing enforces this, so it holds only as long as it is followed.
 - 🚩 **Never run `/impeccable live`** — it forwards `ANTHROPIC_API_KEY` /
   `CLAUDE_CODE_OAUTH_TOKEN` to a third-party backend. Other impeccable commands are
   fine. Never `npx impeccable install/update` (wires hooks); keep it skill-only.

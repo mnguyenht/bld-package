@@ -117,24 +117,6 @@ def build(spec, root):
             reg["plugins"][p + "@m"] = [{"installPath": d}]
         io.open(os.path.join(claude, "plugins", "installed_plugins.json"), "w").write(
             json.dumps(reg))
-    if spec.get("hook_file"):
-        os.makedirs(os.path.join(claude, "hooks"), exist_ok=True)
-        io.open(os.path.join(claude, "hooks", "block-image-skills.py"), "w").write("x")
-    if spec.get("hook_reg"):
-        entry = {"hooks": {"PreToolUse": [{"matcher": "Skill", "hooks": [
-            {"type": "command",
-             "command": 'python "' + claude + '/hooks/block-image-skills.py"'}]}]}}
-        if spec["hook_reg"] == "project":
-            d = os.path.join(proj, ".claude")
-            os.makedirs(d, exist_ok=True)
-            io.open(os.path.join(d, "settings.local.json"), "w").write(json.dumps(entry))
-        else:
-            # Merge, so a case can carry both plugins and the hook the way a real
-            # settings.json does - writing it flat would silently drop the other.
-            p = os.path.join(claude, "settings.json")
-            cur = json.load(io.open(p, encoding="utf-8")) if os.path.isfile(p) else {}
-            cur.update(entry)
-            io.open(p, "w").write(json.dumps(cur))
     if spec.get("claudemd"):
         io.open(os.path.join(claude, "CLAUDE.md"), "w").write("# rules")
     if spec.get("proj_claudemd"):
@@ -420,22 +402,6 @@ CASES = [
   ["(the package folder, not a workspace)",
    "Not here    : ", "claude-md-workspace",
    "!On disk now : bld, claude-md-workspace"], 0),
-
- ({"id": "C38", "desc": "hook copied but never registered",
-   "global_bld": 1, "hook_file": 1},
-  ["image-gen hook      on disk but NOT REGISTERED"], 0),
-
- ({"id": "C39", "desc": "hook registered but the script is gone",
-   "global_bld": 1, "hook_reg": 1},
-  ["image-gen hook      REGISTERED but the script is gone"], 0),
-
- ({"id": "C40", "desc": "hook installed and registered is not nagged about",
-   "global_bld": 1, "hook_file": 1, "hook_reg": 1},
-  ["[ok]  image-gen hook", "!NOT REGISTERED", "!script is gone"], 0),
-
- ({"id": "C41", "desc": "hook registered project-scoped counts too",
-   "project_bld": 1, "hook_file": 1, "hook_reg": "project", "pass_project": 1},
-  ["[ok]  image-gen hook"], 0),
 
  ({"id": "C42", "desc": "package path is remembered for the next session",
    "global_bld": 1, "state": dict(DONE, package=PKG)},

@@ -63,7 +63,7 @@ Read it before installing anything you have not vetted.
 
 | Group | What you get | Recommended |
 |---|---|---|
-| **BLD** | The 23 `/bld-*` commands, the executor agent, the image-gen block | Yes |
+| **BLD** | The 23 `/bld-*` commands and the executor agent | Yes |
 | **Plugins** | ponytail, ui-ux-pro-max, claude-code-setup | Yes |
 | **Core skills** | 11 standalone skills: design, animation, copy, a11y, legal | Yes |
 | **React tools** | react-doctor and react-scan, for `/bld-optimize-react` | Yes |
@@ -81,58 +81,13 @@ Steps 1 and 2 are the minimum that gives you a working BLD.
 From inside the cloned `bld-package` directory:
 
 ```bash
-mkdir -p ~/.claude/skills ~/.claude/agents ~/.claude/hooks
+mkdir -p ~/.claude/skills ~/.claude/agents
 cp -r skills/*  ~/.claude/skills/
 cp -r agents/*  ~/.claude/agents/
-cp hooks/block-image-skills.py ~/.claude/hooks/
 ```
 
 `mkdir -p` is not optional — a fresh Claude Code install has no `agents/`
 directory and `cp` into a missing target fails.
-
-### Register the image-gen block
-
-BLD ships a hook that blocks ui-ux-pro-max's two image-generation sub-skills.
-Copying the file is not enough; it has to be registered, and a hook that names a
-missing interpreter registers fine and then silently fails every time it fires.
-
-Add this to `~/.claude/settings.json`. **Merge it — do not overwrite a file you
-already have.** If the file does not exist, create it with just this:
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Skill",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"/Users/YOUR-NAME/.claude/hooks/block-image-skills.py\""
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-Two things matter in that command string:
-
-- **`python3`, not `python`.** macOS and most Linux distros have no bare
-  `python`. Use whichever of `python3` / `python` answered your version check.
-- **An absolute path, with `~` expanded yourself.** The hook runs with an
-  unpredictable working directory and the command is not run through a shell, so
-  a literal `~` is looked up as a directory named `~` and never resolves.
-
-Then prove it works:
-
-```bash
-python3 ~/.claude/hooks/block-image-skills.py --selftest
-```
-
-Expect a line starting `selftest ok:` and exit 0. A hook nobody tested is a hook
-nobody has.
 
 ---
 

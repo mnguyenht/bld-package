@@ -82,7 +82,8 @@ than moving on silently.
 ## Guardrails
 
 - Per-screen, post-done. Never run strict critique/animation review on a half-built app.
-- Never image-generation skills (`design`, `banner-design`) — blocked.
+- Never image-generation skills (`design`, `banner-design`). BLD finds existing
+  assets rather than generating them.
 - Never `impeccable live`. MCP tools default to on-demand via
   `/bld-runtime-activate-mcps`; always-on is opt-in through `/bld-mcp-settings`.
 - Enrichment (Spline/21st) only if it makes the app better; empty-handed is fine.

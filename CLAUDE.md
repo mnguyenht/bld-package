@@ -1,7 +1,7 @@
 # bld-package — the BLD skillset, packaged for other people
 
 This repo is **not an app.** It is the distributable copy of the `bld-*` skillset:
-23 skills, one agent, one hook, two CLAUDE.md templates. Almost all of it is
+23 skills, one agent, two CLAUDE.md templates. Almost all of it is
 markdown read by Claude Code on someone else's machine. The exceptions are the
 five helper scripts below, which do execute, and the manifest lists them as such
 because that column is the one users decide on.
@@ -14,8 +14,7 @@ because that column is the one users decide on.
   `bld-professional-settings/scripts/switch-mode.py` (renames every command),
   `bld-mcp-settings/scripts/mcp-settings.py` (edits `.mcp.json` without clobbering it),
   `skills/bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader),
-  `skills/bld-runtime-activate-mcps/run.py` (MCP runner),
-  plus `hooks/block-image-skills.py`, which is a hook rather than a helper.
+  `skills/bld-runtime-activate-mcps/run.py` (MCP runner).
 
   `bld-setup/scripts/scenarios.py` is a seventh Python file but not a helper: it
   is the regression suite for `preflight.py`, run by people working on this
@@ -43,7 +42,6 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 | `skills/bld-*/SKILL.md` | One skill each. Frontmatter `name` + `description` drives invocation |
 | `skills/bld-setup/references/manifest.md` | The operational install table, with the trust column |
 | `agents/bld-executor.md` | The worker the orchestrator skills fan out to |
-| `hooks/block-image-skills.py` | PreToolUse hook blocking `ui-ux-pro-max:design` and any `banner-design`. Claude Code's own top-level `design` skill is deliberately NOT blocked; it generates no images. `--selftest` asserts both halves |
 | `templates/CLAUDE.*.md` | The global + workspace rule layers, sanitised |
 
 ## Conventions
@@ -95,7 +93,7 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   thing standing over `bld-professional-settings`, which nothing else keeps in
   sync. Two of the bugs it now catches are ones it was written after.
 - **Run `python skills/bld-setup/scripts/scenarios.py` after touching
-  `preflight.py`.** 50 scenarios, each one a bug that was real once: a corrupt
+  `preflight.py`.** 46 scenarios, each one a bug that was real once: a corrupt
   state file, a scoped install whose project was deleted, a naming switch that
   stopped partway, a Node too old for `npx`. It builds a fake machine per case
   under a temp dir and asserts on the verdict. A green run is a regression net,
@@ -120,8 +118,7 @@ shipped that way once, and every one of those names is now in `LEGACY`.
 byte-identical.
 
 Verified: `lh-report.mjs` against a live Lighthouse v13.4.1 report, `preflight.py`
-on real Windows and real Linux machines and across 50 scripted scenarios, `switch-mode.py` across two
-full round trips, `block-image-skills.py` against the sub-skills of
-ui-ux-pro-max 2.6.2 (exactly two touch image generation; both are blocked).
+on real Windows and real Linux machines and across 46 scripted scenarios, `switch-mode.py` across two
+full round trips.
 
 Not yet run end to end by a real new user: `/bld-setup`. MIT licensed.

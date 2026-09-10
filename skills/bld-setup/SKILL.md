@@ -144,7 +144,7 @@ It prints prerequisites, deploy tooling, what BLD already installed, and a
 | `FIRST RUN` | Full flow, Phase 1 onward. |
 | `NO STATE FILE, but BLD is already on this machine` | **Not a first run.** BLD is on disk with no record of it: a hand install, or a deleted state file. Go to **Phase 6** and read its no-state note. |
 | `STATE FILE UNREADABLE` | A setup interrupted while writing it. Same as the row above: **Phase 6**. Never run the full flow over it, and never delete their install to "start clean". |
-| `RESUMING` | **Skip Phases 1 and 3, and Phase 2 unless `deploy` is in "Still to do".** Then pick up at the first item. **`deploy` is the one group whose install step is not in Phase 4** - it lives in Phase 2, so go there for it and take the rest in Phase 4 order. Do not re-ask what they already chose. Anything under `ALREADY DONE` is on disk already - record it, do not reinstall it. Anything under `RECHECK` is the opposite: claimed, absent, reinstall it. **A `[--] image-gen hook` row is unfinished work whatever the verdict says** - re-run the hook copy and registration in Phase 4 before closing out. |
+| `RESUMING` | **Skip Phases 1 and 3, and Phase 2 unless `deploy` is in "Still to do".** Then pick up at the first item. **`deploy` is the one group whose install step is not in Phase 4** - it lives in Phase 2, so go there for it and take the rest in Phase 4 order. Do not re-ask what they already chose. Anything under `ALREADY DONE` is on disk already - record it, do not reinstall it. Anything under `RECHECK` is the opposite: claimed, absent, reinstall it. |
 | `RETURNING USER` | Skip to **Phase 6**. Do not re-run the flow. |
 
 Show the user the preflight output. It is short, and it is the honest picture of
@@ -381,12 +381,45 @@ not just a category.
 | Group | What you get |
 |---|---|
 | **Core skills** (11) | Design taste from a working design engineer, animation craft, marketing copy, WCAG accessibility audits, and draft terms/privacy pages. **9 are markdown and can only suggest. Two ship scripts that execute:** `a11y-audit` and `webapp-testing`, the latter driving a real browser through Playwright. |
-| **BLD** (23 commands) | What you cloned this for. Also adds a hook that blocks AI image generation. |
-| **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Those two run code, and ui-ux-pro-max also ships image generation, which BLD blocks. **claude-code-setup** is Anthropic's official setup advisor: it reads a repo and suggests hooks, agents and skills. Markdown, so it can only suggest. |
+| **BLD** (23 commands) | What you cloned this for. |
+| **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Those two run code, and ui-ux-pro-max also ships image generation, which BLD does not block. **claude-code-setup** is Anthropic's official setup advisor: it reads a repo and suggests hooks, agents and skills. Markdown, so it can only suggest. |
 | **React tools** (2 CLIs) | react-doctor and react-scan find real bugs, hook misuse, and needless re-renders. They power `/bld-optimize-react`. Adds two commands you can run from anywhere. |
 | **Token monitor** | `/bld-runtime-tokens` shows how much Claude usage is left before a long session. Needs `uv`, one more installer. Skip it and you lose only that one command. |
 | **Code search** (3 MCP servers) | Cheaper exploration of large codebases. Only pays off past roughly fifty files. **context-mode runs shell commands with your logged-in CLIs**, which makes it the highest-trust item on this list. Easy to add later. |
 | **gstack + impeccable** | Two large opinionated suites: engineering specs, security review, deep design audits. Both ship code, both are big, and both need git. Nothing depends on them, so adding them later costs nothing. |
+
+### Then ask where BLD itself goes
+
+**Only if `bld` is in what they chose.** It is the one group with a per-project
+form, so the question is meaningless otherwise. Ask it here rather than in
+Phase 4, so every decision is made before anything is installed.
+
+**Lead with the recommendation, not the choice.** A first-timer has no project
+yet, and a bare "global or project?" is a question they cannot evaluate. Say
+which one you would pick and why, then let them override it:
+
+> *"I'd put BLD on your machine globally, so the `/bld-*` commands work in every
+> project. The alternative is scoping it to one folder, which is worth it if you
+> share this machine or only want BLD in one repo. Global unless you say
+> otherwise."*
+
+One `AskUserQuestion`, single select:
+
+| Option | What it does |
+|---|---|
+| **Global (recommended)** | `~/.claude/skills`. Every project sees the commands. |
+| **This one project** | `<project>/.claude/skills`. Only that folder sees them, and it wins over a global copy on a name clash. |
+
+**If they pick project, get the path and say what scoping does not cover** -
+before installing, not after. Only BLD's own skills and the executor agent are
+scoped. Core skills, plugins, React tools, gstack and impeccable are all machine-wide with no per-project form, so scoping BLD does not give
+them a machine-free install. The full table is in Phase 4 under "What scoping
+does and does not cover"; if keeping a shared machine clean is the actual goal,
+the honest answer is "scope BLD, and take Just the essentials".
+
+Resolve the project to an absolute path the same way Phase 0a resolves the
+package, and **record `scope` and `project` in the state file now**. A scoped
+install whose path was never recorded reports as vanished on every later run.
 
 Record the answer in the state file (Phase 5) **before** installing, so an
 interrupted run knows what they wanted.
@@ -494,9 +527,9 @@ If it is absent, create it with just the keys below.
 
 ### BLD itself
 
-**Recommend global** unless they already have a project in mind. A first-timer
-has no project yet, so asking them to choose is asking about something they
-cannot evaluate.
+**Phase 3 already asked where this goes.** Use that answer rather than asking
+again. If it said global, run the block below; if it said project, skip to
+"Project-scoped instead". Global is the recommendation and the common case.
 
 **On a re-run, check the naming mode FIRST.** Phase 0c prints it: `23 of 23
 (global, pro mode)`. The package ships friendly names, so copying it over a pro
@@ -574,49 +607,11 @@ machine-wide and has no per-project form:
 | Plugins (3) | global - Claude Code installs plugins per machine |
 | React tools | global - `npm install -g` |
 | gstack, impeccable | global - both clone into `~/.claude/skills/` |
-| The image-gen hook file | global - `~/.claude/hooks/`, so it outlives the project |
 
 Someone who picks project scope to keep a shared machine clean is not getting
 that, and should hear it before the install rather than after. If that is their
 actual goal, the honest answer is "scope BLD, and take Just the essentials", not
 "scoped install".
-
-**Copy the hook out of the package first.** The two `cp` lines above move
-`skills/` and `agents/` but not `hooks/`, so registering the package's own copy
-points the hook at a folder the user is likely to delete once setup "worked".
-Nothing warns them: the hook stays registered, silently fails to run, and image
-generation is quietly unblocked from then on. Give it a home that outlives the
-clone:
-
-```bash
-mkdir -p ~/.claude/hooks
-cp "<resolved path>/hooks/block-image-skills.py"  ~/.claude/hooks/
-```
-
-Then register **that** copy at the same scope BLD was installed at: a global
-install uses `~/.claude/settings.json`; a project-scoped install uses that
-project's `.claude/settings.local.json`. **Merge, do not overwrite.** If plugins
-were installed, global settings already hold `enabledPlugins` and
-`extraKnownMarketplaces`; read them, add the `hooks` key, and write back. **If
-the file does not exist, create it with just the `hooks` key** - a user who
-declined plugins on a fresh Claude Code install has no `settings.json` yet, and
-reading one that is not there is not a reason to skip the hook. Use an
-**absolute path** because the hook runs with an unpredictable working directory.
-Expand `~` yourself: the hook command is not run through a shell, so a literal
-`~` is looked up as a directory named `~` and never resolves.
-
-```json
-{ "hooks": { "PreToolUse": [ { "matcher": "Skill", "hooks": [
-  { "type": "command", "command": "<PY> \"<home>/.claude/hooks/block-image-skills.py\"" } ] } ] } }
-```
-
-**`<PY>` here is not optional.** Substitute the interpreter Phase 0b found. A hook
-that names a missing interpreter still registers fine and then fails every single
-time it fires, printing nothing the user will see. The result is a security
-control that looks installed and is not running. After writing the file, run the
-cheaper check: `<PY> ~/.claude/hooks/block-image-skills.py --selftest` prints
-`selftest ok: N blocked, M allowed` and exits 0. A hook nobody tested is a hook
-nobody has.
 
 ### React tools
 
@@ -1090,9 +1085,7 @@ reads as "setup failed" at the exact moment they are primed to believe it.
 that as a problem.** `completed` is still `false` at this point - it is set at
 the end of this phase, after the restart reminder - so a completely successful
 install lands in the resume branch by design. What matters is the line below it:
-`Still to do : finish up + restart` means every group installed - though check
-the `image-gen hook` row as well, which is not a group and so cannot appear
-there. A list of real
+`Still to do : finish up + restart` means every group installed. A list of real
 group names there does not, and that is the failure worth reading out.
 
 Then have them type `/bld-` and confirm the commands appear. A skill on disk but
@@ -1127,7 +1120,11 @@ Set `completed: true` in the state file.
   run, and reinstalling over it wastes their time and re-clones what is there.
 - **Finishing a scoped install without writing `scope` and `project`.** The
   install works; every later run then reports it as vanished.
-- **Asking a first-timer to choose global vs project scope.** Recommend global.
+- **Asking global vs project as a bare question.** Phase 3 asks it, but it always
+  leads with the recommendation. "Global or project?" with no steer is a question
+  a first-timer cannot answer, and the honest default is global.
+- **Letting "scoped" imply a machine-free install.** Only BLD's own skills and the
+  executor agent are scoped. Say so before installing, not after.
 - **Over-explaining.** See the voice rules at the top. Beginners need the
   unfamiliar explained, not everything.
 

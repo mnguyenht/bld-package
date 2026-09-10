@@ -196,7 +196,6 @@ python -c "import ast,io;[ast.parse(io.open(p,encoding='utf-8').read()) for p in
    'skills/bld-runtime-activate-mcps/run.py']];print('python parses')"
 python skills/bld-setup/scripts/preflight.py >/dev/null && echo "preflight exit 0"
 node --check skills/bld-optimize-app/scripts/lh-report.mjs && echo "lh-report ok"
-python hooks/block-image-skills.py --selftest
 
 # every skill folder matches its declared name
 for d in skills/*/; do d=${d%/}; f=$(basename $d)

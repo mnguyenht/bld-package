@@ -538,35 +538,6 @@ def main():
     row("bld-executor agent", agent_have,
         "" if agent_have else "MISSING - the orchestrator skills cannot run without it")
 
-    # The image-gen block ships with the bld group but is the one piece of it
-    # that is not a file copy: it has to be written into settings as well. A run
-    # interrupted between the two, or a hand install that skipped registration,
-    # left `bld-* skills 23 of 23` and a verdict of "finish up + restart" sitting
-    # over a security control that was not running - with no row anywhere saying
-    # so. Both halves are checked because they fail in opposite directions and
-    # the registered-but-absent one is silent at the moment it fires.
-    hook_file = os.path.isfile(os.path.join(CLAUDE, "hooks", "block-image-skills.py"))
-    hook_reg = False
-    for cfg in (os.path.join(CLAUDE, "settings.json"),
-                os.path.join(project, ".claude", "settings.local.json")):
-        if not os.path.isfile(cfg):
-            continue
-        try:
-            if "block-image-skills" in json.dumps(
-                    json.load(io.open(cfg, encoding="utf-8")).get("hooks", {})):
-                hook_reg = True
-        except Exception:
-            pass
-    if hook_file and hook_reg:
-        hook_note = ""
-    elif hook_reg:
-        hook_note = "REGISTERED but the script is gone - fires and fails silently"
-    elif hook_file:
-        hook_note = "on disk but NOT REGISTERED - image generation is not blocked"
-    else:
-        hook_note = "MISSING - image generation is not blocked (Phase 4, BLD itself)"
-    row("image-gen hook", hook_file and hook_reg, hook_note)
-
     # Phase 8 offers these two rather than installing them, so they are groups
     # like any other: recorded in done/declined, and re-offered by Phase 6 only
     # when they are in neither. Two slugs, not one - the picker lets someone take

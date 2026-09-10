@@ -47,5 +47,4 @@ and check for the issues below.
 
 - **No `.mcp.json`** — MCP is on-demand only (spawn → query → kill). Its presence is itself a finding.
 - `.gitignore` ignores `.env`, `.env.*` (allows `!.env.example`), and `handoff.md`.
-- The image-gen block hook (`.claude/hooks/block-image-skills.py`) is intentional, not a finding.
 - Third-party skills were meant to be vetted before install (the "drill"). Re-confirm none execute code silently.
