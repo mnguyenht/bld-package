@@ -14,86 +14,18 @@ You pick the step. The skill brings everything else.
 
 ---
 
-## The commands
+## Contents
 
-### sprint
-
-*You give Claude a goal and it builds toward it.*
-
-| Command | What it does |
-|---|---|
-| `/bld-sprint-planning` | Decides what should exist before anything gets built. Plan mode answers *how to build*. This answers *whether to*. |
-| `/bld-sprint-init` | Idea to a working, deployed base in one sprint. Asks your time budget and design direction, then scaffolds and ships. |
-| `/bld-sprint-refine` | Base to feels-alive. The craft passes init skipped. Run it per screen, once a screen is basically done. |
-
-### optimize
-
-*Improves an app that already exists.*
-
-| Command | What it does |
-|---|---|
-| `/bld-optimize-app` | Lighthouse against the shipped app, three runs and a median, because one run is a sample and not a measurement. |
-| `/bld-optimize-react` | Static scan of your source with react-doctor and your own eslint. Findings are hypotheses, so it triages before it fixes. |
-| `/bld-optimize-security` | A static security pass, 13 layers deep. Free, local, and it reports rather than auto-fixing. |
-| `/bld-optimize-seo-indexing` | Gets an app found on Google. Audits the live site with curl instead of trusting the source. |
-
-### find
-
-*Locates a ready-made asset.*
-
-| Command | What it does |
-|---|---|
-| `/bld-find-21st` | Browses [21st.dev](https://21st.dev) for shadcn components. Coming back empty-handed is a valid outcome. |
-| `/bld-find-spline` | Same idea for 3D scenes from [Spline](https://spline.design). Heavy, so it only suggests one that earns its weight. |
-
-### runtime
-
-*Applies to how the session runs, not to what gets built.*
-
-| Command | What it does |
-|---|---|
-| `/bld-runtime-agents` | Boss mode over an external coding agent. Claude specs and reviews, the agent writes. Needs a Codex or Gemini account. |
-| `/bld-runtime-tokens` | How much of your Claude window is left, and what to do about it. |
-| `/bld-runtime-activate-mcps` | Spawns a code-search server, fires one batch of queries, kills it. |
-
-### orchestrator
-
-*Claude bosses other agents instead of writing code.*
-
-| Command | What it does |
-|---|---|
-| `/bld-orchestrator-fable` | Plan, execute in parallel, judge each report as a skeptic, re-spec until it passes. |
-| `/bld-orchestrator-opus` | The same loop with Opus in the boss seat. |
-
-### util
-
-*Everything in between.*
-
-| Command | What it does |
-|---|---|
-| `/bld-util-deploy` | Private GitHub repo plus Vercel, auto-deploy on push. After the first run, shipping is a commit and a push. |
-| `/bld-util-handoff` | Snapshots the session so you can `/clear` and pick up in fresh context before it rots. |
-| `/bld-util-documentation` | Writes a `/docs` page inside your app, in Simplified Technical English. Half-built features go under Known limits. |
-| `/bld-util-customize-component` | Builds real sliders in the browser, bound to the real component. You drag, the values get committed, the panel gets deleted. |
-| `/bld-util-copywriting` | App copy, with workspace rules for pre-launch proof, litotes, irony, and phrasing that reads as machine-written. |
-
-### settings
-
-*A package setting you turn on and off.*
-
-| Command | What it does |
-|---|---|
-| `/bld-mcp-settings` | Switches BLD's MCP servers between on-demand and always-on, without touching an entry it did not write. |
-| `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
-
-### special
-
-*Acts on BLD itself.*
-
-| Command | What it does |
-|---|---|
-| `/bld-setup` | Sets BLD up, or adds more of it later. Remembers where it got to. |
-| `/bld-quiz` | A learning checkpoint after a sprint, at matching depth. Small changes get a walkthrough instead. |
+- [Install](#install)
+- [How it stays light](#how-it-stays-light)
+- [How commands are named](#how-commands-are-named)
+- [What BLD will not do](#what-bld-will-not-do)
+- [Repo layout](#repo-layout)
+- [The commands](#the-commands)
+  - [sprint](#sprint) · [optimize](#optimize) · [find](#find) · [runtime](#runtime)
+  - [orchestrator](#orchestrator) · [util](#util) · [settings](#settings) · [special](#special)
+- [License](#license)
+- [Credits](#credits)
 
 ---
 
@@ -242,6 +174,91 @@ bld-package/
 A skill is a folder with a `SKILL.md`. The `name:` in its frontmatter is the
 command you type. Add `references/` for detail that should not cost context on
 every invocation, and `scripts/` for work that has to be deterministic.
+
+---
+
+## The commands
+
+### sprint
+
+*You give Claude a goal and it builds toward it.*
+
+| Command | What it does |
+|---|---|
+| `/bld-sprint-planning` | Decides what should exist before anything gets built. Plan mode answers *how to build*. This answers *whether to*. |
+| `/bld-sprint-init` | Idea to a working, deployed base in one sprint. Asks your time budget and design direction, then scaffolds and ships. |
+| `/bld-sprint-refine` | Base to feels-alive. The craft passes init skipped. Run it per screen, once a screen is basically done. |
+
+### optimize
+
+*Improves an app that already exists.*
+
+| Command | What it does |
+|---|---|
+| `/bld-optimize-app` | Lighthouse against the shipped app, three runs and a median, because one run is a sample and not a measurement. |
+| `/bld-optimize-react` | Static scan of your source with react-doctor and your own eslint. Findings are hypotheses, so it triages before it fixes. |
+| `/bld-optimize-security` | A static security pass, 13 layers deep. Free, local, and it reports rather than auto-fixing. |
+| `/bld-optimize-seo-indexing` | Gets an app found on Google. Audits the live site with curl instead of trusting the source. |
+
+### find
+
+*Locates a ready-made asset.*
+
+| Command | What it does |
+|---|---|
+| `/bld-find-21st` | Browses [21st.dev](https://21st.dev) for shadcn components. Coming back empty-handed is a valid outcome. |
+| `/bld-find-spline` | Same idea for 3D scenes from [Spline](https://spline.design). Heavy, so it only suggests one that earns its weight. |
+
+### runtime
+
+*Applies to how the session runs, not to what gets built.*
+
+| Command | What it does |
+|---|---|
+| `/bld-runtime-agents` | Boss mode over an external coding agent. Claude specs and reviews, the agent writes. Needs a Codex or Gemini account. |
+| `/bld-runtime-tokens` | How much of your Claude window is left, and what to do about it. |
+| `/bld-runtime-activate-mcps` | Spawns a code-search server, fires one batch of queries, kills it. |
+
+### orchestrator
+
+*Claude bosses other agents instead of writing code.*
+
+| Command | What it does |
+|---|---|
+| `/bld-orchestrator-fable` | Plan, execute in parallel, judge each report as a skeptic, re-spec until it passes. |
+| `/bld-orchestrator-opus` | The same loop with Opus in the boss seat. |
+
+### util
+
+*Everything in between.*
+
+| Command | What it does |
+|---|---|
+| `/bld-util-deploy` | Private GitHub repo plus Vercel, auto-deploy on push. After the first run, shipping is a commit and a push. |
+| `/bld-util-handoff` | Snapshots the session so you can `/clear` and pick up in fresh context before it rots. |
+| `/bld-util-documentation` | Writes a `/docs` page inside your app, in Simplified Technical English. Half-built features go under Known limits. |
+| `/bld-util-customize-component` | Builds real sliders in the browser, bound to the real component. You drag, the values get committed, the panel gets deleted. |
+| `/bld-util-copywriting` | App copy, with workspace rules for pre-launch proof, litotes, irony, and phrasing that reads as machine-written. |
+
+### settings
+
+*A package setting you turn on and off.*
+
+| Command | What it does |
+|---|---|
+| `/bld-mcp-settings` | Switches BLD's MCP servers between on-demand and always-on, without touching an entry it did not write. |
+| `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
+
+### special
+
+*Acts on BLD itself.*
+
+| Command | What it does |
+|---|---|
+| `/bld-setup` | Sets BLD up, or adds more of it later. Remembers where it got to. |
+| `/bld-quiz` | A learning checkpoint after a sprint, at matching depth. Small changes get a walkthrough instead. |
+
+---
 
 ---
 
