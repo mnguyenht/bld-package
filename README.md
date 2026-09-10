@@ -325,10 +325,7 @@ shows you before it installs anything.
 | webapp-testing | Drives a local app with Playwright. | [anthropics/skills](https://github.com/anthropics/skills) |
 | terms-of-service | Drafts and reviews SaaS terms. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
 | privacy-policy | Drafts and reviews privacy policies. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
-
-Security checklists used by `/bld-optimize-security` are vendored from
-[affaan-m/ECC](https://github.com/affaan-m/ECC) under MIT, with the source commit
-pinned in `references/ecc/SOURCES.md`.
+| ECC checklists | Security checklists behind `/bld-optimize-security`. Vendored into the skill rather than installed separately, under MIT, with the source commit pinned in `references/ecc/SOURCES.md`. | [affaan-m/ECC](https://github.com/affaan-m/ECC) |
 
 ### Command-line tools
 
