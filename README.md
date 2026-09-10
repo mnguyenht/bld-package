@@ -31,9 +31,8 @@ You pick the step. The skill brings everything else.
 
 ## Install
 
-**You need** [Claude Code](https://claude.com/claude-code), plus `node`, `npm`
-and `git`. Everything else is optional, and BLD tells you what each optional
-piece gives you before you decide.
+Assuming you already have [Claude Code](https://claude.com/claude-code), plus `npm`
+and `git`:
 
 **1. Clone it.**
 
@@ -41,17 +40,18 @@ piece gives you before you decide.
 git clone https://github.com/mnguyenht/bld-package.git
 ```
 
-**2. Open that folder in Claude Code.** Use the app's folder picker, or start it
-from inside the folder:
+**2. Open Claude in that folder,** or open it in the native Claude app.
 
 ```bash
 cd bld-package
 claude
 ```
 
-**3. Ask it to set BLD up.**
+**3. Run the setup command.**
 
-> read skills/bld-setup/SKILL.md and set BLD up
+```bash
+/bld-setup
+```
 
 That is the whole install. Claude reads the file, checks your machine, shows you
 what it could install, and puts on only what you pick.
