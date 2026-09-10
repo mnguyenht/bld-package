@@ -117,10 +117,42 @@ def build(spec, root):
             reg["plugins"][p + "@m"] = [{"installPath": d}]
         io.open(os.path.join(claude, "plugins", "installed_plugins.json"), "w").write(
             json.dumps(reg))
+    if spec.get("hook_file"):
+        os.makedirs(os.path.join(claude, "hooks"), exist_ok=True)
+        io.open(os.path.join(claude, "hooks", "block-image-skills.py"), "w").write("x")
+    if spec.get("hook_reg"):
+        entry = {"hooks": {"PreToolUse": [{"matcher": "Skill", "hooks": [
+            {"type": "command",
+             "command": 'python "' + claude + '/hooks/block-image-skills.py"'}]}]}}
+        if spec["hook_reg"] == "project":
+            d = os.path.join(proj, ".claude")
+            os.makedirs(d, exist_ok=True)
+            io.open(os.path.join(d, "settings.local.json"), "w").write(json.dumps(entry))
+        else:
+            # Merge, so a case can carry both plugins and the hook the way a real
+            # settings.json does - writing it flat would silently drop the other.
+            p = os.path.join(claude, "settings.json")
+            cur = json.load(io.open(p, encoding="utf-8")) if os.path.isfile(p) else {}
+            cur.update(entry)
+            io.open(p, "w").write(json.dumps(cur))
     if spec.get("claudemd"):
         io.open(os.path.join(claude, "CLAUDE.md"), "w").write("# rules")
     if spec.get("proj_claudemd"):
         io.open(os.path.join(proj, "CLAUDE.md"), "w").write("# workspace rules")
+    if spec.get("cwd_is_pkg"):
+        # preflight runs with cwd=root, so this is the no---project case: the
+        # package folder as the default project dir, which is the real first run.
+        d = os.path.join(root, "skills", "bld-setup", "scripts")
+        os.makedirs(d, exist_ok=True)
+        io.open(os.path.join(d, "preflight.py"), "w").write("# marker")
+        io.open(os.path.join(root, "CLAUDE.md"), "w").write("# the package's own guide")
+    if spec.get("proj_is_pkg"):
+        # Make `proj` look like the BLD package: during a real first run the
+        # package folder IS the default project dir, and it ships its own
+        # CLAUDE.md, which used to count as the user's workspace rules.
+        d = os.path.join(proj, "skills", "bld-setup", "scripts")
+        os.makedirs(d, exist_ok=True)
+        io.open(os.path.join(d, "preflight.py"), "w").write("# marker")
 
     st = spec.get("state")
     sp = os.path.join(claude, ".bld-setup.json")
@@ -151,10 +183,22 @@ def run(spec, root):
     if WIN:
         rest = os.path.join(os.environ.get("SystemRoot", "C:\\Windows"), "System32")
     else:
-        rest = "/usr/bin" + os.pathsep + "/bin"
+        # /usr/bin used to sit here, and on Linux that is exactly where the real
+        # node, npm and git live - so C10 ("node and npm missing") and C11 ("git
+        # missing") found the host's own tools and could not fail. They passed on
+        # Windows only because System32 happens to contain none of them. The
+        # stubs are #!/bin/sh scripts whose shebang is an absolute path and needs
+        # no PATH, so an empty directory is enough and keeps the machine hermetic.
+        rest = os.path.join(root, "emptypath")
+        os.makedirs(rest, exist_ok=True)
     env["PATH"] = binp + os.pathsep + rest
     env["HOME"] = home
     env["USERPROFILE"] = home
+    # preflight falls back to gh's absolute install path when it is not on PATH,
+    # which is right for a user and wrong here: it reaches straight past the fake
+    # HOME to the host's own signed-in gh, so no case could express a machine
+    # without gh. Point it at nothing unless the case asks for gh.
+    env["BLD_GH_PATH"] = os.path.join(binp, "gh-absent-by-design")
     for k in ("HOMEPATH", "HOMEDRIVE"):
         env.pop(k, None)
     args = [sys.executable, PRE]
@@ -323,6 +367,86 @@ CASES = [
  ({"id": "C26", "desc": "current Node is not warned about",
    "bin": [("node", 0, "v22.11.0"), "npm", "git"]},
   ["!Node 18+ is expected"], 0),
+
+ # --- run 12: the continuation path -------------------------------------
+ ({"id": "C36", "desc": "gh really absent, not leaked in from the host",
+   "bin": ["node", "npm", "git"]},
+  ["gh                  not installed"], 0),
+
+ ({"id": "C37", "desc": "resume names deploy, whose step is in phase 2",
+   "core": 11, "plugins": "ok",
+   "state": {"chose": ["deploy", "core-skills", "bld", "plugins"], "declined": [],
+             "done": ["prereqs", "core-skills", "plugins"], "completed": False}},
+  ["Still to do : deploy (gh + vercel), bld",
+   "deploy is the exception: its step is Phase 2",
+   "!Skip Phases 1-3"], 0),
+
+ ({"id": "C45", "desc": "resume without deploy says to skip phase 2 too",
+   "global_bld": 1,
+   "state": {"chose": ["bld", "react-tools"], "declined": ["deploy"],
+             "done": ["prereqs", "bld"], "completed": False}},
+  ["Skip Phase 2 as well", "!deploy is the exception"], 0),
+
+ ({"id": "C46", "desc": "returning: never-answered split from actually-gone",
+   "global_bld": 1, "core": 11, "plugins": "ok",
+   "state": {"chose": ["core-skills", "bld", "plugins", "react-tools"],
+             "declined": ["gstack", "impeccable", "mcp", "token-monitor", "agents"],
+             "done": ["prereqs", "core-skills", "plugins", "bld", "react-tools"],
+             "completed": True, "completed_on": "2026-09-09"}},
+  ["MISSING NOW : react-tools", "NEVER SET UP:", "claude-md-global",
+   "deploy (gh + vercel)"], 0),
+
+ ({"id": "C47", "desc": "returning with nothing absent says neither line",
+   "global_bld": 1, "core": 11, "plugins": "ok", "claudemd": 1, "hook_file": 1,
+   "hook_reg": 1, "bin": ["node", "npm", "git", "react-doctor", "react-scan",
+                          "jcodemunch-mcp", "claude-monitor", "codex", "vercel",
+                          "gstack-not-real"],
+   "gstack": 1, "impeccable": 1, "proj_claudemd": 1, "pass_project": 1,
+   "state": {"chose": ["core-skills", "bld", "plugins"], "declined": ["deploy"],
+             "done": ["prereqs", "core-skills", "plugins", "bld"],
+             "completed": True, "completed_on": "2026-09-09"}},
+  ["!MISSING NOW", "!NEVER SET UP"], 0),
+
+ ({"id": "C48", "desc": "package's own CLAUDE.md is not the user's workspace rules",
+   "global_bld": 1, "proj_claudemd": 1, "proj_is_pkg": 1, "pass_project": 1},
+  ["Not here    : ", "claude-md-workspace", "!On disk now : bld, claude-md-workspace"], 0),
+
+ ({"id": "C49", "desc": "a real project's CLAUDE.md still counts",
+   "global_bld": 1, "proj_claudemd": 1, "pass_project": 1},
+  ["On disk now : bld, claude-md-workspace"], 0),
+
+ ({"id": "C50", "desc": "package folder is labelled as not a workspace",
+   "cwd_is_pkg": 1, "global_bld": 1},
+  ["(the package folder, not a workspace)",
+   "Not here    : ", "claude-md-workspace",
+   "!On disk now : bld, claude-md-workspace"], 0),
+
+ ({"id": "C38", "desc": "hook copied but never registered",
+   "global_bld": 1, "hook_file": 1},
+  ["image-gen hook      on disk but NOT REGISTERED"], 0),
+
+ ({"id": "C39", "desc": "hook registered but the script is gone",
+   "global_bld": 1, "hook_reg": 1},
+  ["image-gen hook      REGISTERED but the script is gone"], 0),
+
+ ({"id": "C40", "desc": "hook installed and registered is not nagged about",
+   "global_bld": 1, "hook_file": 1, "hook_reg": 1},
+  ["[ok]  image-gen hook", "!NOT REGISTERED", "!script is gone"], 0),
+
+ ({"id": "C41", "desc": "hook registered project-scoped counts too",
+   "project_bld": 1, "hook_file": 1, "hook_reg": "project", "pass_project": 1},
+  ["[ok]  image-gen hook"], 0),
+
+ ({"id": "C42", "desc": "package path is remembered for the next session",
+   "global_bld": 1, "state": dict(DONE, package=PKG)},
+  ["package   : " + PKG, "!GONE"], 0),
+
+ ({"id": "C43", "desc": "remembered package path that no longer exists",
+   "global_bld": 1, "state": dict(DONE, package=PKG + "-moved")},
+  ["GONE, ask where they moved it"], 0),
+
+ ({"id": "C44", "desc": "no package recorded prints no package line",
+   "global_bld": 1, "state": dict(DONE)}, ["!package   :"], 0),
 ]
 
 

@@ -50,6 +50,14 @@ directory, or the one they just cloned or unzipped. **Resolve it to a real
 absolute path and use that in every command you show them.** A beginner cannot
 substitute `<BLD>` and should never be asked to.
 
+**On a resume, read it back rather than guessing.** Phase 5 records it as
+`package` in the state file and preflight prints it as `package:`. A later
+session did not just clone anything and may be running from a completely
+different directory, so "the current directory" is first-run advice only - and
+six commands across Phases 0c, 4, 8 and 9 need this path. If the line is absent
+or points somewhere that no longer exists, ask them where they put it, then
+write the corrected path back to the state file.
+
 ### 0b. Confirm Python exists BEFORE running a Python script
 
 `preflight.py` is written in Python. If Python is missing, the script whose whole
@@ -136,7 +144,7 @@ It prints prerequisites, deploy tooling, what BLD already installed, and a
 | `FIRST RUN` | Full flow, Phase 1 onward. |
 | `NO STATE FILE, but BLD is already on this machine` | **Not a first run.** BLD is on disk with no record of it: a hand install, or a deleted state file. Go to **Phase 6** and read its no-state note. |
 | `STATE FILE UNREADABLE` | A setup interrupted while writing it. Same as the row above: **Phase 6**. Never run the full flow over it, and never delete their install to "start clean". |
-| `RESUMING` | **Skip Phases 1-3.** Pick up at the first item in "Still to do". Do not re-ask what they already chose. Anything under `ALREADY DONE` is on disk already - record it, do not reinstall it. Anything under `RECHECK` is the opposite: claimed, absent, reinstall it. |
+| `RESUMING` | **Skip Phases 1 and 3, and Phase 2 unless `deploy` is in "Still to do".** Then pick up at the first item. **`deploy` is the one group whose install step is not in Phase 4** - it lives in Phase 2, so go there for it and take the rest in Phase 4 order. Do not re-ask what they already chose. Anything under `ALREADY DONE` is on disk already - record it, do not reinstall it. Anything under `RECHECK` is the opposite: claimed, absent, reinstall it. **A `[--] image-gen hook` row is unfinished work whatever the verdict says** - re-run the hook copy and registration in Phase 4 before closing out. |
 | `RETURNING USER` | Skip to **Phase 6**. Do not re-run the flow. |
 
 Show the user the preflight output. It is short, and it is the honest picture of
@@ -190,6 +198,12 @@ on two account logins for a feature that cannot run. Say one line instead:
 > from [git-scm.com](https://git-scm.com) and re-run `/bld-setup` when you want
 > it. Everything else works fine without it."*
 
+**A resume can land here too.** If `deploy` is sitting in "Still to do", they
+already said yes on an earlier run - skip the question below and pick up at
+whichever half is unfinished, which preflight's DEPLOY TOOLING rows name
+exactly. Re-asking a question they have already answered is the thing the resume
+path exists to avoid.
+
 Otherwise, ask before the main install, because these need **human logins**
 nobody else can do, and they are the slow part:
 
@@ -218,11 +232,25 @@ fail in a way nobody connects back to this:
 ```bash
 mkdir -p ~/.npm-global
 npm config set prefix ~/.npm-global
-echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc   # or ~/.bashrc
+echo 'export NPM_CONFIG_PREFIX=~/.npm-global' >> ~/.zshrc   # or ~/.bashrc
+echo 'export PATH=~/.npm-global/bin:$PATH'    >> ~/.zshrc
+export NPM_CONFIG_PREFIX=~/.npm-global; export PATH=~/.npm-global/bin:$PATH
 ```
 
-Then re-open the shell and re-run the install. This is npm's own documented
-remedy. Do not raise it pre-emptively: on most machines it never happens, and it
+Then re-run the install. `npm config set prefix` is npm's own documented remedy,
+and the `NPM_CONFIG_PREFIX` line beside it is not redundant.
+
+**On Debian and Ubuntu the documented remedy alone does nothing, silently** -
+which is unfortunate, because that is precisely where the `EACCES` comes from.
+The packaged npm ships a builtin config at `/usr/share/npm/npmrc` pinning
+`prefix=/usr/local`, and it wins. Measured on Ubuntu 26.04 with npm 9.2.0:
+after `npm config set prefix`, `npm config get prefix` reports the new directory
+while `npm prefix -g` still answers `/usr/local`, and `npm install -g` installs
+there and fails for the same reason as before. The environment variable is read
+earlier and does win.
+
+**Verify with `npm prefix -g`, never `npm config get prefix`.** They disagree in
+exactly this case, and only the first one describes where packages actually go. Do not raise it pre-emptively: on most machines it never happens, and it
 is one more thing to hold for someone who does not need it.
 
 `gh` has no npm package, so it installs per-platform. **Give them the one line for
@@ -268,8 +296,16 @@ check whether the binary exists - `ls "$(npm prefix -g)/bin"` on macOS and Linux
 this shell is stale. `gh` shows the same thing from the other direction: Phase 0c
 says `found at the default path but NOT on PATH` when it resolved the fallback.
 
-**Record the answer either way, before moving on (Phase 5).** Yes puts `deploy`
-in `done` once both CLIs are signed in; no puts it in `declined`.
+**Record the answer either way, before moving on (Phase 5).** A yes puts `deploy`
+in `chose` **straight away, before the installs**, and moves it into `done` once
+both CLIs are signed in. A no puts it in `declined`.
+
+**Write `chose` before the logins, not after them.** Those two logins are the
+longest human step in the setup and the likeliest place for it to be
+interrupted. A yes recorded only on completion is a yes that disappears:
+`deploy` lands in neither `chose` nor `declined`, so the resume never mentions
+it again and every later run files it under `MISSING NOW` as "uninstalled, or a
+fresh machine" - to someone who said yes and did both logins.
 
 **If they say no, `declined` is the half that matters.**
 An unrecorded decline is not neutral: preflight has no way to tell "did not want
@@ -624,6 +660,18 @@ Neither is a BLD problem. Use the same tools the token monitor uses:
 pipx install jcodemunch-mcp     # or: uv tool install jcodemunch-mcp
 ```
 
+**On a minimal image neither of those exists either, and that is where this
+dead-ends if you do not say so.** Measured on Ubuntu 26.04: no `pip`, no `pipx`,
+no `uv`. Give them one line to get one, then continue:
+
+```bash
+sudo apt install pipx           # Debian/Ubuntu; or see astral.sh/uv for uv
+```
+
+If they do not want a third installer for an optional group, **say it is fine to
+skip.** Code search only pays off past roughly fifty files and costs nothing to
+add later.
+
 Expect one of the two on Debian and Ubuntu, and `externally-managed-environment`
 on Homebrew Python 3.11+. A python.org install on Windows or macOS takes the
 plain `pip install` fine, which is where most users will be.
@@ -658,7 +706,17 @@ npm install -g bun
 ```
 
 ```bash
-command -v bun >/dev/null || { echo "gstack needs bun: run 'npm install -g bun', or skip gstack"; exit 1; }
+# `command -v bun` is not enough, and the case it misses is common. Under WSL the
+# Windows npm shim sits on the inherited PATH, passes `command -v`, and answers
+# `bun --version` - then cannot read a single Linux path, so `setup` dies with
+# `Module not found` and nothing in the error mentions bun. Probe the capability
+# that actually matters instead: running a script at a real path on this OS.
+probe="${TMPDIR:-/tmp}/.bld-bun-probe.js"; : > "$probe"
+bun "$probe" >/dev/null 2>&1 || {
+  echo "gstack needs a bun that can run scripts on this machine."
+  echo "Install one with 'npm install -g bun', or skip gstack."
+  rm -f "$probe"; exit 1; }
+rm -f "$probe"
 
 # git clone into an existing directory fails outright, and this skill is built to
 # be re-run. Three states to handle, not two: a real clone (pull it), a leftover
@@ -709,7 +767,11 @@ first looks:**
 
 1. **`setup` never ran.** Scroll up. `Error: bun is required but not installed.`
    means there are no wrappers to prune and the count is correctly zero. Install
-   bun, re-run `setup`, then re-run the prune.
+   bun, re-run `setup`, then re-run the prune. **Under WSL the message is
+   different and names nothing useful:** a Windows bun on the inherited PATH gets
+   as far as running, then reports `Module not found "/home/..."` because it
+   cannot see Linux paths at all. The guard above now catches that before the
+   clone, but an older install may still be sitting in this state.
 2. **The matcher is stale.** Only if `setup` actually succeeded. gstack changed
    its wrapper layout and `grep 'skills/gstack'` no longer matches them.
 
@@ -754,6 +816,7 @@ setup that recorded nothing is a setup that starts over.
 {
   "scope": "global",
   "project": null,
+  "package": "C:/Users/you/Downloads/bld-package",
   "chose": ["core-skills", "bld", "plugins", "react-tools"],
   "declined": ["deploy", "gstack", "impeccable", "mcp", "token-monitor", "agents"],
   "done": ["prereqs", "core-skills", "plugins"],
@@ -769,6 +832,10 @@ setup that recorded nothing is a setup that starts over.
   for a global install. Omit them and a healthy scoped install reports as
   `MISSING NOW: bld ... Uninstalled, or a fresh machine reusing an old state file`,
   which is alarming and wrong.
+- **`package` is how a resume finds the files.** Write the absolute path Phase 0a
+  resolved, on the first write, before any install. Every `cp` in Phase 4, both
+  template copies in Phase 8 and the verify command in Phase 9 read from it, and
+  a fresh session has no other way to know where they put it.
 - Append to `done` after each group finishes.
 - **`declined` is every group they did not choose**, not just the ones they
   argued about: a declined deploy, the extras they skipped in Phase 3, `agents`
@@ -951,6 +1018,14 @@ groups - someone can take the machine-wide rules and skip the workspace ones:
 | `claude-md-global` | `~/.claude/CLAUDE.md` |
 | `claude-md-workspace` | `<workspace>/CLAUDE.md` |
 
+**Write the answer the moment they give it**, into `chose` for the file(s) they
+took and `declined` for the ones they refused - then move `chose` to `done` once
+the copy lands. Recording only on success is the mistake Phase 2 made with
+`deploy`: an interruption between the answer and the copy leaves the group in
+neither list, so the resume never mentions it and preflight has to report it as
+`NEVER SET UP` afterwards. This phase is the likeliest one to be interrupted,
+because it is last.
+
 Installed goes in `done`, declined goes in `declined`. Left out of both, Phase 6
 re-offers it on every future run - which is the wrong outcome for someone who has
 already said no once.
@@ -1015,7 +1090,9 @@ reads as "setup failed" at the exact moment they are primed to believe it.
 that as a problem.** `completed` is still `false` at this point - it is set at
 the end of this phase, after the restart reminder - so a completely successful
 install lands in the resume branch by design. What matters is the line below it:
-`Still to do : finish up + restart` means everything installed. A list of real
+`Still to do : finish up + restart` means every group installed - though check
+the `image-gen hook` row as well, which is not a group and so cannot appear
+there. A list of real
 group names there does not, and that is the failure worth reading out.
 
 Then have them type `/bld-` and confirm the commands appear. A skill on disk but

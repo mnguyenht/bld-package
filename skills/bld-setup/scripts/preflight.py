@@ -328,7 +328,14 @@ def main():
 
     print("\n  Optional, each unlocks one thing:\n")
     has_uv = bool(have("uv")) or bool(have("pipx"))
-    row("uv or pipx", has_uv, "" if has_uv else "needed for /bld-runtime-tokens only -> astral.sh/uv")
+    # "only /bld-runtime-tokens" was true on Windows and wrong on Linux. A
+    # minimal Debian or Ubuntu ships python3 with no pip at all - measured on
+    # Ubuntu 26.04, `python3 -m pip` answers `No module named pip` - so the
+    # code-search group needs one of these too, and naming just the token
+    # monitor sends people past the row that would have unblocked them.
+    row("uv or pipx", has_uv, "" if has_uv else
+        "needed for /bld-runtime-tokens, and for code search where pip is absent"
+        " -> astral.sh/uv, or apt install pipx")
 
     # gstack's own `setup` is a bun script and refuses to run without it. Nothing
     # else in BLD needs bun, so it is optional - but a missing bun is worth
@@ -349,7 +356,12 @@ def main():
     # shell picks up the new PATH. Reporting a plain "ok" there sends people to
     # debug `gh auth login` instead of restarting their terminal.
     gh_on_path = have("gh")
-    gh_fallback = r"C:\Program Files\GitHub CLI\gh.exe"
+    # An absolute path ignores PATH by design, which is the point for a user and
+    # a problem for the scenario suite: a fake machine built under a temp HOME
+    # still finds the host's real, signed-in gh here, so "a machine without gh"
+    # could not be expressed as a test at all. The override lets scenarios.py
+    # point it at nothing. Users never set it.
+    gh_fallback = os.environ.get("BLD_GH_PATH", r"C:\Program Files\GitHub CLI\gh.exe")
     gh_path = gh_on_path or (gh_fallback if os.path.exists(gh_fallback) else None)
     gh_authed = False
     if gh_path:
@@ -395,6 +407,13 @@ def main():
         scope_src = "  (remembered from your last setup)"
     elif project_given:
         scope_src = "  (--project)"
+    # Recognised by a path only the BLD package has. During setup `project`
+    # defaults to the package folder, and the package ships its own CLAUDE.md,
+    # which used to read as the user's installed workspace rules.
+    project_is_package = os.path.isfile(
+        os.path.join(project, "skills", "bld-setup", "scripts", "preflight.py"))
+    if project_is_package and not (project_given or project_from_state):
+        scope_src += "  (the package folder, not a workspace)"
     print("  project scope checked: " + os.path.join(project, ".claude") + scope_src)
     project_missing = (project_given or project_from_state) and not os.path.isdir(project)
     if project_missing:
@@ -519,12 +538,48 @@ def main():
     row("bld-executor agent", agent_have,
         "" if agent_have else "MISSING - the orchestrator skills cannot run without it")
 
+    # The image-gen block ships with the bld group but is the one piece of it
+    # that is not a file copy: it has to be written into settings as well. A run
+    # interrupted between the two, or a hand install that skipped registration,
+    # left `bld-* skills 23 of 23` and a verdict of "finish up + restart" sitting
+    # over a security control that was not running - with no row anywhere saying
+    # so. Both halves are checked because they fail in opposite directions and
+    # the registered-but-absent one is silent at the moment it fires.
+    hook_file = os.path.isfile(os.path.join(CLAUDE, "hooks", "block-image-skills.py"))
+    hook_reg = False
+    for cfg in (os.path.join(CLAUDE, "settings.json"),
+                os.path.join(project, ".claude", "settings.local.json")):
+        if not os.path.isfile(cfg):
+            continue
+        try:
+            if "block-image-skills" in json.dumps(
+                    json.load(io.open(cfg, encoding="utf-8")).get("hooks", {})):
+                hook_reg = True
+        except Exception:
+            pass
+    if hook_file and hook_reg:
+        hook_note = ""
+    elif hook_reg:
+        hook_note = "REGISTERED but the script is gone - fires and fails silently"
+    elif hook_file:
+        hook_note = "on disk but NOT REGISTERED - image generation is not blocked"
+    else:
+        hook_note = "MISSING - image generation is not blocked (Phase 4, BLD itself)"
+    row("image-gen hook", hook_file and hook_reg, hook_note)
+
     # Phase 8 offers these two rather than installing them, so they are groups
     # like any other: recorded in done/declined, and re-offered by Phase 6 only
     # when they are in neither. Two slugs, not one - the picker lets someone take
     # the machine-wide rules and skip the workspace ones, or the reverse.
     claudemd_global  = os.path.isfile(os.path.join(CLAUDE, "CLAUDE.md"))
-    claudemd_project = os.path.isfile(os.path.join(project, "CLAUDE.md"))
+    # The package folder ships its OWN CLAUDE.md - a guide for people working on
+    # BLD, not the workspace rules Phase 8 offers - and during setup the package
+    # folder is exactly what `project` defaults to, because nobody has passed
+    # --project yet. So every first run read "the workspace rules are already
+    # installed", Phase 8 had no reason to offer them, and the user silently
+    # never got the file. Recognise the package by a path only it has.
+    claudemd_project = (not project_is_package
+                        and os.path.isfile(os.path.join(project, "CLAUDE.md")))
     row("~/.claude/CLAUDE.md", claudemd_global, "")
 
     # What the disk actually proves, keyed by the group slugs written to
@@ -654,18 +709,50 @@ def main():
             print("  RECHECK     : " + named(unproven))
             print("                marked done, but not found on disk. The state")
             print("                file is wrong. Re-install these, do not skip them.")
-        print("  -> Skip Phases 1-3. Pick up at the first item in 'Still to do'.")
+        # This instruction exists twice - here and in SKILL.md's verdict table -
+        # and this is the copy the session actually reads. They said "Skip Phases
+        # 1-3" while deploy's only install step IS Phase 2, so the resume was
+        # told to skip the phase it was being sent to. Keep both wordings in step.
+        print("  -> Skip Phases 1 and 3. Pick up at the first item in 'Still to do'.")
+        if "deploy" in remaining:
+            print("     deploy is the exception: its step is Phase 2, not Phase 4,")
+            print("     so go there for it. They already said yes - do not re-ask.")
+        else:
+            print("     Skip Phase 2 as well: deploy is not in the list above.")
     else:
         declined = slist(state, "declined")
         print("  RETURNING USER. Setup was completed on " + str(state.get("completed_on", "?")) + ".")
         print("  Previously declined: " + (", ".join(declined) if declined else "nothing"))
-        gone = [g for g, ok in sorted(evidence.items())
-                if ok is False and g not in declined]
+        # "Absent" has two causes and they need opposite responses. A group that
+        # was recorded done and is gone today really did vanish. A group in
+        # neither list was never answered at all - which is what an interrupted
+        # run leaves behind for every phase it did not reach, Phase 8's two rule
+        # files most of all. Reporting those as "uninstalled, or a fresh machine"
+        # tells someone their setup broke when it simply never got that far.
+        done_once = slist(state, "done")
+        absent = [g for g, ok in sorted(evidence.items())
+                  if ok is False and g not in declined]
+        gone = [g for g in absent if g in done_once]
+        never = [g for g in absent if g not in done_once]
         if gone:
             print("  MISSING NOW : " + named(gone))
             print("                completed once, absent today. Uninstalled, or a")
             print("                fresh machine reusing an old state file.")
+        if never:
+            print("  NEVER SET UP: " + named(never))
+            print("                in neither `done` nor `declined`, so it was never")
+            print("                answered - usually a run that ended early. Offer")
+            print("                these, then record the answer either way.")
         print("  -> Do NOT re-run the full flow. Offer only what is missing or was declined.")
+
+    # Six commands across Phases 0c, 4, 8 and 9 interpolate the package path, and
+    # a resuming session has no other way to know it: it did not just clone
+    # anything and may be running from anywhere. Surfacing it here means the
+    # resume reads one report instead of opening the state file separately.
+    pkg = state.get("package") if isinstance(state, dict) else None
+    if isinstance(pkg, str) and pkg:
+        print("\n  package   : " + pkg
+              + ("" if os.path.isdir(pkg) else "   <- GONE, ask where they moved it"))
 
     if state_status == "ok":
         print("\n  state file: " + STATE)

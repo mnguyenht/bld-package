@@ -95,7 +95,7 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   thing standing over `bld-professional-settings`, which nothing else keeps in
   sync. Two of the bugs it now catches are ones it was written after.
 - **Run `python skills/bld-setup/scripts/scenarios.py` after touching
-  `preflight.py`.** 26 scenarios, each one a bug that was real once: a corrupt
+  `preflight.py`.** 50 scenarios, each one a bug that was real once: a corrupt
   state file, a scoped install whose project was deleted, a naming switch that
   stopped partway, a Node too old for `npx`. It builds a fake machine per case
   under a temp dir and asserts on the verdict. A green run is a regression net,
@@ -120,7 +120,7 @@ shipped that way once, and every one of those names is now in `LEGACY`.
 byte-identical.
 
 Verified: `lh-report.mjs` against a live Lighthouse v13.4.1 report, `preflight.py`
-on a real machine and across 26 scripted scenarios, `switch-mode.py` across two
+on real Windows and real Linux machines and across 50 scripted scenarios, `switch-mode.py` across two
 full round trips, `block-image-skills.py` against the sub-skills of
 ui-ux-pro-max 2.6.2 (exactly two touch image generation; both are blocked).
 
