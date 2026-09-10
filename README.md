@@ -101,21 +101,11 @@ printed list.
 
 Every skillset claims to be lightweight. Here is what BLD does to earn it.
 
-**Nothing runs in the background.** No `.mcp.json` is created unless you ask for
-one. Code search servers get spawned for one batch of queries and killed. No
-third-party process sits idle with a view of your codebase.
 
-**You can read the whole thing.** BLD is instructions, not a framework. Five small
-helper scripts do real work; the rest is markdown you could get through in an
-afternoon and disagree with in specific places.
 
-**It ships less than it could.** BLD bundles
-[gstack](https://github.com/garrytan/gstack) at 6 skills instead of 54. The other
-48 were iOS, paid-provider and team-process skills that duplicated what BLD
-already did, and every one cost context on every session.
 
-**Skills call skills.** `/bld-sprint-init` drives the design engine, the
-scaffolder and the deploy skill rather than reimplementing any of them.
+**Skills call skills.** Skills such as `/bld-sprint-refine` compiles 4 different skills into one.
+All serving the same purpose of UI refinement, why call each one every time?
 
 ---
 
@@ -147,21 +137,12 @@ fixed for a sharper reason: a switch named after its own state is a trap.
 
 ## What BLD will not do
 
-These are the opinions. They live in the CLAUDE.md templates, so they apply to
-every app you build with it.
+From a development and UI/UX standpoint, these are the universal guardrails BLD follows:
 
-- **It will not push your code.** Finishing a change is not a reason to ship one.
-- **It will not fix what you did not mention.** Not the padding next to the thing
-  you asked about, not the easing curve it read on the way past. If it spots a
-  real problem, it tells you and leaves it alone.
-- **It will not take over your scrolling.** Wheel and trackpad motion stays
-  exactly what your OS would do. Click a nav link and it can glide, because you
-  asked to go somewhere.
-- **It will not invent a number.** No made-up prices, testimonials, or proof.
-  Gaps get marked and handed back, because a plausible fake price ends up quoted
-  to a real customer.
-- **It will not trust a scanner.** Every audit in here returns a tempting list of
-  things nobody asked for. BLD reads the code before believing any of it.
+- **It will not push your code without confirmation.**
+- **It will not fix what you did not mention.** 
+- **It will not invent a number.** *(prices, testimonials, or proof. Everything stays as placeholders.)*
+- **Nothing runs in the background.** *(MCP servers are only utilized when called, then immediately killed. No third parties behind every query.)*
 
 ---
 
@@ -188,16 +169,12 @@ bld-package/
 │       └── scripts/switch-mode.py  renames every command between modes
 ├── agents/
 │   └── bld-executor.md             the worker the orchestrators fan out to
+├── hooks/
+│   └── block-image-skills.py       blocks AI image generation
 └── templates/
     ├── CLAUDE.global.md            machine-wide rules
     └── CLAUDE.workspace.md         workspace rules
 ```
-
-A skill is a folder with a `SKILL.md`. The `name:` in its frontmatter is the
-command you type. Add `references/` for detail that should not cost context on
-every invocation, and `scripts/` for work that has to be deterministic.
-
----
 
 ## The commands
 
@@ -286,7 +263,7 @@ every invocation, and `scripts/` for work that has to be deterministic.
 
 ## License
 
-MIT. Use it, fork it, ship things with it.
+MIT. 
 
 The security checklists in `skills/bld-optimize-security/references/ecc/` are
 vendored from [affaan-m/ECC](https://github.com/affaan-m/ECC) and stay under
@@ -297,8 +274,7 @@ ECC's own MIT license, included in full beside them.
 ## Credits
 
 BLD is mostly glue. The people below wrote the parts that do the hard work, and
-every one is worth a look on its own terms. This is the same table `/bld-setup`
-shows you before it installs anything.
+every one is worth a look on its own terms. (This table is shown during `/bld-setup`)
 
 ### Claude Code plugins
 
@@ -325,9 +301,12 @@ shows you before it installs anything.
 | webapp-testing | Drives a local app with Playwright. | [anthropics/skills](https://github.com/anthropics/skills) |
 | terms-of-service | Drafts and reviews SaaS terms. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
 | privacy-policy | Drafts and reviews privacy policies. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
-| ECC checklists | Security checklists behind `/bld-optimize-security`. Vendored into the skill rather than installed separately, under MIT, with the source commit pinned in `references/ecc/SOURCES.md`. | [affaan-m/ECC](https://github.com/affaan-m/ECC) |
 
-### Command-line tools
+(Parts of the security checklists used by `/bld-optimize-security` are vendored from
+[affaan-m/ECC](https://github.com/affaan-m/ECC) under MIT, with the source commit
+pinned in `references/ecc/SOURCES.md`.)
+
+### CLI tools
 
 | Tool | What it does | Source |
 |---|---|---|
@@ -340,20 +319,13 @@ shows you before it installs anything.
 
 ### MCP servers
 
-On-demand by default: spawned, queried, killed, with no `.mcp.json` involved.
-`/bld-mcp-settings` switches any of them to always-on if you want that, per server
-and reversibly.
-
 | Server | What it does | Source |
 |---|---|---|
 | jcodemunch | Token-cheap code search. Read-only. | [jgravelle/jcodemunch-mcp](https://github.com/jgravelle/jcodemunch-mcp) |
 | context-mode | Heavier code context. Its `ctx_execute` runs real shell commands, so BLD treats it as the highest-trust item it offers. | [mksglu/context-mode](https://github.com/mksglu/context-mode) |
 | shadcn | Real registry data so components are not guessed. | [shadcn-ui/ui](https://github.com/shadcn-ui/ui) |
 
-### Optional, not installed by default
-
-Needed only for `/bld-runtime-agents`. `/bld-setup` offers to walk you through
-either one, and you do the login yourself.
+### Optional tools for `/bld-runtime-agents`
 
 | Tool | Why it is separate | Source |
 |---|---|---|
