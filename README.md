@@ -5,8 +5,9 @@
 # Background
 Many skillsets nowadays ship with excessive amounts of skills, subagents, hooks, etc. Clogging up hundreds of thousands of tokens every session for skills you'll probably never use.
 
-BLD was made to address the needs of *the simple builder*. 23 slash commands for every part of the ```web-development``` process, from planning and prototype, into deployment and even SEO. With many utility
-commands to save you hundreds of thousands of tokens every run. 
+BLD is the simplest skillset you'll ever need. Providing 23 skills for every part of the ```web-development``` process. 
+
+From planning to deployment and SEO, it has it all. Including many utility commands to save you hundreds of thousands of tokens every run. 
 
 ---
 
