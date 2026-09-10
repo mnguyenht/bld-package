@@ -20,10 +20,10 @@ You pick the step. The skill brings everything else.
 - [How it stays light](#how-it-stays-light)
 - [How commands are named](#how-commands-are-named)
 - [What BLD will not do](#what-bld-will-not-do)
-- [Repo layout](#repo-layout)
 - [The commands](#the-commands)
   - [sprint](#sprint) · [optimize](#optimize) · [find](#find) · [runtime](#runtime)
   - [orchestrator](#orchestrator) · [util](#util) · [settings](#settings) · [special](#special)
+- [Repo layout](#repo-layout)
 - [License](#license)
 - [Credits](#credits)
 
@@ -101,9 +101,6 @@ printed list.
 
 Every skillset claims to be lightweight. Here is what BLD does to earn it.
 
-
-
-
 **Skills call skills.** Skills such as `/bld-sprint-refine` compiles 4 different skills into one.
 All serving the same purpose of UI refinement, why call each one every time?
 
@@ -145,36 +142,6 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 - **Nothing runs in the background.** *(MCP servers are only utilized when called, then immediately killed. No third parties behind every query.)*
 
 ---
-
-## Repo layout
-
-```
-bld-package/
-├── README.md
-├── MANUAL-INSTALL.md               the install written out by hand
-├── skills/                         23 commands, one folder each
-│   ├── bld-setup/
-│   │   ├── SKILL.md
-│   │   ├── references/manifest.md  every tool, with source links
-│   │   ├── scripts/preflight.py    what is installed, what is missing
-│   │   └── scripts/scenarios.py    regression tests for preflight
-│   ├── bld-sprint-*/               planning · init · refine
-│   ├── bld-optimize-*/             app · react · security · seo-indexing
-│   ├── bld-find-*/                 21st · spline
-│   ├── bld-runtime-*/              agents · tokens · activate-mcps
-│   ├── bld-orchestrator-*/         fable · opus
-│   ├── bld-util-*/                 deploy · handoff · documentation · customize-component · copywriting
-│   ├── bld-quiz/
-│   └── bld-professional-settings/
-│       └── scripts/switch-mode.py  renames every command between modes
-├── agents/
-│   └── bld-executor.md             the worker the orchestrators fan out to
-├── hooks/
-│   └── block-image-skills.py       blocks AI image generation
-└── templates/
-    ├── CLAUDE.global.md            machine-wide rules
-    └── CLAUDE.workspace.md         workspace rules
-```
 
 ## The commands
 
@@ -259,6 +226,38 @@ bld-package/
 
 ---
 
+## Repo layout
+
+```
+bld-package/
+├── README.md
+├── MANUAL-INSTALL.md               the install written out by hand
+├── skills/                         23 commands, one folder each
+│   ├── bld-setup/
+│   │   ├── SKILL.md
+│   │   ├── references/manifest.md  every tool, with source links
+│   │   ├── scripts/preflight.py    what is installed, what is missing
+│   │   └── scripts/scenarios.py    regression tests for preflight
+│   ├── bld-sprint-*/               planning · init · refine
+│   ├── bld-optimize-*/             app · react · security · seo-indexing
+│   ├── bld-find-*/                 21st · spline
+│   ├── bld-runtime-*/              agents · tokens · activate-mcps
+│   ├── bld-orchestrator-*/         fable · opus
+│   ├── bld-util-*/                 deploy · handoff · documentation · customize-component · copywriting
+│   ├── bld-quiz/
+│   └── bld-professional-settings/
+│       └── scripts/switch-mode.py  renames every command between modes
+├── agents/
+│   └── bld-executor.md             the worker the orchestrators fan out to
+└── templates/
+    ├── CLAUDE.global.md            machine-wide rules
+    └── CLAUDE.workspace.md         workspace rules
+```
+
+---
+
+---
+
 ---
 
 ## License
@@ -301,10 +300,7 @@ every one is worth a look on its own terms. (This table is shown during `/bld-se
 | webapp-testing | Drives a local app with Playwright. | [anthropics/skills](https://github.com/anthropics/skills) |
 | terms-of-service | Drafts and reviews SaaS terms. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
 | privacy-policy | Drafts and reviews privacy policies. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
-
-(Parts of the security checklists used by `/bld-optimize-security` are vendored from
-[affaan-m/ECC](https://github.com/affaan-m/ECC) under MIT, with the source commit
-pinned in `references/ecc/SOURCES.md`.)
+| ECC checklists | Parts of the security checklists behind `/bld-optimize-security`. Vendored into the skill rather than installed separately, under MIT, with the source commit pinned in `references/ecc/SOURCES.md`. | [affaan-m/ECC](https://github.com/affaan-m/ECC) |
 
 ### CLI tools
 
