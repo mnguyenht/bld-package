@@ -1,4 +1,4 @@
-# BLD
+# bld-package
 
 **A lightweight Claude agent skillset, for every step of the ```building``` process.**
 
