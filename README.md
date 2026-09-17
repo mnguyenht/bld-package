@@ -9,7 +9,8 @@ Many skillsets nowadays ship with excessive amounts of skills, subagents, etc. S
 
 From planning to deployment, it has it all. Including many utility commands ***saving up to 75% of your tokens***. 
 
----
+&nbsp;
+
 
 ## Contents 📋
 
@@ -24,7 +25,7 @@ From planning to deployment, it has it all. Including many utility commands ***s
 - [License](#license)
 - [Credits](#credits)
 
----
+&nbsp;
 
 ## Installation ⬇️
 
@@ -95,7 +96,8 @@ Once you know the set, use `/bld-professional-settings on` to move the type to t
 
 Any commands with 2 parts are special commands, and won't be affected.
 
----
+&nbsp;
+
 
 ## What bld will NOT do ❌
 
@@ -106,11 +108,11 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 - **It will not invent a number.** *(prices, testimonials, or proof. Everything stays as placeholders.)*
 - **Nothing runs in the background.** *(MCP servers are only utilized when called, then immediately killed. No third parties behind every query.)*
 
----
+&nbsp;
 
 ## The Commands 📃
 
-### sprint
+### -sprint
 
 *Main commands to initiate coding sprints.*
 
@@ -120,7 +122,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 | `/bld-sprint-init` | An initial sprint to build the scaffolds of your app, such as landing pages, routing, and protoyping. |
 | `/bld-sprint-refine` | Refining your initial build into something pleasing to use, consolidating the design style further, and improves overall UI/UX. |
 
-### optimize
+### -optimize
 
 *App optimization commands using different tools.*
 
@@ -131,7 +133,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 | `/bld-optimize-security` | A static security pass, 13 layers deep. Free, local, and it reports rather than auto-fixing. |
 | `/bld-optimize-seo-indexing` | Gets an app found on Google. Audits the live site with curl instead of trusting the source. |
 
-### find
+### -find
 
 *Searches for fitting, pre-made professional assets instead of needing Claude to build it.*
 
@@ -140,7 +142,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 | `/bld-find-21st` | Browses [21st.dev](https://21st.dev) for different UI components. From backgrounds to shader effects.|
 | `/bld-find-spline` | Find 3D interactive assets from [Spline](https://spline.design) to make your website come to life. |
 
-### runtime
+### -runtime
 
 *Runtime optimization and token management.*
 
@@ -150,7 +152,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 | `/bld-runtime-tokens` | How much of your Claude window is left, and what to do about it. |
 | `/bld-runtime-activate-mcps` | Spawns a code-search server, fires one batch of queries, kills it. |
 
-### orchestrator
+### -orchestrator
 
 *Claude orchestrates other agents instead of writing code.*
 
@@ -159,7 +161,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 | `/bld-orchestrator-fable` | Plan, execute in parallel, judge each report as a skeptic, re-spec until it passes. |
 | `/bld-orchestrator-opus` | The same loop with Opus in the boss seat. |
 
-### util
+### -util
 
 *Handy general functions for every part of the .*
 
@@ -171,7 +173,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 | `/bld-util-customize-component` | Builds a customization menu in the browser, to help fine-tune a real component. Then simply let Claude know what you chose. |
 | `/bld-util-copywriting` | Humanizes and makes sure any writing drives the value of your app. Eliminating litotes, irony, or any phrasing that sounds machine-written. |
 
-### settings
+### -settings
 
 *Customize bld to your liking.*
 
@@ -180,7 +182,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 | `/bld-mcp-settings` | Switches BLD's MCP policies between ```on-demand``` and ```always-on```. |
 | `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
 
-### special
+### -special
 
 *Acts on BLD itself.*
 
@@ -189,7 +191,8 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 | `/bld-setup` | Sets BLD up, or adds more of it later. Remembers where it got to. |
 | `/bld-quiz` | A learning checkpoint after a sprint, at matching depth. Small changes get a walkthrough instead. |
 
----
+&nbsp;
+
 
 ## Repo layout
 
@@ -219,7 +222,6 @@ bld-package/
     └── CLAUDE.workspace.md         workspace rules
 ```
 
----
 
 ## License
 
@@ -229,14 +231,13 @@ The security checklists in `skills/bld-optimize-security/references/ecc/` are
 vendored from [affaan-m/ECC](https://github.com/affaan-m/ECC) and stay under
 ECC's own MIT license, included in full beside them.
 
----
 
 ## Credits
 
 BLD is mostly glue. The people below wrote the parts that do the hard work, and
 every one is worth a look on its own terms. (This table is shown during `/bld-setup`)
 
-### Claude Code plugins
+### -Claude Code plugins
 
 | Tool | What it does | Source |
 |---|---|---|
@@ -244,7 +245,7 @@ every one is worth a look on its own terms. (This table is shown during `/bld-se
 | ui-ux-pro-max | The design engine behind `/bld-sprint-init`. Styles, palettes, font pairings, UX rules. | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) |
 | claude-code-setup | Anthropic's official setup advisor. | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) |
 
-### Skills
+### -Skills
 
 | Tool | What it does | Source |
 |---|---|---|
@@ -263,7 +264,7 @@ every one is worth a look on its own terms. (This table is shown during `/bld-se
 | privacy-policy | Drafts and reviews privacy policies. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
 | ECC checklists | Parts of the security checklists behind `/bld-optimize-security`. Vendored into the skill rather than installed separately, under MIT, with the source commit pinned in `references/ecc/SOURCES.md`. | [affaan-m/ECC](https://github.com/affaan-m/ECC) |
 
-### CLI tools
+### -CLI tools
 
 | Tool | What it does | Source |
 |---|---|---|
@@ -274,7 +275,7 @@ every one is worth a look on its own terms. (This table is shown during `/bld-se
 | vercel | Deploy target. | [vercel/vercel](https://github.com/vercel/vercel) |
 | gh | GitHub CLI. Creates the private repo in `/bld-util-deploy`. | [cli/cli](https://github.com/cli/cli) |
 
-### MCP servers
+### -MCP servers
 
 | Server | What it does | Source |
 |---|---|---|
@@ -282,7 +283,7 @@ every one is worth a look on its own terms. (This table is shown during `/bld-se
 | context-mode | Heavier code context. Its `ctx_execute` runs real shell commands, so BLD treats it as the highest-trust item it offers. | [mksglu/context-mode](https://github.com/mksglu/context-mode) |
 | shadcn | Real registry data so components are not guessed. | [shadcn-ui/ui](https://github.com/shadcn-ui/ui) |
 
-### Optional tools for `/bld-runtime-agents`
+### -Optional tools for `/bld-runtime-agents`
 
 | Tool | Why it is separate | Source |
 |---|---|---|
