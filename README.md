@@ -11,7 +11,7 @@ From planning to deployment, it has it all. Including many utility commands ***s
 
 ---
 
-## Contents
+## Contents 📋
 
 - [Install](#install)
 - [Installing on macOS or Linux](#installing-on-macos-or-linux)
@@ -26,7 +26,7 @@ From planning to deployment, it has it all. Including many utility commands ***s
 
 ---
 
-## Install
+## Installation ⬇️
 
 Assuming you already have [Claude Code](https://claude.com/claude-code), plus `npm`
 and `git`:
@@ -50,37 +50,15 @@ claude
 > read skills/bld-setup/SKILL.md and set BLD up
 ```
 
-Claude should now execute `/bld-setup`, in which it'll install all the dependencies and
+Claude should now execute `/bld-setup`, which it'll install all the dependencies and
 underlying tools. 
 
-### What it does
-
-| Step | What happens |
-|---|---|
-| **Preflight** | Checks what you already have. Read-only. Stops with install links if something required is missing. |
-| **The manifest** | Prints every tool it could install, with a source link and a column saying whether it runs code on your machine. |
-| **Deploy accounts** | Asks whether you want `/bld-util-deploy`, since GitHub and Vercel need logins only you can do. |
-| **You choose** | Nothing is installed until you pick. |
-| **Install** | Cheap and safe first, slow last. |
-| **Restart** | Skills register at startup, so Claude Code has to restart before anything works. |
-
-***Be sure to keep an eye on the installation, read over what you want
-to install or not, and apply any fixes during the way.***
-
+### *Be sure to keep an eye on the installation, read over what you want to install or not, and apply any fixes during the way.*
 (Once finished, if you'd like to install any tools / skills in the future, simply re-run /bld-setup.)
 
-### Prefer the real slash command?
 
-Copy the one skill in first and restart Claude Code, and `/bld-setup` exists:
+&nbsp;
 
-```bash
-mkdir -p ~/.claude/skills && cp -r skills/bld-setup ~/.claude/skills/
-```
-
-Same flow either way. The trade is that this puts one file on your machine before
-you have read the manifest.
-
----
 
 ## Installing on macOS or Linux
 
@@ -99,35 +77,27 @@ It also carries the two things the Linux runs measured that catch people out: th
 `npm` prefix remedy that Debian and Ubuntu silently ignore, and the check that
 your `bun` is the Linux one rather than a Windows shim inherited through WSL.
 
----
+&nbsp;
 
-## How commands are named
 
-Every command reads **`bld` · type · skill**. The middle segment tells you what
-kind of thing it is before you have learned the set.
+## How Commands Are Named ✒️
+
+Every command reads **`bld` · type · skill**. 
 
 ```
 /bld-sprint-init
- │    │      └── what it does
- │    └───────── which kind of skill it is
- └────────────── the prefix
+ │    │      └──> what it does
+ │    └─────────> which kind of skill it is
+ └──────────────> the prefix
 ```
 
-Once you know the set, leading with the type buries the word you are reaching
-for. `/bld-professional-settings on` moves the type to the end, so typing the
-first few letters lands on the command instead of the category. `off` puts it
-back. Both orders keep all three parts, and the switch rewrites folders,
-frontmatter and every cross-reference together, so nothing is left pointing at a
-command that no longer exists.
+Once you know the set, use `/bld-professional-settings on` to move the type to the end, requiring less typing to reach what you want.
 
-Four commands never rename themselves. `/bld-setup` and `/bld-quiz` are what you
-reach for when you are confused about your own setup, and a command that renames
-itself is the worst thing to need at that moment. The two settings commands stay
-fixed for a sharper reason: a switch named after its own state is a trap.
+Any commands with 2 parts are special commands, and won't be affected.
 
 ---
 
-## What BLD will not do
+## What bld will NOT do ❌
 
 From a development and UI/UX standpoint, these are the universal guardrails BLD follows:
 
@@ -138,21 +108,21 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 
 ---
 
-## The commands
+## The Commands 📃
 
 ### sprint
 
-*You give Claude a goal and it builds toward it.*
+*Main commands to initiate coding sprints.*
 
 | Command | What it does |
 |---|---|
-| `/bld-sprint-planning` | Decides what should exist before anything gets built. Plan mode answers *how to build*. This answers *whether to*. |
-| `/bld-sprint-init` | Idea to a working, deployed base in one sprint. Asks your time budget and design direction, then scaffolds and ships. |
-| `/bld-sprint-refine` | Base to feels-alive. The craft passes init skipped. Run it per screen, once a screen is basically done. |
+| `/bld-sprint-planning` | Helps you sketch out the architecture and everything Claude needs to know before building your project.|
+| `/bld-sprint-init` | An initial sprint to build the scaffolds of your app, such as landing pages, routing, and protoyping. |
+| `/bld-sprint-refine` | Refining your initial build into something pleasing to use, consolidating the design style further, and improves overall UI/UX. |
 
 ### optimize
 
-*Improves an app that already exists.*
+*App optimization commands using different tools.*
 
 | Command | What it does |
 |---|---|
@@ -163,16 +133,16 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 
 ### find
 
-*Locates a ready-made asset.*
+*Searches for fitting, pre-made professional assets instead of needing Claude to build it.*
 
 | Command | What it does |
 |---|---|
-| `/bld-find-21st` | Browses [21st.dev](https://21st.dev) for shadcn components. Coming back empty-handed is a valid outcome. |
-| `/bld-find-spline` | Same idea for 3D scenes from [Spline](https://spline.design). Heavy, so it only suggests one that earns its weight. |
+| `/bld-find-21st` | Browses [21st.dev](https://21st.dev) for different UI components. From backgrounds to shader effects.|
+| `/bld-find-spline` | Find 3D interactive assets from [Spline](https://spline.design) to make your website come to life. |
 
 ### runtime
 
-*Applies to how the session runs, not to what gets built.*
+*Runtime optimization and token management.*
 
 | Command | What it does |
 |---|---|
@@ -182,7 +152,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 
 ### orchestrator
 
-*Claude bosses other agents instead of writing code.*
+*Claude orchestrates other agents instead of writing code.*
 
 | Command | What it does |
 |---|---|
@@ -191,23 +161,23 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 
 ### util
 
-*Everything in between.*
+*Handy general functions for every part of the .*
 
 | Command | What it does |
 |---|---|
-| `/bld-util-deploy` | Private GitHub repo plus Vercel, auto-deploy on push. After the first run, shipping is a commit and a push. |
-| `/bld-util-handoff` | Snapshots the session so you can `/clear` and pick up in fresh context before it rots. |
-| `/bld-util-documentation` | Writes a `/docs` page inside your app, in Simplified Technical English. Half-built features go under Known limits. |
-| `/bld-util-customize-component` | Builds real sliders in the browser, bound to the real component. You drag, the values get committed, the panel gets deleted. |
-| `/bld-util-copywriting` | App copy, with workspace rules for pre-launch proof, litotes, irony, and phrasing that reads as machine-written. |
+| `/bld-util-deploy` | Automatically pushes to your GitHub repos and integrates with Vercel. After the first run, shipping is simply a commit and a push. |
+| `/bld-util-handoff` | Snapshots the session so you can pick up in fresh context before it rots. |
+| `/bld-util-documentation` | Writes a `/docs` page for your app, in Simplified Technical English. Half-built features go under Known limits. |
+| `/bld-util-customize-component` | Builds a customization menu in the browser, to help fine-tune a real component. Then simply let Claude know what you chose. |
+| `/bld-util-copywriting` | Humanizes and makes sure any writing drives the value of your app. Eliminating litotes, irony, or any phrasing that sounds machine-written. |
 
 ### settings
 
-*A package setting you turn on and off.*
+*Customize bld to your liking.*
 
 | Command | What it does |
 |---|---|
-| `/bld-mcp-settings` | Switches BLD's MCP servers between on-demand and always-on, without touching an entry it did not write. |
+| `/bld-mcp-settings` | Switches BLD's MCP policies between ```on-demand``` and ```always-on```. |
 | `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
 
 ### special
