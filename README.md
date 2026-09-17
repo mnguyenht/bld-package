@@ -5,7 +5,7 @@
 # Background
 Many skillsets nowadays ship with excessive amounts of skills, subagents, etc. Some clogging up to ***80% of your context*** every session, for skills you'll probably never use.
 
-*BLD is the simplest skillset you'll ever need*. Providing 23 skills for every part of the ```web-development``` process. 
+```*BLD is the simplest skillset you'll ever need*```. Providing 23 skills for every part of the ```web-development``` process. 
 
 From planning to deployment, it has it all. Including many utility commands ***saving up to 75% of your tokens***. 
 
