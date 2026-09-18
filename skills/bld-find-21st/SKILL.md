@@ -1,6 +1,6 @@
 ---
 name: bld-find-21st
-description: Browse the 21st.dev marketplace for ready-made shadcn/Tailwind UI components, present a shortlist for the user to pick from, then install the chosen one. Use when the user says /bld-find-21st, "find a component", "find UI on 21st", "get me a <navbar/hero/card/form/etc>", or wants a premade UI asset instead of building one from scratch. No MCP server, no API key, no AI generation — pure web browsing.
+description: Find a ready-made shadcn/Tailwind component on 21st.dev, shortlist options, install the pick. Use for "find a component", "get me a navbar/hero/card", or premade UI instead of building from scratch.
 ---
 
 # bld-find-21st — shop the 21st.dev marketplace

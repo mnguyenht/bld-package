@@ -1,20 +1,22 @@
 # bld-package — the BLD skillset, packaged for other people
 
 This repo is **not an app.** It is the distributable copy of the `bld-*` skillset:
-23 skills, one agent, two CLAUDE.md templates. Almost all of it is
+24 skills, one agent, two CLAUDE.md templates. Almost all of it is
 markdown read by Claude Code on someone else's machine. The exceptions are the
-five helper scripts below, which do execute, and the manifest lists them as such
+six helper scripts below, which do execute, and the manifest lists them as such
 because that column is the one users decide on.
 
 - **Users:** people who want the BLD workflow without rebuilding it. Installed via
   `/bld-setup`.
 - **Monetization:** none. Public, free, credit-the-sources.
-- **Stack:** markdown, plus five helper scripts where the work must be deterministic:
+- **Stack:** markdown, plus six helper scripts where the work must be deterministic:
   `bld-setup/scripts/preflight.py` (environment + resume state),
   `bld-professional-settings/scripts/switch-mode.py` (renames every command),
   `bld-mcp-settings/scripts/mcp-settings.py` (edits `.mcp.json` without clobbering it),
   `skills/bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader),
-  `skills/bld-runtime-activate-mcps/run.py` (MCP runner).
+  `skills/bld-runtime-activate-mcps/run.py` (MCP runner),
+  `bld-settings-block-image-generation/scripts/block-image-generation.py` (the
+  image-generation hook, installed only by that command).
 
   `bld-setup/scripts/scenarios.py` is a seventh Python file but not a helper: it
   is the regression suite for `preflight.py`, run by people working on this
@@ -41,13 +43,14 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 | `README.md` | Public front door: positioning, skills by phase, credits table |
 | `skills/bld-*/SKILL.md` | One skill each. Frontmatter `name` + `description` drives invocation |
 | `skills/bld-setup/references/manifest.md` | The operational install table, with the trust column |
+| `skills/bld-setup/references/skills.md` | The 24 commands with a **Needs** column. Phase 2 prints it and picks from it |
 | `agents/bld-executor.md` | The worker the orchestrator skills fan out to |
 | `templates/CLAUDE.*.md` | The global + workspace rule layers, sanitised |
 
 ## Conventions
 
 - **Folder name and frontmatter `name` must match.** They drifted apart
-  historically and the frontmatter won, but every one of the 23 now agrees, and
+  historically and the frontmatter won, but every one of the 24 now agrees, and
   `switch-mode.py` relies on that: `detect_mode` treats a BLD skill whose folder
   and declared name disagree as evidence of an interrupted rename, and refuses to
   toggle. Renaming a folder by hand without its frontmatter now jams the mode
@@ -57,17 +60,22 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   pressure, so the reasons are the point, not padding.
 - **The README is marketing copy, so no em dashes there.** The SKILL.md files are
   instructions to a model and follow the existing house style instead.
-- **Three things must stay in sync:** the credits table in `README.md`, the
-  manifest at `skills/bld-setup/references/manifest.md`, and the "What each group
-  actually is" table in `bld-setup/SKILL.md` Phase 3. Different readers, same
+- **Five things must stay in sync:** the credits table in `README.md`, the
+  manifest at `skills/bld-setup/references/manifest.md`, its **At a glance**
+  table (what Phase 3 prints, and the one place the "skip it and you lose" facts
+  live), the command table at `bld-setup/references/skills.md` (what Phase 2
+  prints, and the only place each command's **Needs** is recorded), and the
+  "What each tool actually is" table in `bld-setup/SKILL.md` Phase 3. Different readers, same
   facts. **The Phase 3 table is the one users actually consent against**, so a
   `code` row in the manifest that reads as markdown in the picker is a consent
   bug, not a wording slip. It shipped once: the picker called all 11 core skills
   "all markdown" while `a11y-audit` and `webapp-testing` ship executable scripts.
-- **Adding a skill? Four places.** Its own `SKILL.md`, the `SKILLS` table in
+- **Adding a skill? Five places.** Its own `SKILL.md`, the `SKILLS` table in
   `bld-professional-settings/scripts/switch-mode.py` (the canonical taxonomy, and the
-  rename breaks without it), the type table in `README.md`, and the routing table
-  in `templates/CLAUDE.workspace.md`.
+  rename breaks without it), the type table in `README.md`, the routing table
+  in `templates/CLAUDE.workspace.md`, and `bld-setup/references/skills.md` with
+  its **Needs** column - a command absent from that table cannot be picked in
+  Phase 2, so it ships uninstallable. `check.py` fails on all five.
 - **Renaming a command?** Add the old name to `LEGACY` in that same script rather
   than editing `SKILLS` in place, so existing installs still migrate.
 - **`bld-professional-settings` is exempt from the rename pass** (`NO_REWRITE`). Its docs
@@ -88,12 +96,12 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 - **Run `python check.py` before committing.** Every convention on this page that
   can be checked mechanically, is: folder vs frontmatter names, the folder set
   against the table, a type existing in the code but in neither doc, a skill
-  missing from one of the four places, a stated command count that went stale,
+  missing from one of the five places, a stated command count that went stale,
   and an other-mode command literal waiting to be flattened. It is the only
   thing standing over `bld-professional-settings`, which nothing else keeps in
   sync. Two of the bugs it now catches are ones it was written after.
 - **Run `python skills/bld-setup/scripts/scenarios.py` after touching
-  `preflight.py`.** 46 scenarios, each one a bug that was real once: a corrupt
+  `preflight.py`.** 49 scenarios, each one a bug that was real once: a corrupt
   state file, a scoped install whose project was deleted, a naming switch that
   stopped partway, a Node too old for `npx`. It builds a fake machine per case
   under a temp dir and asserts on the verdict. A green run is a regression net,
@@ -110,7 +118,7 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 
 ## Status
 
-23 skills. **There are exactly two naming conventions and no third:**
+24 skills. **There are exactly two naming conventions and no third:**
 prefix-type-skill (default) and prefix-skill-type (pro). Pro reorders; it never
 drops a segment. A name missing its type belongs to neither convention — pro mode
 shipped that way once, and every one of those names is now in `LEGACY`.
@@ -118,7 +126,7 @@ shipped that way once, and every one of those names is now in `LEGACY`.
 byte-identical.
 
 Verified: `lh-report.mjs` against a live Lighthouse v13.4.1 report, `preflight.py`
-on real Windows and real Linux machines and across 46 scripted scenarios, `switch-mode.py` across two
+on real Windows and real Linux machines and across 49 scripted scenarios, `switch-mode.py` across two
 full round trips.
 
 Not yet run end to end by a real new user: `/bld-setup`. MIT licensed.

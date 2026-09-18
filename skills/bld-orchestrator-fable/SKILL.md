@@ -1,6 +1,6 @@
 ---
 name: bld-orchestrator-fable
-description: Boss mode over Claude subagents — turn a brain-dump into a plan → execute → judge loop. Claude scopes, specs, fans out bld-executor workers in parallel, judges their reports as a skeptic, and re-specs until the work meets the bar. Use when the user says /bld-orchestrator-fable, drops a messy multi-item to-do list, or wants several independent pieces built at once. Claude never writes the code.
+description: Boss mode over Claude subagents. Plan a brain-dump, fan out bld-executor workers in parallel, judge their work. Use for a messy multi-item to-do list or several independent pieces to build at once.
 model: fable
 ---
 

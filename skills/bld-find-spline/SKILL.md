@@ -1,6 +1,6 @@
 ---
 name: bld-find-spline
-description: Find ready-made 3D scenes on Spline (spline.design) for use in an app, present a shortlist to pick from, then wire the chosen scene's embed into the code. Use when the user says /bld-find-spline, "find a 3D scene", "add a Spline", "get me a 3D hero/model", or wants a premade 3D asset instead of building one. No MCP, no API key — web browsing + npm. 3D is heavy: only surface a scene if it genuinely elevates the app and the performance cost is acceptable.
+description: Find a ready-made 3D scene on Spline and wire its embed into the app. Use for "find a 3D scene", "add a Spline", "3D hero". Heavy. Only when it genuinely elevates the page.
 ---
 
 # bld-find-spline — shop Spline for a 3D scene, then wire the embed

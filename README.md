@@ -5,7 +5,7 @@
 # Background
 Many skillsets nowadays ship with excessive amounts of skills, subagents, etc. Some clogging up to ***80% of your context*** every session, for skills you'll probably never use.
 
-***BLD is the simplest skillset you'll ever need***. Providing 23 skills for every part of the ```web-development``` process. 
+***BLD is the simplest skillset you'll ever need***. Providing 24 skills for every part of the ```web-development``` process. 
 
 From planning to deployment, it has it all. Including many utility commands ***saving up to 75% of your tokens***. 
 
@@ -181,6 +181,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 |---|---|
 | `/bld-mcp-settings` | Switches BLD's MCP policies between ```on-demand``` and ```always-on```. |
 | `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
+| `/bld-settings-block-image-generation` | The switch for the image-generation block, which is ```on``` from install. ```off``` allows it again. |
 
 ### -special
 
@@ -200,10 +201,11 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 bld-package/
 ├── README.md
 ├── MANUAL-INSTALL.md               the install written out by hand
-├── skills/                         23 commands, one folder each
+├── skills/                         24 commands, one folder each
 │   ├── bld-setup/
 │   │   ├── SKILL.md
 │   │   ├── references/manifest.md  every tool, with source links
+│   │   ├── references/skills.md    every command, and what each one needs
 │   │   ├── scripts/preflight.py    what is installed, what is missing
 │   │   └── scripts/scenarios.py    regression tests for preflight
 │   ├── bld-sprint-*/               planning · init · refine
@@ -213,8 +215,10 @@ bld-package/
 │   ├── bld-orchestrator-*/         fable · opus
 │   ├── bld-util-*/                 deploy · handoff · documentation · customize-component · copywriting
 │   ├── bld-quiz/
-│   └── bld-professional-settings/
-│       └── scripts/switch-mode.py  renames every command between modes
+│   ├── bld-professional-settings/
+│   │   └── scripts/switch-mode.py  renames every command between modes
+│   └── bld-settings-block-image-generation/
+│       └── scripts/block-image-generation.py   the image-generation hook
 ├── agents/
 │   └── bld-executor.md             the worker the orchestrators fan out to
 └── templates/
@@ -253,7 +257,7 @@ every one is worth a look on its own terms. (This table is shown during `/bld-se
 | animation-vocabulary | Names a motion effect so you can ask for it by its real term. | [emilkowalski/skills](https://github.com/emilkowalski/skills) |
 | review-animations | Strict animation craft gate. | [emilkowalski/skills](https://github.com/emilkowalski/skills) |
 | impeccable | Design craft and audit, 23 sub-commands. | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) |
-| gstack | Garry Tan's engineering framework. BLD keeps 6 of its 54 skills. | [garrytan/gstack](https://github.com/garrytan/gstack) |
+| gstack | Garry Tan's engineering framework. BLD turns on 5 of its 54 skills and skips its installer. | [garrytan/gstack](https://github.com/garrytan/gstack) |
 | karpathy-guidelines | Anti-slop rules: ask before coding, surgical changes. | [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) |
 | find-skills | Discovers skills on skills.sh. | [vercel-labs/skills](https://github.com/vercel-labs/skills) |
 | copywriting | Headlines, CTAs, value props, landing page copy. | [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) |
@@ -263,6 +267,7 @@ every one is worth a look on its own terms. (This table is shown during `/bld-se
 | terms-of-service | Drafts and reviews SaaS terms. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
 | privacy-policy | Drafts and reviews privacy policies. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
 | ECC checklists | Parts of the security checklists behind `/bld-optimize-security`. Vendored into the skill rather than installed separately, under MIT, with the source commit pinned in `references/ecc/SOURCES.md`. | [affaan-m/ECC](https://github.com/affaan-m/ECC) |
+| agent-skills | The practices behind the "Test-first" rules in `templates/CLAUDE.global.md` and the docs-first section of `/bld-sprint-init`. Adapted into those files, not installed. | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) |
 
 ### -CLI tools
 

@@ -1,6 +1,6 @@
 ---
 name: bld-runtime-agents
-description: Run a task as BOSS over an external coding agent — interview to scope, plan it into small specced pieces, hand each piece to the Codex CLI (Gemini as fallback), review the result against the spec, re-run until it passes. Use when the user says /bld-runtime-agents, "delegate this", "boss mode", "have Codex build X", or hands over work that is bulky/repetitive/long-generation. Claude plans and reviews only; the executor writes the code.
+description: Boss mode over an external coding agent. Spec small pieces, have Codex (Gemini fallback) build them, review each against the spec. Use for "delegate this", "have Codex build X", or bulky repetitive work.
 ---
 
 # bld-runtime-agents — Claude is the boss, Codex is the executor

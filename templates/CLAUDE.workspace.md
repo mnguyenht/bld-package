@@ -68,8 +68,9 @@ file holds only what's specific to this workspace.
 | Long sprint ahead, or "how many tokens left?" | `/bld-runtime-tokens` — one-shot check → one line + what to do |
 | Long session, context rotting | `/bld-util-handoff` → `/clear` → "read handoff.md and continue" |
 | Session starts and `handoff.md` exists | offer to resume from it |
+| Image generation: it is blocked, and you want it allowed (or want to check) | `/bld-settings-block-image-generation` — the only switch. On by default from install; `off` unregisters the hook, `status` reports it. Restart after either |
 | Want the MCP servers connected all session instead of per-query | `/bld-mcp-settings on <server>` — writes them into `.mcp.json`. `off` removes them. Enable `context-mode` only on its own, never in a bundle |
-| I keep forgetting which category a command is under | `/bld-professional-settings on` — pro mode moves the type segment to the END of all 23 names, so the distinctive word comes first and the first few letters reach the command. `off` puts the type back in front. Same length either way; this is about recall, not keystrokes |
+| I keep forgetting which category a command is under | `/bld-professional-settings on` — pro mode moves the type segment to the END of the renameable names, so the distinctive word comes first and the first few letters reach the command. `off` puts the type back in front. Same length either way; this is about recall, not keystrokes |
 | Change done & user explicitly says ship it | `/bld-util-deploy` (established app = just commit + push) — NOT after every edit |
 | App about to **charge users** | install a Stripe skill |
 | App needs **accounts/DB/backend** | install a Supabase skill |
@@ -81,24 +82,23 @@ is listed in `skills/bld-setup/references/manifest.md`, with GitHub links.
 
 Two that carry non-obvious operating rules worth repeating here:
 
-**gstack** — installed solo: **no hooks in `settings.json`**, telemetry off, no team
-mode. **Pruned to 6 skills** (`spec`, `investigate`, `cso`, `review`, `careful`,
-`upgrade`) from 54.
-- ⚠️ **`setup` un-prunes.** On Windows the wrappers are file copies, not symlinks, so
-  `setup` must be re-run after every `git pull` / `/gstack-upgrade` — and it
-  regenerates all 54. Immediately follow it with the prune script (idempotent). The
-  prune only deletes generated wrappers in `~/.claude/skills/`; the repo and its
-  binaries are never touched, so it's fully reversible.
+**gstack** — **5 skills of 54** (`spec`, `investigate`, `cso`, `review`, `careful`),
+copied out of the clone by `/bld-setup`. **Its own `setup` never runs**, so there are
+no hooks in `settings.json`, no 700 MB browser download and no team mode. Telemetry
+is off until a gstack skill asks you.
+- ⚠️ **Never run `~/.claude/skills/gstack/setup` or `/gstack-upgrade`.** Both install
+  the whole suite, which is what BLD is avoiding. `/bld-setup` switched gstack's
+  update check off so it stops offering. To update gstack, re-run `/bld-setup`.
 - 🌐 gstack's README asks you to ban Claude's built-in browser tools in favour of its
   own browser skill. **We did not do that** — `mcp__Claude_Browser__*` stays default.
-- 📉 Context cost after prune: ~160 tokens, down from ~1.5k. Note the *invoke* cost is
+- 📉 Context cost of the 5: ~160 tokens, against ~1.5k for all 54. Note the *invoke* cost is
   what's really heavy: `gstack-spec`'s body is ~32k tokens, so reach for it
   deliberately, not reflexively.
 
 **ui-ux-pro-max** — the design **engine**. `--design-system` generates palette/type/
 style/UX rules; persist once per app to `design-system/MASTER.md`, then reference it
 (don't re-run per screen). Sub-skills: `ui-styling` (shadcn build), `design-system`
-(tokens), `slides`, `brand`. (`design` / `banner-design` = **blocked**, image gen.)
+(tokens), `slides`, `brand`. Its `design` and `banner-design` sub-skills call image models.
 
 ## MCP servers — ON-DEMAND ONLY
 
@@ -125,10 +125,6 @@ write, and editing around it loses that protection.
   prop nobody mentioned), or deleting a rule that a change happened to orphan.
   Adjacent ≠ in scope. If the ask truly can't work without a second change, **say so
   first and wait**. Spot something else wrong? Report it, don't fix it.
-- 🚫 **No AI image generation.** Never invoke `design` / `banner-design` from
-  ui-ux-pro-max. Find existing assets instead. This is a convention, not an
-  enforced one: nothing blocks those sub-skills, so it holds only as long as it
-  is followed.
 - 🔒 **MCP defaults to on-demand.** Always-on is a deliberate choice made through
   `/bld-mcp-settings`, never by hand-editing `.mcp.json`. **`context-mode` gets
   enabled on its own or not at all** — its `ctx_execute` runs shell commands with

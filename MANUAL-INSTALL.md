@@ -78,6 +78,11 @@ Steps 1 and 2 are the minimum that gives you a working BLD.
 
 ## 1. BLD itself
 
+**You do not have to take all 23 commands.** `skills/bld-setup/references/skills.md`
+lists every one with what it does and what it needs; copy only the folders you
+want, plus `bld-setup` and the agent. Every installed skill's description is
+loaded into Claude Code at startup, so a shorter list is a real saving.
+
 From inside the cloned `bld-package` directory:
 
 ```bash
@@ -155,34 +160,7 @@ Lighthouse is deliberately not installed — `/bld-optimize-app` runs it through
 
 ---
 
-## 5. Deploy (optional)
-
-Needed only for `/bld-util-deploy`, which puts an app in a private GitHub repo
-and on a live URL.
-
-```bash
-npm install -g vercel
-brew install gh          # Debian/Ubuntu: see the note below
-```
-
-**`apt install gh` fails on a lot of Debian and Ubuntu machines.** `gh` only
-reached Ubuntu's repos in 23.04 and is not in Debian's at all, so on 22.04 LTS it
-answers `Unable to locate package gh`. Get it from
-[cli.github.com](https://cli.github.com) rather than adding GitHub's apt
-repository mid-install.
-
-Then sign in. Both open a browser, and both are things only you can do:
-
-```bash
-gh auth login
-vercel login
-```
-
-An installed CLI is not a signed-in CLI, and `--version` passes on both.
-
----
-
-## 6. The optional extras
+## 5. The optional extras
 
 **Code search.** Only one of the three servers installs anything; the other two
 launch on demand through `npx`.
@@ -213,47 +191,24 @@ sudo apt install pipx           # or see astral.sh/uv
 uv tool install claude-monitor     # or: pipx install claude-monitor
 ```
 
-**gstack.** Its installer is a bun script, so bun has to exist first.
+**gstack.** Five of its 54 skills, and **not** its own `setup`: that installer
+pulls in the whole suite, about 700 MB of Playwright Chromium, and a `Stop` hook
+in your `settings.json`. The five ship pre-built in the repo, so copying them is
+the whole install. The clone has to stay at `~/.claude/skills/gstack`, because
+those skills call helper scripts inside it.
 
 ```bash
-npm install -g bun
-git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
-bash ~/.claude/skills/gstack/setup
-```
-
-**Under WSL, check that bun is the Linux one before you run `setup`.** The
-Windows npm shim sits on the inherited PATH, answers `command -v bun` and
-`bun --version`, and then cannot read a single Linux path. `setup` dies with
-`Module not found` and nothing in the error mentions bun. One line settles it:
-
-```bash
-: > /tmp/p.js && bun /tmp/p.js && echo "bun is usable here"; rm -f /tmp/p.js
-```
-
-`setup` generates all 54 wrappers under bare names like `spec` and `review`. BLD
-keeps six. Prune the rest, or every session pays for them:
-
-```bash
-cat > ~/.claude/skills/gstack-prune.sh <<'SH'
-#!/usr/bin/env bash
-keep=" gstack _gstack-command spec investigate cso review careful gstack-upgrade "
-n=0
-for d in ~/.claude/skills/*/; do
-  s=$(basename "$d")
-  case "$s" in bld-*) continue ;; esac
-  case "$keep" in *" $s "*) continue ;; esac
-  grep -q 'skills/gstack' "$d/SKILL.md" 2>/dev/null || continue
-  rm -rf "$d" && echo "pruned $s" && n=$((n+1))
+git clone --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+for s in spec investigate cso review careful; do
+  rm -rf ~/.claude/skills/gstack-$s
+  cp -r ~/.claude/skills/gstack/$s ~/.claude/skills/gstack-$s
 done
-echo "pruned $n gstack wrappers"
-SH
-bash ~/.claude/skills/gstack-prune.sh
+~/.claude/skills/gstack/bin/gstack-config set update_check false
 ```
 
-`pruned 0` right after a successful `setup` means the matcher went stale. `pruned
-0` after a **failed** setup is correct — check for `bun is required` further up
-before chasing it. Re-run the prune after every `gstack-upgrade`, because `setup`
-puts all 54 back.
+The last line switches off gstack's upgrade prompt, which would run `setup`.
+To update gstack later, `git -C ~/.claude/skills/gstack pull --ff-only` and run
+the loop again. Telemetry is off until a gstack skill asks you and you say yes.
 
 **impeccable.** Skill files only.
 
@@ -275,6 +230,44 @@ settings. Never run `/impeccable live`, which forwards your API key to a
 third-party backend. Every other impeccable command is fine.
 
 ---
+
+## 6. Deploy and coding agents (optional)
+
+Needed only for `/bld-util-deploy`, which puts an app in a private GitHub repo
+and on a live URL.
+
+```bash
+npm install -g vercel
+brew install gh          # Debian/Ubuntu: see the note below
+```
+
+**`apt install gh` fails on a lot of Debian and Ubuntu machines.** `gh` only
+reached Ubuntu's repos in 23.04 and is not in Debian's at all, so on 22.04 LTS it
+answers `Unable to locate package gh`. Get it from
+[cli.github.com](https://cli.github.com) rather than adding GitHub's apt
+repository mid-install.
+
+Then sign in. Both open a browser, and both are things only you can do:
+
+```bash
+gh auth login
+vercel login
+```
+
+An installed CLI is not a signed-in CLI, and `--version` passes on both.
+
+---
+
+**Coding agents.** `/bld-runtime-agents` hands bulky work to Codex or Gemini
+instead of your Claude usage. Free tiers, low caps, and you sign in yourself.
+
+```bash
+npm install -g @openai/codex        # then: codex login
+npm install -g @google/gemini-cli   # then: gemini, and follow the prompt
+```
+
+Codex refuses to run outside a git repo, so prove it from inside one:
+`codex exec "reply with one word: ready"`.
 
 ## 7. The rule files (optional)
 

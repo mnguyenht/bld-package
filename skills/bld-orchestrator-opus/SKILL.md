@@ -1,6 +1,6 @@
 ---
 name: bld-orchestrator-opus
-description: The bld-orchestrator-fable plan → execute → judge loop with Opus in the boss seat. Use when the user says /bld-orchestrator-opus, or wants the orchestrator loop run on Opus rather than Fable. Claude never writes the code.
+description: The /bld-orchestrator-fable loop with Opus as the boss. Use when the user wants the orchestrator run on Opus.
 model: opus
 ---
 

@@ -25,6 +25,11 @@ EXEMPT = "bld-professional-settings"
 
 problems = []
 
+# Skill-listing budget (check 8). ~6,000 chars is ~1,500 tokens: under the
+# 8,000-char fallback with room left for the user's own skills.
+DESC_MAX = 250
+LISTING_MAX = 6000
+
 # Phase 8 spells its counts as words, so the check has to read both forms.
 _WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six",
           7: "seven", 8: "eight", 9: "nine", 10: "ten", 11: "eleven",
@@ -87,12 +92,19 @@ def main():
     for t in sorted(types):
         if not re.search(r"^\|\s*\*\*%s\*\*\s*\|" % re.escape(t), type_doc, re.M):
             fail("type %r is in SKILLS but has no row in %s/SKILL.md's type table" % (t, EXEMPT))
-        if not re.search(r"^### %s\s*$" % re.escape(t), readme, re.M):
+        # The README is allowed to decorate its headings (`### -sprint`); the
+        # type name is what has to be there. Requiring a bare heading made a
+        # styling pass read as seven missing sections.
+        if not re.search(r"^###\s*[-–—]?\s*%s\s*$" % re.escape(t), readme, re.M):
             fail("type %r is in SKILLS but has no '### %s' section in README.md" % (t, t))
 
-    # 4. every skill is named in all four required places (CLAUDE.md's rule).
+    # 4. every skill is named in all required places (CLAUDE.md's rule).
+    #    skills.md joined the list when Phase 2 started asking which commands to
+    #    install: a skill missing from that table cannot be chosen, and nothing
+    #    else would have reported it.
     places = {"README.md": readme,
               "templates/CLAUDE.workspace.md": read("templates", "CLAUDE.workspace.md"),
+              "bld-setup/references/skills.md": read("skills", "bld-setup", "references", "skills.md"),
               "switch-mode.py": read("skills", EXEMPT, "scripts", "switch-mode.py")}
     for d in folders:
         for where, text in places.items():
@@ -198,6 +210,27 @@ def main():
                 fail("bld-setup Phase 8 never states the %s <FILL IN> count (%d). "
                      "Templates hold %d global + %d workspace = %d."
                      % (label, want, g, w, g + w))
+
+    # 8. the skill-listing budget. Claude Code puts every skill's description in
+    #    one listing capped at 1% of the context window (8,000-char fallback), and
+    #    BLD shares it with whatever else the user runs. On overflow it shortens
+    #    the least-used descriptions, stripping the words that make them trigger.
+    #    BLD's alone came to ~10,400 chars before this check (2026-09-17), past
+    #    the whole budget of a 200k-context model before any other skill loaded.
+    #    A plain YAML scalar also must not hold ": ", or the frontmatter is
+    #    invalid YAML; Claude Code tolerates it today, other parsers do not.
+    total = 0
+    for d in folders:
+        m = re.search(r"^description:\s*(.*)$", read("skills", d, "SKILL.md"), re.M)
+        desc = m.group(1).strip() if m else ""
+        total += len(d) + len(desc)
+        if len(desc) > DESC_MAX:
+            fail("%s: description is %d chars, cap is %d" % (d, len(desc), DESC_MAX))
+        if ": " in desc and desc[:1] not in "\"'":
+            fail("%s: description contains ': ', invalid in a plain YAML scalar" % d)
+    if total > LISTING_MAX:
+        fail("skill listing is %d chars of names + descriptions, cap is %d"
+             % (total, LISTING_MAX))
 
     print("%d skills, %d types, %d problems" % (len(folders), len(types), len(problems)))
     for p in problems:

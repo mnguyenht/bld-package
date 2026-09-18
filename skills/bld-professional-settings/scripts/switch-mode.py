@@ -65,6 +65,7 @@ SKILLS = {
     # depending on the setting is a trap. Both are identical in both modes.
     "professional-settings": ("settings",   "bld-professional-settings",      "bld-professional-settings"),
     "mcp-settings":          ("settings",   "bld-mcp-settings",               "bld-mcp-settings"),
+    "block-image-generation": ("settings",  "bld-settings-block-image-generation", "bld-settings-block-image-generation"),
 }
 
 # Names that existed before the current scheme, so an older install still

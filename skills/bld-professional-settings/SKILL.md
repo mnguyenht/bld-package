@@ -1,6 +1,6 @@
 ---
 name: bld-professional-settings
-description: Switch BLD's command naming between friendly mode (bld-<type>-<skill>, e.g. /bld-sprint-init) and pro mode (bld-<skill>-<type>, e.g. /bld-init-sprint). Use when the user says /bld-professional-settings, "pro mode", "activate pro mode", "shorter commands", "turn off pro mode", "go back to the long names", or asks which naming mode they are in. Renames the skill folders, the frontmatter, and every cross-reference, then tells the user to restart.
+description: Switch BLD command names between friendly and pro mode (which word comes first). Use for "pro mode", "shorter commands", "go back to the long names", or which naming mode is on.
 ---
 
 # bld-professional-settings — two orders for the same name
@@ -13,7 +13,7 @@ behaviour, different thing to type.
 | **friendly** (default) | `bld-<type>-<skill>` | `/bld-sprint-init` | Learning the set. Typing `/bld-` groups everything by type, so the list teaches you the taxonomy. |
 | **pro** | `bld-<skill>-<type>` | `/bld-init-sprint` | Knowing the set. You already know the category, so leading with it buries the word you are reaching for. |
 
-Neither is better. Friendly is the default because a first-timer facing 23
+Neither is better. Friendly is the default because a first-timer facing 24
 unfamiliar commands benefits from the grouping, and a pro can switch in one
 command.
 
@@ -111,7 +111,7 @@ the source of truth for the whole taxonomy, not just this skill.
 | **runtime** | Applies to how the session runs, not to what gets built |
 | **orchestrator** | Claude bosses other agents rather than writing code |
 | **util** | Everything in between: not building, not optimizing |
-| **settings** | A package setting you toggle on and off. **Identical in both modes** — `bld-professional-settings`, `bld-mcp-settings` |
+| **settings** | A package setting you toggle on and off. **Identical in both modes** — `bld-professional-settings`, `bld-mcp-settings`, `bld-settings-block-image-generation` |
 | *(special)* | Acts on BLD itself. **Identical in both modes** — `bld-setup`, `bld-quiz` |
 
 Specials keep one name on purpose. They are the commands you reach for when you

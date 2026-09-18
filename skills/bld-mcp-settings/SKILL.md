@@ -1,6 +1,6 @@
 ---
 name: bld-mcp-settings
-description: Toggle BLD's MCP servers between on-demand and always-on. On writes them into .mcp.json so Claude Code starts them at launch; off removes them again and they stay available through /bld-runtime-activate-mcps. Use when the user says /bld-mcp-settings, "keep my MCPs running", "always-on MCP", "turn the MCP servers on", "stop spawning MCPs every time", or asks why an MCP server is not connected. Never removes an MCP entry BLD did not write.
+description: Switch BLD's MCP servers between on-demand and always-on by editing .mcp.json. Use for "keep my MCPs running", "always-on MCP", "stop spawning MCPs every time", or when an MCP server is not connected.
 ---
 
 # bld-mcp-settings — on-demand or always-on

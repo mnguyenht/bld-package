@@ -1,6 +1,6 @@
 ---
 name: bld-runtime-activate-mcps
-description: Run the third-party code-optimizer MCP servers (jcodemunch, context-mode, shadcn) on-demand for a single burst of code search, then shut them down — no persistent connection. Use when the user says /bld-runtime-activate-mcps, "hard optimize", "token-optimize this search", or is about to do a big code sprint across many files and wants compact, cheap code exploration.
+description: Spawn an MCP server (jcodemunch, context-mode, shadcn) for one burst of code search or registry lookup, then shut it down. Use for "hard optimize", "token-optimize this search", or a big multi-file sprint.
 ---
 
 # bld-runtime-activate-mcps — burst-use the optimizer MCPs, then dip

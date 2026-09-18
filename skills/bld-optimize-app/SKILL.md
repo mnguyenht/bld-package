@@ -1,6 +1,6 @@
 ---
 name: bld-optimize-app
-description: Audit a whole web app with Google Lighthouse — performance, accessibility, best practices, SEO — then triage the findings and fix the ones that are real. Use when the user says /bld-optimize-app, "run Lighthouse", "check my PageSpeed", "why is my site slow", "audit the live site", "get my scores up", or before shipping something that strangers will load on mobile. Measures the shipped app end to end; /bld-optimize-react reads the source instead.
+description: Run Lighthouse on the live app (performance, accessibility, SEO), triage, fix what's real. Use for "run Lighthouse", "check my PageSpeed", "why is my site slow", "audit the live site", or before a public launch. Source code is /bld-optimize-react.
 ---
 
 # bld-optimize-app — measure the shipped app, then fix what the numbers point at

@@ -1,6 +1,6 @@
 ---
 name: bld-util-deploy
-description: Deploy an app in this workspace to a private GitHub repo + Vercel with auto-deploy on push. Use when the user says /bld-util-deploy, "deploy this", "put this online", or "get me a share link".
+description: Deploy an app to a private GitHub repo + Vercel with auto-deploy on push. Use for "deploy this", "put this online", "get me a share link".
 ---
 
 # Deploy an app (GitHub → Vercel)

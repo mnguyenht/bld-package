@@ -73,9 +73,6 @@ Before running **any approval-required command**, explain in plain language:
   anything that executes code gets named as such and asked about.
 - **MCP servers: on-demand over persistent.** Prefer spawn → query → kill (stdio)
   over `.mcp.json` entries. Never route the whole codebase through unofficial tools.
-- 🚫 **No AI image/model generation, anywhere.** Find existing assets instead.
-  ui-ux-pro-max's `design` and `banner-design` sub-skills use image gen — never invoke
-  them. Nothing enforces this, so it holds only as long as it is followed.
 - 🚩 **Never run `/impeccable live`** — it forwards `ANTHROPIC_API_KEY` /
   `CLAUDE_CODE_OAUTH_TOKEN` to a third-party backend. Other impeccable commands are
   fine. Never `npx impeccable install/update` (wires hooks); keep it skill-only.
@@ -178,6 +175,52 @@ The default cycle for any app work. Do not shortcut it.
 
 "Bias to shipping" above is about **scope and ambition** — small, working, iterate.
 It is not permission to push unprompted. These two do not conflict.
+
+## Test-first — the habit behind every behavior change
+
+Practices adapted from the `test-driven-development` skill in
+[addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (MIT). Not
+installed; the lessons live here.
+
+**Why:** "I checked it in the browser" does not last. A test does: it re-checks
+the behavior every time the code changes, and it tells the next session what the
+code is *supposed* to do. The browser check catches what looks wrong; tests catch
+logic that is quietly wrong.
+
+- **Red → green → refactor.** For any change to *logic* (calculations,
+  validation, data transforms, state rules, API handlers): write a test that
+  fails first, then the smallest code that makes it pass, then tidy up with the
+  tests still green.
+- **Watch it fail.** A new test that passes on its first run proves nothing: it
+  may not be testing what you think. Confirm it can go red.
+- **Bugs: prove it first.** Before touching a fix, write a test that reproduces
+  the bug and fails. Fix, see it pass, run the full suite. The bug can't come
+  back silently.
+- **What gets a test:** logic and behavior. **What doesn't:** pure styling, copy,
+  config, static content; the browser check covers those. Most tests should be
+  small and fast (pure functions, milliseconds); keep full end-to-end browser
+  tests (Playwright) for the few flows that must never break (signup, checkout).
+- **Use the app's own test command.** Read `package.json` scripts first; never
+  assume `npm test` exists. **No test runner yet?** Adding one (Vitest for Vite
+  apps) is a new dependency: say so and ask before installing it.
+- **A test for the behavior you're changing is part of the change**, not an
+  unrequested extra. Adding tests to untouched code *is* an extra; ask first.
+- **Test outcomes, not internals.** Assert what the function returns or what the
+  user sees, not which methods got called. Tests of internals break on every
+  refactor even when nothing is wrong.
+- **Real code over mocks.** Prefer real implementation → in-memory fake → canned
+  stub → mock. Mock only what is slow, random, or has real side effects
+  (payments, email, third-party APIs). Over-mocked tests pass while production
+  breaks.
+- **Each test reads on its own.** Descriptive name that states the behavior
+  (`rejects an empty title`, not `works`), arrange → act → assert, one behavior
+  per test. Repeating setup in tests is fine if it keeps each test readable.
+- **Honest green.** Never skip, disable, or loosen a test to get the suite
+  passing. "All tests pass" means you saw them run. Don't re-run an unchanged
+  suite for reassurance; re-run after the code changes.
+- **New to testing?** If the profile above says so, the first time an app gets
+  tests, explain the red/green loop in a line or two and show the failing run
+  before the passing one.
 
 ## Spawning Claude subagents — hard cap of 2–3, and only if necessary
 

@@ -1,6 +1,6 @@
 ---
 name: bld-sprint-planning
-description: Decide what to build before anything gets built — interview the idea, pressure-test the assumption it rests on, cut it to a shippable v1, and write the durable planning artifacts (PRODUCT.md, planning.md, progress.md). Use when the user says /bld-sprint-planning, "help me plan this", "I have an idea", "what should I build", "plan the next feature", or arrives with a vague idea and no shape. Ends by handing off to /bld-sprint-init. Does not write app code.
+description: Decide what to build before building. Interview the idea, test its core assumption, cut to a shippable v1, write the planning files. Use for "I have an idea", "help me plan this", "plan the next feature", "what should I build". No app code.
 ---
 
 # bld-sprint-planning — what should exist, and what gets cut

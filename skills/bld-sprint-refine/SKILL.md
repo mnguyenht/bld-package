@@ -1,6 +1,6 @@
 ---
 name: bld-sprint-refine
-description: Refinement sprint — take a working app base and bring it to life with craft, polish, and (optionally) 3D/premade assets. Orchestrates the ui-ux-pro-max steps that /bld-sprint-init skipped, plus emil-design-eng, impeccable, and review-animations, then asks about Spline 3D and 21st.dev. Use when the user says /bld-sprint-refine, "polish this app", "make it feel great", "bring it to life", after a base exists. Runs per-screen once a screen is basically done.
+description: Polish a working app base screen by screen. Design craft, motion, optional 3D and premade components. Use for "polish this app", "make it feel great", "bring it to life", once a screen is basically done.
 ---
 
 # bld-sprint-refine — working base → feels alive
@@ -82,8 +82,6 @@ than moving on silently.
 ## Guardrails
 
 - Per-screen, post-done. Never run strict critique/animation review on a half-built app.
-- Never image-generation skills (`design`, `banner-design`). BLD finds existing
-  assets rather than generating them.
 - Never `impeccable live`. MCP tools default to on-demand via
   `/bld-runtime-activate-mcps`; always-on is opt-in through `/bld-mcp-settings`.
 - Enrichment (Spline/21st) only if it makes the app better; empty-handed is fine.

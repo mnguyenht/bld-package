@@ -144,6 +144,12 @@ def build(spec, root):
         io.open(sp, "w").write('["core-skills"]')
     elif isinstance(st, dict):
         st = dict(st)
+        # "KEEP" means: record exactly the skills this fake machine has.
+        # "KEEP+1" adds one it does not have, which is a real missing skill.
+        if st.get("skills") == "KEEP":
+            st["skills"] = list(keep)
+        elif st.get("skills") == "KEEP+1":
+            st["skills"] = list(keep) + [names[-1]]
         if st.pop("_scoped", False):
             st["scope"], st["project"] = "project", proj
         io.open(sp, "w").write(json.dumps(st, indent=1))
@@ -282,6 +288,12 @@ CASES = [
  ({"id": "C21", "desc": "skills copied but the agents/ copy failed",
    "global_bld": 1, "no_agent": 1}, ["bld-executor agent  MISSING"], 0),
 
+ # C21's warning is for a BLD install that lost its agent. On a first run
+ # nothing is installed yet, and claiming the orchestrators are broken there
+ # reads as a fault before setup has done anything.
+ ({"id": "C51", "desc": "first run: missing agent is not called a fault",
+   }, ["bld-executor agent", "!the orchestrator skills cannot run without it"], 0),
+
  ({"id": "C22", "desc": "naming switch stopped partway",
    "global_bld": 1, "mixed_names": 1},
   ["use the other naming mode", "Do NOT re-copy BLD"], 0),
@@ -318,12 +330,14 @@ CASES = [
              "done": ["bld", "claude-md-workspace"], "completed": False}},
   ["!NOT REAL GROUP NAMES", "!RECHECK"], 0),
 
- ({"id": "C27", "desc": "bun missing is named, with a source",
-   "global_bld": 1}, ["bun                 needed for gstack only -> npm i -g bun"], 0),
+ # gstack now installs without its own bun-driven `setup`, so bun is no longer
+ # a prerequisite of anything and must not be asked for, present or absent.
+ ({"id": "C27", "desc": "bun missing is not asked for",
+   "global_bld": 1}, ["![--]  bun", "!needed for gstack only"], 0),
 
- ({"id": "C28", "desc": "bun present is not nagged about",
+ ({"id": "C28", "desc": "bun present is not listed either",
    "global_bld": 1, "bin": ["node", "npm", "git", "bun"]},
-  ["!needed for gstack only"], 0),
+  ["![ok]  bun"], 0),
 
  ({"id": "C29", "desc": "a bld-* folder the package no longer ships",
    "global_bld": 1, "stray_skills": ["bld-dropped-thing"]},
@@ -360,14 +374,14 @@ CASES = [
    "state": {"chose": ["deploy", "core-skills", "bld", "plugins"], "declined": [],
              "done": ["prereqs", "core-skills", "plugins"], "completed": False}},
   ["Still to do : deploy (gh + vercel), bld",
-   "deploy is the exception: its step is Phase 2",
+   "deploy and the coding agents are the exception: their step is Phase 7",
    "!Skip Phases 1-3"], 0),
 
  ({"id": "C45", "desc": "resume without deploy says to skip phase 2 too",
    "global_bld": 1,
    "state": {"chose": ["bld", "react-tools"], "declined": ["deploy"],
              "done": ["prereqs", "bld"], "completed": False}},
-  ["Skip Phase 2 as well", "!deploy is the exception"], 0),
+  ["Skip Phase 7 as well", "!their step is Phase 7"], 0),
 
  ({"id": "C46", "desc": "returning: never-answered split from actually-gone",
    "global_bld": 1, "core": 11, "plugins": "ok",
@@ -402,6 +416,21 @@ CASES = [
   ["(the package folder, not a workspace)",
    "Not here    : ", "claude-md-workspace",
    "!On disk now : bld, claude-md-workspace"], 0),
+
+ # Phase 2 lets someone take a subset of the commands. Without `skills` in the
+ # state file, preflight compared the disk to all 23 and reported the ones they
+ # deliberately never wanted as MISSING - a healthy install reading as broken.
+ ({"id": "C52", "desc": "a recorded subset is not reported as missing",
+   "global_bld": 1, "drop": 9,
+   "state": {"chose": ["bld"], "declined": [], "done": ["bld"],
+             "completed": False, "skills": "KEEP"}},
+  ["!MISSING:"], 0),
+
+ ({"id": "C53", "desc": "a skill they did choose, and is absent, still reports",
+   "global_bld": 1, "drop": 9,
+   "state": {"chose": ["bld"], "declined": [], "done": ["bld"],
+             "completed": False, "skills": "KEEP+1"}},
+  ["MISSING:"], 0),
 
  ({"id": "C42", "desc": "package path is remembered for the next session",
    "global_bld": 1, "state": dict(DONE, package=PKG)},

@@ -188,8 +188,15 @@ def disk_summary(evidence):
     print("  Not here    : " + (named(off) if off else "nothing"))
 
 
-def expected_bld_names():
+def expected_bld_names(only=None):
     """{"friendly": {folder names...}, "pro": {...}}, or {} if unknown.
+
+    `only` is the `skills` list from the state file: the commands they actually
+    chose in Phase 2. Phase 2 can install a subset, so without it a deliberate
+    14-command install is compared against all 23 and the nine they never wanted
+    are reported as MISSING - a healthy install reading as a broken one. Names
+    are matched in either naming mode, because the state file was written before
+    the machine may have been switched.
 
     The canonical table lives in the professional-settings skill. That skill is
     a sibling of this one in BOTH layouts (the package, and ~/.claude/skills
@@ -209,8 +216,12 @@ def expected_bld_names():
         spec = importlib.util.spec_from_file_location("bld_switch_mode", table)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        return {"friendly": set(f for _, f, _ in mod.SKILLS.values()),
-                "pro": set(p for _, _, p in mod.SKILLS.values())}
+        pairs = [(f, p) for _, f, p in mod.SKILLS.values()]
+        if only:
+            want = set(only)
+            pairs = [(f, p) for f, p in pairs if f in want or p in want]
+        return {"friendly": set(f for f, _ in pairs),
+                "pro": set(p for _, p in pairs)}
     except Exception:
         return {}
 
@@ -337,14 +348,10 @@ def main():
         "needed for /bld-runtime-tokens, and for code search where pip is absent"
         " -> astral.sh/uv, or apt install pipx")
 
-    # gstack's own `setup` is a bun script and refuses to run without it. Nothing
-    # else in BLD needs bun, so it is optional - but a missing bun is worth
-    # naming HERE, because the failure downstream is misleading: setup exits 1,
-    # the prune that follows finds no wrappers to remove, and prints
-    # "pruned 0 gstack wrappers" - which the skill reads as a stale matcher
-    # rather than a runtime that was never installed.
-    has_bun = bool(have("bun"))
-    row("bun", has_bun, "" if has_bun else "needed for gstack only -> npm i -g bun")
+    # No bun row. It was here only for gstack's own `setup`, a bun script, and
+    # BLD no longer runs that: Phase 4 copies the five gstack skills it uses
+    # straight out of the clone. Listing bun would send people to install a
+    # runtime that nothing in BLD calls.
 
     # ── 2. deploy accounts ──────────────────────────────────────────────
     print("\nDEPLOY TOOLING")
@@ -368,7 +375,7 @@ def main():
         gh_authed, line = run([gh_path, "auth", "status"])
         auth = "signed in" if gh_authed else "NOT SIGNED IN -> gh auth login"
         if not gh_on_path:
-            # Both facts matter and they are independent: Phase 2 needs to know
+            # Both facts matter and they are independent: Phase 7 needs to know
             # whether they are authenticated, and every later step calls a bare
             # `gh` that will not resolve until the shell is restarted.
             row("gh", True, auth + ", but NOT on PATH -> restart the shell")
@@ -432,7 +439,7 @@ def main():
     # Which bld-* skills SHOULD be there, by NAME, in whichever naming mode this
     # machine is in. Comparing sets rather than counts is the point: a count let
     # any unrelated bld-* folder cover for a skill that never copied.
-    expected = expected_bld_names()
+    expected = expected_bld_names(slist(state, "skills"))
     bld_strays = []
     bld_unknown = []
     bld_missing = []
@@ -535,8 +542,13 @@ def main():
     # Both orchestrator skills fan out to the bld-executor subagent, so a BLD
     # install whose agents/ copy silently failed leaves them broken with nothing
     # reporting why. Cheap to check, and it is the only file that group installs.
-    row("bld-executor agent", agent_have,
-        "" if agent_have else "MISSING - the orchestrator skills cannot run without it")
+    # The warning only means something once BLD's skills are there: on a first
+    # run nothing is installed yet, and "cannot run" read as a fault before
+    # setup had touched the machine.
+    agent_note = ""
+    if not agent_have and bld_have:
+        agent_note = "MISSING - the orchestrator skills cannot run without it"
+    row("bld-executor agent", agent_have, agent_note)
 
     # Phase 8 offers these two rather than installing them, so they are groups
     # like any other: recorded in done/declined, and re-offered by Phase 6 only
@@ -634,7 +646,7 @@ def main():
             print("     ask rather than assume, then write the state file.")
         else:
             print("  FIRST RUN. No prior setup recorded.")
-            print("  -> Run the full flow from Phase 1.")
+            print("  -> Run the full flow from Phase 2 onward.")
     elif not state.get("completed"):
         done = slist(state, "done")
         print("  RESUMING an unfinished setup.")
@@ -681,15 +693,16 @@ def main():
             print("                marked done, but not found on disk. The state")
             print("                file is wrong. Re-install these, do not skip them.")
         # This instruction exists twice - here and in SKILL.md's verdict table -
-        # and this is the copy the session actually reads. They said "Skip Phases
-        # 1-3" while deploy's only install step IS Phase 2, so the resume was
-        # told to skip the phase it was being sent to. Keep both wordings in step.
-        print("  -> Skip Phases 1 and 3. Pick up at the first item in 'Still to do'.")
-        if "deploy" in remaining:
-            print("     deploy is the exception: its step is Phase 2, not Phase 4,")
-            print("     so go there for it. They already said yes - do not re-ask.")
+        # and this is the copy the session actually reads. An earlier version said
+        # "Skip Phases 1-3" while deploy's only install step was inside one of
+        # them, so the resume was told to skip the phase it was being sent to.
+        # Keep both wordings in step.
+        print("  -> Skip Phases 0, 2 and 3. Pick up at the first item in 'Still to do'.")
+        if "deploy" in remaining or "agents" in remaining:
+            print("     deploy and the coding agents are the exception: their step is Phase 7,")
+            print("     not Phase 4, so go there for them. They already said yes - do not re-ask.")
         else:
-            print("     Skip Phase 2 as well: deploy is not in the list above.")
+            print("     Skip Phase 7 as well: neither deploy nor agents is in the list above.")
     else:
         declined = slist(state, "declined")
         print("  RETURNING USER. Setup was completed on " + str(state.get("completed_on", "?")) + ".")
@@ -716,7 +729,7 @@ def main():
             print("                these, then record the answer either way.")
         print("  -> Do NOT re-run the full flow. Offer only what is missing or was declined.")
 
-    # Six commands across Phases 0c, 4, 8 and 9 interpolate the package path, and
+    # Six commands across Phases 1c, 4, 8 and 9 interpolate the package path, and
     # a resuming session has no other way to know it: it did not just clone
     # anything and may be running from anywhere. Surfacing it here means the
     # resume reads one report instead of opening the state file separately.

@@ -1,6 +1,6 @@
 ---
 name: bld-optimize-security
-description: The final-boss STATIC security pass for an app in this workspace. Runs a full audit across 13 layers (front-end → APIs → DB → auth → hosting → cloud → CI/CD → RLS → rate limiting → caching/CDN → scaling → logging → recovery) by combining the built-in /security-review, the gstack security skills (cso, review, careful, investigate), vendored ECC checklists (security-review, cloud-infra, production-audit, bounty-hunter, and — for AI apps — agent-architecture-audit), and an AgentShield config checklist. Use when the user says /bld-optimize-security, "secure this app", "full security audit", "harden this", or "final security pass" before shipping something serious. Static only: it reads code and config and never attacks a running target.
+description: Full static security audit of an app across 13 layers, front end to recovery. Reads code and config, never attacks. Use for "secure this app", "full security audit", "harden this", or before shipping something serious.
 ---
 
 # bld-optimize-security — the final-boss security pass

@@ -1,6 +1,6 @@
 ---
 name: bld-util-copywriting
-description: Write or rewrite the words in an app we are building — hero headline, subheadline, CTAs, feature sections, empty states, pricing, about. Runs the installed copywriting skill, then applies this workspace's constraints on top: pre-launch apps with no proof to cite, no litotes, no irony, and a hard list of phrasings that read as AI-written. Use when the user says /bld-util-copywriting, "write the copy", "fix this headline", "what should the hero say", "this text sounds like AI", or a screen is built and still holding placeholder words.
+description: Write or fix app copy (hero, CTAs, features, empty states, pricing) with no invented proof and no AI-sounding phrasing. Use for "write the copy", "fix this headline", "this sounds like AI", or placeholder text.
 ---
 
 # bld-util-copywriting
