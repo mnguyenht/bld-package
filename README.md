@@ -94,7 +94,7 @@ Every command reads **`bld` · type · skill**.
  └──────────────> the prefix
 ```
 
-Once you know the set, use `/bld-professional-settings on` to move the type to the end, requiring less typing to reach what you want.
+Once you know the set, use `/bld-settings-professional on` to move the type to the end, requiring less typing to reach what you want.
 
 Any commands with 2 parts are special commands, and won't be affected.
 
@@ -181,8 +181,8 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 
 | Command | What it does |
 |---|---|
-| `/bld-mcp-settings` | Switches BLD's MCP policies between ```on-demand``` and ```always-on```. |
-| `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
+| `/bld-settings-mcp` | Switches BLD's MCP policies between ```on-demand``` and ```always-on```. |
+| `/bld-settings-professional` | Switches the naming scheme between the two conventions. |
 | `/bld-settings-block-image-generation` | ```Enable``` or ```Disable``` image-generation blocking, Enabled by default. |
 
 ### -special
@@ -217,7 +217,7 @@ bld-package/
 │   ├── bld-orchestrator-*/         fable · opus
 │   ├── bld-util-*/                 deploy · handoff · documentation · customize-component · copywriting
 │   ├── bld-quiz/
-│   ├── bld-professional-settings/
+│   ├── bld-settings-professional/
 │   │   └── scripts/switch-mode.py  renames every command between modes
 │   └── bld-settings-block-image-generation/
 │       └── scripts/block-image-generation.py   the image-generation hook

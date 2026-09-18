@@ -210,7 +210,7 @@ def expected_bld_names(only=None):
     ~/.claude/skills itself, comparing the install to itself.
     """
     table = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
-                         "bld-professional-settings", "scripts", "switch-mode.py")
+                         "bld-settings-professional", "scripts", "switch-mode.py")
     try:
         import importlib.util
         spec = importlib.util.spec_from_file_location("bld_switch_mode", table)
@@ -506,7 +506,7 @@ def main():
               % (len(bld_strays), ", ".join(bld_strays[:3]),
                  ", ..." if len(bld_strays) > 3 else ""))
         print("        That is a naming switch that stopped partway. Finish it")
-        print("        with /bld-professional-settings. Do NOT re-copy BLD: that")
+        print("        with /bld-settings-professional. Do NOT re-copy BLD: that")
         print("        restores the missing names and leaves these, giving you")
         print("        both sets and twice the context cost.")
     row("gstack", gstack_have, "")

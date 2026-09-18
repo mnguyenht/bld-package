@@ -69,8 +69,8 @@ file holds only what's specific to this workspace.
 | Long session, context rotting | `/bld-util-handoff` → `/clear` → "read handoff.md and continue" |
 | Session starts and `handoff.md` exists | offer to resume from it |
 | Image generation: it is blocked, and you want it allowed (or want to check) | `/bld-settings-block-image-generation` — the only switch. On by default from install; `off` unregisters the hook, `status` reports it. Restart after either |
-| Want the MCP servers connected all session instead of per-query | `/bld-mcp-settings on <server>` — writes them into `.mcp.json`. `off` removes them. Enable `context-mode` only on its own, never in a bundle |
-| I keep forgetting which category a command is under | `/bld-professional-settings on` — pro mode moves the type segment to the END of the renameable names, so the distinctive word comes first and the first few letters reach the command. `off` puts the type back in front. Same length either way; this is about recall, not keystrokes |
+| Want the MCP servers connected all session instead of per-query | `/bld-settings-mcp on <server>` — writes them into `.mcp.json`. `off` removes them. Enable `context-mode` only on its own, never in a bundle |
+| I keep forgetting which category a command is under | `/bld-settings-professional on` — pro mode moves the type segment to the END of the renameable names, so the distinctive word comes first and the first few letters reach the command. `off` puts the type back in front. Same length either way; this is about recall, not keystrokes |
 | Change done & user explicitly says ship it | `/bld-util-deploy` (established app = just commit + push) — NOT after every edit |
 | App about to **charge users** | install a Stripe skill |
 | App needs **accounts/DB/backend** | install a Supabase skill |
@@ -107,7 +107,7 @@ style/UX rules; persist once per app to `design-system/MASTER.md`, then referenc
 sees the codebase. They're unofficial third-party tools and that default is
 deliberate.
 
-**Always-on is opt-in, through `/bld-mcp-settings on`.** It writes them into
+**Always-on is opt-in, through `/bld-settings-mcp on`.** It writes them into
 `.mcp.json` so they connect at startup and stay for the session. More convenient,
 and a real change in what a third-party tool observes. Never hand-edit
 `.mcp.json` to achieve this: the skill refuses to remove entries it did not
@@ -126,7 +126,7 @@ write, and editing around it loses that protection.
   Adjacent ≠ in scope. If the ask truly can't work without a second change, **say so
   first and wait**. Spot something else wrong? Report it, don't fix it.
 - 🔒 **MCP defaults to on-demand.** Always-on is a deliberate choice made through
-  `/bld-mcp-settings`, never by hand-editing `.mcp.json`. **`context-mode` gets
+  `/bld-settings-mcp`, never by hand-editing `.mcp.json`. **`context-mode` gets
   enabled on its own or not at all** — its `ctx_execute` runs shell commands with
   logged-in CLIs, so always-on hands that to the whole session.
 - ✅ **Asset lookups have a quality bar** (21st/Spline): only surface what genuinely
@@ -213,7 +213,7 @@ cheap to reverse.
 
 ## Key files & conventions
 
-- `.mcp.json` — **absent by default** (on-demand MCP). `/bld-mcp-settings` writes
+- `.mcp.json` — **absent by default** (on-demand MCP). `/bld-settings-mcp` writes
   it if you opt into always-on, and is the only thing that should.
 - `.claude/agents/` — subagent definitions. Holds `bld-executor`, the worker the two
   orchestrator skills fan out. Project-level beats `~/.claude/agents/` on a name clash.

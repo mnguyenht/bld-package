@@ -5,7 +5,7 @@
 
 Exits 0 if clean, 1 with a list if not. Reads only; changes nothing.
 
-Why this exists: `bld-professional-settings` is deliberately excluded from the
+Why this exists: `bld-settings-professional` is deliberately excluded from the
 rename pass, because that pass would flatten its side-by-side naming examples.
 The side effect is that NOTHING keeps it in sync, and it went stale twice in one
 session - a missing category in its own type table, and a command count still
@@ -21,7 +21,7 @@ import sys
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SKILLS_DIR = os.path.join(ROOT, "skills")
 # The one file allowed to contain command names from BOTH naming modes.
-EXEMPT = "bld-professional-settings"
+EXEMPT = "bld-settings-professional"
 
 problems = []
 

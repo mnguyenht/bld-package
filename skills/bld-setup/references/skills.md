@@ -67,8 +67,8 @@ installs.
 
 | Command | What it does | Needs |
 |---|---|---|
-| `/bld-mcp-settings` | Switches BLD's MCP servers between on-demand and always-on. | — |
-| `/bld-professional-settings` | Switches command naming between friendly and pro mode. | — |
+| `/bld-settings-mcp` | Switches BLD's MCP servers between on-demand and always-on. | — |
+| `/bld-settings-professional` | Switches command naming between friendly and pro mode. | — |
 | `/bld-settings-block-image-generation` | The one switch for the image-generation block, which is on from install. `off` allows it again. | — |
 | `/bld-quiz` | Quizzes you on what the last sprint actually built. | — |
 | `/bld-setup` | This. Installs BLD, or adds more of it later. | — |
@@ -81,7 +81,7 @@ installs.
   `/bld-optimize-seo-indexing`, `/bld-find-21st`, `/bld-find-spline`,
   `/bld-orchestrator-fable`, `/bld-orchestrator-opus`,
   `/bld-util-documentation`, `/bld-util-customize-component`,
-  `/bld-util-handoff`, `/bld-mcp-settings`, `/bld-professional-settings`,
+  `/bld-util-handoff`, `/bld-settings-mcp`, `/bld-settings-professional`,
   `/bld-quiz`, `/bld-settings-block-image-generation` and `/bld-setup`. Nothing
   else to install, nothing half-working.
 

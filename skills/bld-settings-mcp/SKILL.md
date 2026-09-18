@@ -1,9 +1,9 @@
 ---
-name: bld-mcp-settings
+name: bld-settings-mcp
 description: Switch BLD's MCP servers between on-demand and always-on by editing .mcp.json. Use for "keep my MCPs running", "always-on MCP", "stop spawning MCPs every time", or when an MCP server is not connected.
 ---
 
-# bld-mcp-settings — on-demand or always-on
+# bld-settings-mcp — on-demand or always-on
 
 BLD ships three MCP servers and runs them **on demand** by default: spawn, fire
 one batch of queries, kill. This skill switches them to **always-on** instead, by
@@ -55,7 +55,7 @@ edits* is `.mcp.json` in the project being configured. Resolve the script to an
 absolute path, and name the project with `--root`:
 
 ```bash
-PY=~/.claude/skills/bld-mcp-settings/scripts/mcp-settings.py   # or the scoped path
+PY=~/.claude/skills/bld-settings-mcp/scripts/mcp-settings.py   # or the scoped path
 
 python "$PY" status                          --root "<project>"
 python "$PY" on  jcodemunch shadcn           --root "<project>"

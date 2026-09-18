@@ -63,8 +63,8 @@ SKILLS = {
     # "settings" is its own category: package settings you toggle on and off.
     # These never rename themselves, because a settings switch that changes name
     # depending on the setting is a trap. Both are identical in both modes.
-    "professional-settings": ("settings",   "bld-professional-settings",      "bld-professional-settings"),
-    "mcp-settings":          ("settings",   "bld-mcp-settings",               "bld-mcp-settings"),
+    "professional-settings": ("settings",   "bld-settings-professional",      "bld-settings-professional"),
+    "mcp-settings":          ("settings",   "bld-settings-mcp",               "bld-settings-mcp"),
     "block-image-generation": ("settings",  "bld-settings-block-image-generation", "bld-settings-block-image-generation"),
 }
 
@@ -92,6 +92,12 @@ LEGACY = {
     "bld-optimize": "activate-mcps", "bld-optimize-sprint": "activate-mcps",
     "bld-seo": "seo-indexing", "bld-mode": "professional-settings",
     "bld-professional-mode": "professional-settings",
+    # the two settings commands that carried the type LAST while the rest of
+    # the package carried it first. They were never a third convention, just
+    # two names that missed the sweep, and an install made before 2026-09-18
+    # still has them on disk.
+    "bld-professional-settings": "professional-settings",
+    "bld-mcp-settings": "mcp-settings",
 }
 
 # Scripts too, not just markdown. The helper scripts print command names at the
@@ -106,7 +112,7 @@ SKILLS_DIR = os.path.join(ROOT, "skills")
 # This skill's own docs deliberately contain BOTH naming schemes side by side as
 # examples. Rewriting them collapses every contrast into "x becomes x", which is
 # exactly what happened the first time this script ran. Never rewrite ourselves.
-NO_REWRITE = (os.path.join(SKILLS_DIR, "bld-professional-settings"),)
+NO_REWRITE = (os.path.join(SKILLS_DIR, "bld-settings-professional"),)
 
 
 def target_name(key, mode):

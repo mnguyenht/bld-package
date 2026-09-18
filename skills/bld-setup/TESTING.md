@@ -117,7 +117,7 @@ git-gated features**, **crash mid-group + resume**, **project scope + preflight*
 | 2 | Windows, no Python, no git, ZIP download | **Prerequisite checker written in Python** could not report that Python was missing · `git` hard-blocked everything when it only gates three features · **picker specified 8 options into a 4-option tool** · `<BLD>` placeholder shown to a user who cannot substitute it · `cp -r` breaks in PowerShell |
 | 3 | macOS (`python3` only), git present, crash mid-install | **Hook registration hardcodes `python`, so the image-gen block registers and fails silently on every fire** · `gh` install instructions were Windows-only · other skills hardcode `python` too · resume trusted the state file without checking disk |
 | 4 | Windows, **project-scoped install** (shared family machine) | **The verdict ignored the inventory it had just printed**, so a complete install was told to run the full flow · a truncated state file reported as "FIRST RUN … state file: none yet" while sitting on disk · **scope and project path were never recorded**, so a healthy scoped install read as `MISSING NOW: bld … Uninstalled, or a fresh machine` · Phase 4 had no project-scoped commands at all, only a sentence saying it "also works" · scoping was silently partial: core skills, plugins, gstack, impeccable and the hook all stay global · `--project` was required at Phase 0c but scope is not asked until Phase 4 |
-| 5 | Ubuntu 24.04, distro Node, everything else normal | **`npm install -g` dies with `EACCES` on a distro-packaged Node**, which blocks vercel, react-doctor and react-scan, and it is the first install in the flow · `sudo apt install gh` fails on Ubuntu 22.04 LTS and on Debian, where `gh` is not in the repos at all · `bld-mcp-settings` told users `python` was the Windows spelling and then ran `python3` in every command |
+| 5 | Ubuntu 24.04, distro Node, everything else normal | **`npm install -g` dies with `EACCES` on a distro-packaged Node**, which blocks vercel, react-doctor and react-scan, and it is the first install in the flow · `sudo apt install gh` fails on Ubuntu 22.04 LTS and on Debian, where `gh` is not in the repos at all · `bld-settings-mcp` told users `python` was the Windows spelling and then ran `python3` in every command |
 | 6 | "Let me choose" branch, walked Phases 2-9 | **The `mcp` group was offered in Phase 3 and Phase 6 and had no Phase 4 install step**, so it could never leave "Still to do" · the pip install it needs was not in the manifest, breaking the skill's own "never install anything not in the printed table" rule · a resume reinstalled groups the disk already had · "Nothing else" sat in a multi-select with no precedence rule · `LIMITED` dropped git-blocked groups but still offered bundles promising them · Phase 2 recorded neither an accepted nor a declined deploy · Phase 9's own verification prints `RESUMING an unfinished setup` after a successful install and nothing said that was expected · Phase 8 counted the placeholders in one template and highlighted items from the other · Phase 7 told you to prove Codex works and only mentioned below that it refuses to run outside a git repo · the "run these through the Bash tool" note sat on the one block that survives PowerShell, not on the gstack conditional or the prune heredoc, which do not · preflight enforced a Python floor but never checked Node's version, so an ancient Node failed inside `npx` looking like a broken package · the hook's selftest printed a hardcoded tally that a later edit would silently make wrong, and its Skill-only scope was never written down |
 
 | 7 | Windows, python.org install with "Add to PATH" unticked, so only the `py` launcher works | **Nothing.** Verified for real rather than reasoned: `py` satisfies the Phase 0b probe and the version gate, runs preflight, runs the hook selftest, and `py -m pip` covers the Phase 4 code-search step. `py.exe` lives in `C:\Windows`, which is always on PATH, so the registered hook command resolves. Recorded because a clean axis is worth knowing too - it stops the next session re-walking it. |
@@ -192,7 +192,7 @@ cd <bld-package>
 # every script still parses and runs
 python -c "import ast,io;[ast.parse(io.open(p,encoding='utf-8').read()) for p in \
   ['skills/bld-setup/scripts/preflight.py', \
-   'skills/bld-professional-settings/scripts/switch-mode.py', \
+   'skills/bld-settings-professional/scripts/switch-mode.py', \
    'skills/bld-runtime-activate-mcps/run.py']];print('python parses')"
 python skills/bld-setup/scripts/preflight.py >/dev/null && echo "preflight exit 0"
 node --check skills/bld-optimize-app/scripts/lh-report.mjs && echo "lh-report ok"
@@ -206,8 +206,8 @@ done
 # the naming switch is lossless in both directions
 snap () { find skills templates README.md CLAUDE.md -type f | sort | xargs md5sum | md5sum; }
 a=$(snap)
-python skills/bld-professional-settings/scripts/switch-mode.py on  >/dev/null
-python skills/bld-professional-settings/scripts/switch-mode.py off >/dev/null
+python skills/bld-settings-professional/scripts/switch-mode.py on  >/dev/null
+python skills/bld-settings-professional/scripts/switch-mode.py off >/dev/null
 [ "$a" = "$(snap)" ] && echo LOSSLESS || echo "BUG: round trip changed files"
 ```
 

@@ -39,7 +39,7 @@ def bld_names():
     added, and a stale expectation in a test reads exactly like a passing one.
     """
     import importlib.util
-    t = os.path.join(PKG, "skills", "bld-professional-settings",
+    t = os.path.join(PKG, "skills", "bld-settings-professional",
                      "scripts", "switch-mode.py")
     spec = importlib.util.spec_from_file_location("bld_switch_mode", t)
     mod = importlib.util.module_from_spec(spec)

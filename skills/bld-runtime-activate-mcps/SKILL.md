@@ -16,7 +16,7 @@ compact search results once, then work from them.
 ## Ground rules
 
 - **Do not hand-edit `.mcp.json` to make these permanent.** Always-on is a real
-  option, but it belongs to `/bld-mcp-settings`, which refuses to delete entries
+  option, but it belongs to `/bld-settings-mcp`, which refuses to delete entries
   it did not write. Editing the file directly loses that protection, and this
   skill keeps working either way.
 - Prefer **jcodemunch** — it's read-only code search. Reach for **context-mode**

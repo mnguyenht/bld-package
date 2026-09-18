@@ -11,8 +11,8 @@ because that column is the one users decide on.
 - **Monetization:** none. Public, free, credit-the-sources.
 - **Stack:** markdown, plus six helper scripts where the work must be deterministic:
   `bld-setup/scripts/preflight.py` (environment + resume state),
-  `bld-professional-settings/scripts/switch-mode.py` (renames every command),
-  `bld-mcp-settings/scripts/mcp-settings.py` (edits `.mcp.json` without clobbering it),
+  `bld-settings-professional/scripts/switch-mode.py` (renames every command),
+  `bld-settings-mcp/scripts/mcp-settings.py` (edits `.mcp.json` without clobbering it),
   `skills/bld-optimize-app/scripts/lh-report.mjs` (Lighthouse report reader),
   `skills/bld-runtime-activate-mcps/run.py` (MCP runner),
   `bld-settings-block-image-generation/scripts/block-image-generation.py` (the
@@ -71,14 +71,14 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   bug, not a wording slip. It shipped once: the picker called all 11 core skills
   "all markdown" while `a11y-audit` and `webapp-testing` ship executable scripts.
 - **Adding a skill? Five places.** Its own `SKILL.md`, the `SKILLS` table in
-  `bld-professional-settings/scripts/switch-mode.py` (the canonical taxonomy, and the
+  `bld-settings-professional/scripts/switch-mode.py` (the canonical taxonomy, and the
   rename breaks without it), the type table in `README.md`, the routing table
   in `templates/CLAUDE.workspace.md`, and `bld-setup/references/skills.md` with
   its **Needs** column - a command absent from that table cannot be picked in
   Phase 2, so it ships uninstallable. `check.py` fails on all five.
 - **Renaming a command?** Add the old name to `LEGACY` in that same script rather
   than editing `SKILLS` in place, so existing installs still migrate.
-- **`bld-professional-settings` is exempt from the rename pass** (`NO_REWRITE`). Its docs
+- **`bld-settings-professional` is exempt from the rename pass** (`NO_REWRITE`). Its docs
   deliberately hold both naming schemes; rewriting them collapsed every example
   into "x becomes x" the first time it ran.
 - **Never write a literal `/bld-*` example of the *other* naming mode in any file
@@ -98,7 +98,7 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
   against the table, a type existing in the code but in neither doc, a skill
   missing from one of the five places, a stated command count that went stale,
   and an other-mode command literal waiting to be flattened. It is the only
-  thing standing over `bld-professional-settings`, which nothing else keeps in
+  thing standing over `bld-settings-professional`, which nothing else keeps in
   sync. Two of the bugs it now catches are ones it was written after.
 - **Run `python skills/bld-setup/scripts/scenarios.py` after touching
   `preflight.py`.** 49 scenarios, each one a bug that was real once: a corrupt
@@ -122,7 +122,7 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 prefix-type-skill (default) and prefix-skill-type (pro). Pro reorders; it never
 drops a segment. A name missing its type belongs to neither convention — pro mode
 shipped that way once, and every one of those names is now in `LEGACY`.
-`/bld-professional-settings on` switches, and the round trip is verified
+`/bld-settings-professional on` switches, and the round trip is verified
 byte-identical.
 
 Verified: `lh-report.mjs` against a live Lighthouse v13.4.1 report, `preflight.py`

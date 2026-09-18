@@ -501,7 +501,7 @@ Nothing errors and nothing reports it, because both sets are valid skills. A
 If Phase 1c said pro mode, bracket the copy:
 
 ```bash
-<PY> ~/.claude/skills/bld-professional-settings/scripts/switch-mode.py off
+<PY> ~/.claude/skills/bld-settings-professional/scripts/switch-mode.py off
 ```
 
 **Copy the commands they chose in Phase 2, not the folder.** `SKILLS` is that
@@ -552,12 +552,12 @@ a skill and reports nothing. It only ever clears a folder this same list is abou
 to rewrite.
 
 ```bash
-<PY> ~/.claude/skills/bld-professional-settings/scripts/switch-mode.py on
+<PY> ~/.claude/skills/bld-settings-professional/scripts/switch-mode.py on
 ```
 
 Skip both bracketing commands if Phase 1c said friendly mode. If it reported
 folders in "the other naming mode", a rename stopped partway: finish that with
-`/bld-professional-settings` before copying anything, or this same doubling
+`/bld-settings-professional` before copying anything, or this same doubling
 happens from the other direction.
 
 **`cp` adds and overwrites; it never removes.** A skill that was dropped from the
@@ -715,7 +715,7 @@ on Homebrew Python 3.11+. A python.org install on Windows or macOS takes the
 plain `pip install` fine, which is where most users will be.
 
 Nothing is written to `.mcp.json`. These stay on-demand unless the user later
-runs `/bld-mcp-settings on`. Confirm with the `jcodemunch-mcp` row in preflight
+runs `/bld-settings-mcp on`. Confirm with the `jcodemunch-mcp` row in preflight
 rather than by starting a server, which would sit and wait for input.
 
 ### Token monitor (only if chosen)

@@ -1,9 +1,9 @@
 ---
-name: bld-professional-settings
+name: bld-settings-professional
 description: Switch BLD command names between friendly and pro mode (which word comes first). Use for "pro mode", "shorter commands", "go back to the long names", or which naming mode is on.
 ---
 
-# bld-professional-settings — two orders for the same name
+# bld-settings-professional — two orders for the same name
 
 BLD ships every command in one of two naming schemes. Same skills, same
 behaviour, different thing to type.
@@ -34,10 +34,10 @@ instead of doing it by hand.
 > answered.
 
 ```bash
-python skills/bld-professional-settings/scripts/switch-mode.py status     # read-only, changes nothing
-python skills/bld-professional-settings/scripts/switch-mode.py on         # pro: type last
-python skills/bld-professional-settings/scripts/switch-mode.py off        # friendly: long names
-python skills/bld-professional-settings/scripts/switch-mode.py toggle     # flip to the other one
+python skills/bld-settings-professional/scripts/switch-mode.py status     # read-only, changes nothing
+python skills/bld-settings-professional/scripts/switch-mode.py on         # pro: type last
+python skills/bld-settings-professional/scripts/switch-mode.py off        # friendly: long names
+python skills/bld-settings-professional/scripts/switch-mode.py toggle     # flip to the other one
 ```
 
 `on`/`off` and `pro`/`friendly` are the same two modes under different spellings.
@@ -111,7 +111,7 @@ the source of truth for the whole taxonomy, not just this skill.
 | **runtime** | Applies to how the session runs, not to what gets built |
 | **orchestrator** | Claude bosses other agents rather than writing code |
 | **util** | Everything in between: not building, not optimizing |
-| **settings** | A package setting you toggle on and off. **Identical in both modes** — `bld-professional-settings`, `bld-mcp-settings`, `bld-settings-block-image-generation` |
+| **settings** | A package setting you toggle on and off. **Identical in both modes** — `bld-settings-professional`, `bld-settings-mcp`, `bld-settings-block-image-generation` |
 | *(special)* | Acts on BLD itself. **Identical in both modes** — `bld-setup`, `bld-quiz` |
 
 Specials keep one name on purpose. They are the commands you reach for when you
