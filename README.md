@@ -183,7 +183,7 @@ From a development and UI/UX standpoint, these are the universal guardrails BLD 
 |---|---|
 | `/bld-mcp-settings` | Switches BLD's MCP policies between ```on-demand``` and ```always-on```. |
 | `/bld-professional-settings` | Switches the naming scheme between the two conventions. |
-| `/bld-settings-block-image-generation` | The switch for the image-generation block, which is ```on``` from install. ```off``` allows it again. |
+| `/bld-settings-block-image-generation` | ```Enable``` or ```Disable``` image-generation blocking, Enabled by default. |
 
 ### -special
 
