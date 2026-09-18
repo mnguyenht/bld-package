@@ -103,7 +103,7 @@ Any commands with 2 parts are special commands, and won't be affected.
 
 ## What bld will NOT do ❌
 
-From a development and UI/UX standpoint, these are the universal guardrails BLD follows:
+From a development and UI/UX standpoint, these are the universal guardrails bld follows:
 
 - **It will not push your code without confirmation.**
 - **It will not fix what you did not mention.** 
