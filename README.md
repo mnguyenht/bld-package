@@ -2,6 +2,8 @@
 
 **A lightweight Claude agent skillset, for every step of the ```building``` process.**
 
+![BLD - a lightweight Claude agent skillset](thumbnail.png)
+
 # Background
 Many skillsets nowadays ship with excessive amounts of skills, subagents, etc. Some clogging up to ***80% of your context*** every session, for skills you'll probably never use.
 
