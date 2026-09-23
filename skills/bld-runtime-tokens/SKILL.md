@@ -1,6 +1,6 @@
 ---
 name: bld-runtime-tokens
-description: Check how much of the Claude token window is left and say what to do. Continue, batch, delegate, or hand off. Use for "how many tokens left", "am I about to run out", "check my usage", before a long sprint, or unprompted when one runs long.
+description: 'rt: Check how much of the Claude token window is left and say what to do. Continue, batch, delegate, or hand off. Use for "how many tokens left", "am I about to run out", "check my usage", before a long sprint, or unprompted when one runs long.'
 ---
 
 # bld-runtime-tokens — know the budget before spending it

@@ -1,6 +1,6 @@
 ---
 name: bld-quiz
-description: Post-sprint learning check. Quiz the user on what was just built, sized to the sprint; tiny changes get a walkthrough instead. Use for "quiz me", "test me on that", or when a sprint wraps.
+description: 'qz: Post-sprint learning check. Quiz the user on what was just built, sized to the sprint; tiny changes get a walkthrough instead. Use for "quiz me", "test me on that", or when a sprint wraps.'
 ---
 
 # bld-quiz — turn the sprint just built into a learning checkpoint

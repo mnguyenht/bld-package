@@ -1,6 +1,6 @@
 ---
 name: bld-find-21st
-description: Find a ready-made shadcn/Tailwind component on 21st.dev, shortlist options, install the pick. Use for "find a component", "get me a navbar/hero/card", or premade UI instead of building from scratch.
+description: 'f2: Find a ready-made shadcn/Tailwind component on 21st.dev, shortlist options, install the pick. Use for "find a component", "get me a navbar/hero/card", or premade UI instead of building from scratch.'
 ---
 
 # bld-find-21st — shop the 21st.dev marketplace

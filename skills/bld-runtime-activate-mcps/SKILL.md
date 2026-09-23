@@ -1,6 +1,6 @@
 ---
 name: bld-runtime-activate-mcps
-description: Spawn an MCP server (jcodemunch, context-mode, shadcn) for one burst of code search or registry lookup, then shut it down. Use for "hard optimize", "token-optimize this search", or a big multi-file sprint.
+description: 'rm: Spawn an MCP server (jcodemunch, context-mode, shadcn) for one burst of code search or registry lookup, then shut it down. Use for "hard optimize", "token-optimize this search", or a big multi-file sprint.'
 ---
 
 # bld-runtime-activate-mcps — burst-use the optimizer MCPs, then dip

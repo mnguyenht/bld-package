@@ -121,10 +121,8 @@ write, and editing around it loses that protection.
 
 - ✋ **Change only what was asked for — including the *values* named.** Full rule in
   `~/.claude/CLAUDE.md` ("Stay in scope"). The repeat offence is retuning a
-  neighbouring value while doing the real ask (a duration, an easing, a padding, a
-  prop nobody mentioned), or deleting a rule that a change happened to orphan.
-  Adjacent ≠ in scope. If the ask truly can't work without a second change, **say so
-  first and wait**. Spot something else wrong? Report it, don't fix it.
+  neighbouring value while doing the real ask — a duration, an easing, a padding, a
+  prop nobody mentioned.
 - 🔒 **MCP defaults to on-demand.** Always-on is a deliberate choice made through
   `/bld-settings-mcp`, never by hand-editing `.mcp.json`. **`context-mode` gets
   enabled on its own or not at all** — its `ctx_execute` runs shell commands with

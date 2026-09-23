@@ -1,6 +1,6 @@
 ---
 name: bld-optimize-app
-description: Run Lighthouse on the live app (performance, accessibility, SEO), triage, fix what's real. Use for "run Lighthouse", "check my PageSpeed", "why is my site slow", "audit the live site", or before a public launch. Source code is /bld-optimize-react.
+description: 'oa: Run Lighthouse on the live app (performance, accessibility, SEO), triage, fix what''s real. Use for "run Lighthouse", "check my PageSpeed", "why is my site slow", "audit the live site", or before a public launch. Source code is /bld-optimize-react.'
 ---
 
 # bld-optimize-app — measure the shipped app, then fix what the numbers point at

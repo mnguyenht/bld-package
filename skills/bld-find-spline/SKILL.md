@@ -1,6 +1,6 @@
 ---
 name: bld-find-spline
-description: Find a ready-made 3D scene on Spline and wire its embed into the app. Use for "find a 3D scene", "add a Spline", "3D hero". Heavy. Only when it genuinely elevates the page.
+description: 'fs: Find a ready-made 3D scene on Spline and wire its embed into the app. Use for "find a 3D scene", "add a Spline", "3D hero". Heavy. Only when it genuinely elevates the page.'
 ---
 
 # bld-find-spline — shop Spline for a 3D scene, then wire the embed

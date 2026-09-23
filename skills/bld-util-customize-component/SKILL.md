@@ -1,6 +1,6 @@
 ---
 name: bld-util-customize-component
-description: Build a temporary slider panel so the user tunes an effect or animation by hand, then commit the values. Use for "let me tune this", "give me sliders", "control panel", or when a visual tweak has missed twice by prompt.
+description: 'us: Build a temporary slider panel so the user tunes an effect or animation by hand, then commit the values. Use for "let me tune this", "give me sliders", "control panel", or when a visual tweak has missed twice by prompt.'
 ---
 
 # bld-util-customize-component — put the knobs in the user's hands

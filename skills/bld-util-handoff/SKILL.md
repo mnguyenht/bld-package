@@ -1,6 +1,6 @@
 ---
 name: bld-util-handoff
-description: Write handoff.md (goal, state, changes, failed attempts, next steps) so work continues cleanly in a fresh session. Use for "hand off", "write a handoff", "save state and start fresh".
+description: 'uh: Write handoff.md (goal, state, changes, failed attempts, next steps) so work continues cleanly in a fresh session. Use for "hand off", "write a handoff", "save state and start fresh".'
 ---
 
 # handoff — snapshot the session for a clean restart

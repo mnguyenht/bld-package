@@ -1,6 +1,6 @@
 ---
 name: bld-optimize-react
-description: Scan React/Next source for real defects (bugs, hooks, re-renders, a11y) with react-doctor and eslint, triage and fix. Use for "scan this app", "audit this app", "check for re-renders", or before shipping a screen. Live site is /bld-optimize-app.
+description: 'or: Scan React/Next source for real defects (bugs, hooks, re-renders, a11y) with react-doctor and eslint, triage and fix. Use for "scan this app", "audit this app", "check for re-renders", or before shipping a screen. Live site is /bld-optimize-app.'
 ---
 
 # bld-optimize-react — find what's actually broken, then triage

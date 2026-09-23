@@ -1,6 +1,6 @@
 ---
 name: bld-optimize-security
-description: Full static security audit of an app across 13 layers, front end to recovery. Reads code and config, never attacks. Use for "secure this app", "full security audit", "harden this", or before shipping something serious.
+description: 'os: Full static security audit of an app across 13 layers, front end to recovery. Reads code and config, never attacks. Use for "secure this app", "full security audit", "harden this", or before shipping something serious.'
 ---
 
 # bld-optimize-security — the final-boss security pass

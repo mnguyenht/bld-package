@@ -1,6 +1,6 @@
 ---
 name: bld-runtime-agents
-description: Boss mode over an external coding agent. Spec small pieces, have Codex (Gemini fallback) build them, review each against the spec. Use for "delegate this", "have Codex build X", or bulky repetitive work.
+description: 'ra: Boss mode over an external coding agent. Spec small pieces, have Codex (Gemini fallback) build them, review each against the spec. Use for "delegate this", "have Codex build X", or bulky repetitive work.'
 ---
 
 # bld-runtime-agents — Claude is the boss, Codex is the executor

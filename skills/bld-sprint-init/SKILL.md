@@ -1,6 +1,6 @@
 ---
 name: bld-sprint-init
-description: Take an app idea to a good-looking, working, deployed base. Design direction, Vite + React + shadcn scaffold, core screens, deploy. Use for "start a new app", "build me an app", "spin up a new project". Polish is /bld-sprint-refine.
+description: 'si: Take an app idea to a good-looking, working, deployed base. Design direction, Vite + React + shadcn scaffold, core screens, deploy. Use for "start a new app", "build me an app", "spin up a new project". Polish is /bld-sprint-refine.'
 ---
 
 # bld-sprint-init — idea → good-looking, deployed base

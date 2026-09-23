@@ -1,6 +1,6 @@
 ---
 name: bld-optimize-seo-indexing
-description: Get an app found on Google. Audit the live site, add sitemap, robots, canonical and structured data, then list the account steps only the user can do. Use for "get this on Google", "index my site", "why isn't my site showing up", "SEO this".
+description: 'oi: Get an app found on Google. Audit the live site, add sitemap, robots, canonical and structured data, then list the account steps only the user can do. Use for "get this on Google", "index my site", "why isn''t my site showing up", "SEO this".'
 ---
 
 # bld-optimize-seo-indexing — get an app found on Google

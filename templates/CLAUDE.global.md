@@ -48,6 +48,22 @@ Before running **any approval-required command**, explain in plain language:
 (1) what it does in one sentence, (2) each non-obvious part/flag,
 (3) whether it's **read-only** or **modifies/deletes**. Never skip this.
 
+## Firing a BLD command by typing its shortcut
+
+Every `bld-*` skill's description **starts with a two-character shortcut and a
+colon** (`si:`, `ud:`, `rt:`). When the FIRST thing in my message is one of
+them, invoke that skill and treat the rest of the line as its input —
+`si: a habit tracker` means `/bld-sprint-init a habit tracker`. This exists
+because the slash menu is not always reachable.
+
+- **Start of the message only, exact match only.** The same letters mid-sentence
+  are ordinary words.
+- **Never guess.** A shortcut that matches nothing, or that could be two skills,
+  gets a one-line "which did you mean?" — not a best effort. Running the wrong
+  command is worse than asking.
+- The full map is the skill listing itself: each description opens with its own
+  shortcut. Shortcuts do not change in pro mode.
+
 ## Asking questions — timing and delivery
 
 - **Ask last, not first.** Do whatever groundwork doesn't depend on the answer first —
@@ -274,25 +290,16 @@ long copy). I spend my tokens on **planning and reviewing**, not typing.
 code should exist at all, security-sensitive code, or anything where reviewing the
 output costs more than writing it myself.
 
-**The loop — every single delegated piece:**
+**The loop** — spec → run → review against the spec → re-spec until it passes.
+`bld-runtime-agents` carries it step by step, with the spec template and the
+rule about asking before stashing a dirty tree; it loads when I invoke it, so it
+is not repeated here. Two rules it is not the skill's job to hold:
 
-1. **Spec first.** Write the agent a precise brief: **goal · inputs · expected output ·
-   constraints · the exact file paths to touch** (and explicitly what NOT to touch).
-   A vague spec buys a wasted round trip. A clean tree before the handoff is what
-   makes `git diff` afterwards show the agent's work and nothing else, so **ask
-   before committing or stashing** if the tree is dirty. Those are the user's
-   uncommitted changes, and stashing someone's work-in-progress without asking is
-   not a setup step. If they would rather not, run anyway and read
-   `git status --short` first so you know which changes were already there.
-2. **Run it** via the CLI.
-3. **Review against the spec.** Read every file it changed — `git diff` — and check
-   it line by line against each item in the spec. A file the agent touched that the
-   spec didn't name is an automatic reject (stay-in-scope applies to the agent too).
-4. **Wrong → concrete fixes, re-run.** Name the file, the line, and the exact required
-   change. Don't hand-patch it myself if a re-run is cheaper.
-5. **Never accept unreviewed code.** Tell me what the agent generated and that it was
-   reviewed. "The agent wrote it" is never a reason something wasn't checked — its
-   output is my output.
+- 🚩 **Never accept unreviewed code.** Tell me what the agent generated and that it
+  was reviewed. "The agent wrote it" is never a reason something wasn't checked —
+  its output is my output.
+- **Stay-in-scope applies to the agent too.** A file it touched that the spec
+  didn't name is an automatic reject.
 
 **Codex CLI reference** (verified against codex-cli v0.145.0):
 

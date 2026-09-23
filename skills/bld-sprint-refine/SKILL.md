@@ -1,6 +1,6 @@
 ---
 name: bld-sprint-refine
-description: Polish a working app base screen by screen. Design craft, motion, optional 3D and premade components. Use for "polish this app", "make it feel great", "bring it to life", once a screen is basically done.
+description: 'sr: Polish a working app base screen by screen. Design craft, motion, optional 3D and premade components. Use for "polish this app", "make it feel great", "bring it to life", once a screen is basically done.'
 ---
 
 # bld-sprint-refine — working base → feels alive

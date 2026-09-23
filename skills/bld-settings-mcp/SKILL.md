@@ -1,6 +1,6 @@
 ---
 name: bld-settings-mcp
-description: Switch BLD's MCP servers between on-demand and always-on by editing .mcp.json. Use for "keep my MCPs running", "always-on MCP", "stop spawning MCPs every time", or when an MCP server is not connected.
+description: 'gm: Switch BLD''s MCP servers between on-demand and always-on by editing .mcp.json. Use for "keep my MCPs running", "always-on MCP", "stop spawning MCPs every time", or when an MCP server is not connected.'
 ---
 
 # bld-settings-mcp — on-demand or always-on

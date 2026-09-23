@@ -27,7 +27,10 @@ problems = []
 
 # Skill-listing budget (check 8). ~6,000 chars is ~1,500 tokens: under the
 # 8,000-char fallback with room left for the user's own skills.
-DESC_MAX = 250
+# Raised 250 -> 256 when every description gained a 6-char typing prefix
+# ('si: ' plus the two quotes that prefix's colon now forces). The listing
+# budget below is the real limit; this cap is only a per-skill fair share.
+DESC_MAX = 256
 LISTING_MAX = 6000
 
 # Phase 8 spells its counts as words, so the check has to read both forms.

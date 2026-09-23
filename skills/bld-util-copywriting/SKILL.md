@@ -1,6 +1,6 @@
 ---
 name: bld-util-copywriting
-description: Write or fix app copy (hero, CTAs, features, empty states, pricing) with no invented proof and no AI-sounding phrasing. Use for "write the copy", "fix this headline", "this sounds like AI", or placeholder text.
+description: 'uc: Write or fix app copy (hero, CTAs, features, empty states, pricing) with no invented proof and no AI-sounding phrasing. Use for "write the copy", "fix this headline", "this sounds like AI", or placeholder text.'
 ---
 
 # bld-util-copywriting

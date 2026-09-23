@@ -1,6 +1,6 @@
 ---
 name: bld-util-documentation
-description: Write a docs subpage inside the app, in Simplified Technical English, covering only what the code actually does. Use for "write the docs", "document this app", "add a docs page", "user guide", "help page".
+description: 'um: Write a docs subpage inside the app, in Simplified Technical English, covering only what the code actually does. Use for "write the docs", "document this app", "add a docs page", "user guide", "help page".'
 ---
 
 # bld-util-documentation — the app, explained in Simplified Technical English

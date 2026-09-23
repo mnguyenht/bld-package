@@ -1,6 +1,6 @@
 ---
 name: bld-sprint-planning
-description: Decide what to build before building. Interview the idea, test its core assumption, cut to a shippable v1, write the planning files. Use for "I have an idea", "help me plan this", "plan the next feature", "what should I build". No app code.
+description: 'sp: Decide what to build before building. Interview the idea, test its core assumption, cut to a shippable v1, write the planning files. Use for "I have an idea", "help me plan this", "plan the next feature", "what should I build". No app code.'
 ---
 
 # bld-sprint-planning — what should exist, and what gets cut

@@ -19,6 +19,7 @@ From planning to deployment, it has it all. Including many utility commands ***s
 - [Install](#install)
 - [Installing on macOS or Linux](#installing-on-macos-or-linux)
 - [How commands are named](#how-commands-are-named)
+- [Typing shortcuts](#typing-shortcuts)
 - [What BLD will not do](#what-bld-will-not-do)
 - [Commands List](#the-commands)
   - [sprint](#sprint) · [optimize](#optimize) · [find](#find) · [runtime](#runtime)
@@ -97,6 +98,39 @@ Every command reads **`bld` · type · skill**.
 Once you know the set, use `/bld-settings-professional on` to move the type to the end, requiring less typing to reach what you want.
 
 Any commands with 2 parts are special commands, and won't be affected.
+
+&nbsp;
+
+
+## Typing Shortcuts ⌨️
+
+The slash menu is not always reachable. So every command's description now
+**starts with a two-character shortcut and a colon**, and typing one as the
+first thing in a message runs that command:
+
+```
+si: a habit tracker for students
+```
+
+does the same as `/bld-sprint-init a habit tracker for students`. It only
+counts at the very start of a message, so a shortcut in the middle of a
+sentence stays ordinary text. Shortcuts do not move in pro mode — only the
+command name reorders.
+
+| Type | Shortcuts |
+|---|---|
+| **sprint** | `sp:` planning · `si:` init · `sr:` refine |
+| **optimize** | `oa:` app · `or:` react · `os:` security · `oi:` seo-indexing |
+| **find** | `f2:` 21st · `fs:` spline |
+| **runtime** | `rm:` activate-mcps · `ra:` agents · `rt:` tokens |
+| **orchestrator** | `of:` fable · `oo:` opus |
+| **util** | `uc:` copywriting · `us:` customize-component · `ud:` deploy · `um:` documentation · `uh:` handoff |
+| **settings** | `gi:` block-image-generation · `gm:` mcp · `gp:` professional |
+| **special** | `bs:` setup · `qz:` quiz |
+
+This is a convention the model follows, not a parser. It is a little less
+certain than picking the command out of the slash menu, so if a shortcut ever
+lands on the wrong command, use the full name for that one.
 
 &nbsp;
 

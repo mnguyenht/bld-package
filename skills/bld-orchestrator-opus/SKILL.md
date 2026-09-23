@@ -1,6 +1,6 @@
 ---
 name: bld-orchestrator-opus
-description: The /bld-orchestrator-fable loop with Opus as the boss. Use when the user wants the orchestrator run on Opus.
+description: 'oo: The /bld-orchestrator-fable loop with Opus as the boss. Use when the user wants the orchestrator run on Opus.'
 model: opus
 ---
 
