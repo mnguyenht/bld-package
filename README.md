@@ -200,18 +200,14 @@ From a development and UI/UX standpoint, these are the universal guardrails bld 
 
 ## Typing Shortcuts ⌨️
 
-The slash menu is not always reachable. So every command's description now
-**starts with a two-character shortcut and a colon**, and typing one as the
-first thing in a message runs that command:
+The slash menu is not always reachable. So instead, you can invoke commands by simply
+**typing the initials of said command, followed by a semicolon.**
 
 ```
-si: a habit tracker for students
+si: a habit tracker for students ==> /bld-Sprint-Init a habit tracker for students
 ```
 
-does the same as `/bld-sprint-init a habit tracker for students`. It only
-counts at the very start of a message, so a shortcut in the middle of a
-sentence stays ordinary text. Shortcuts do not move in pro mode. Only the
-command name reorders.
+(These shortcuts are unaffected by professional-mode)
 
 | Type | Shortcuts |
 |---|---|
@@ -224,12 +220,8 @@ command name reorders.
 | **settings** | `gi:` block-image-generation · `gm:` mcp · `gp:` professional |
 | **special** | `bs:` setup · `qz:` quiz |
 
-This is a convention the model follows, not a parser. It is a little less
-certain than picking the command out of the slash menu, so if a shortcut ever
-lands on the wrong command, use the full name for that one.
 
 &nbsp;
-
 
 ## Repo layout
 
