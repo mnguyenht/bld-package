@@ -1,6 +1,6 @@
 ---
 name: bld-setup
-description: 'bs: Install BLD or add more of it. Checks prerequisites, lists every tool with its source, installs only what the user picks, resumes if interrupted. Use for "set up BLD", "install the BLD toolkit", "what else can I install".'
+description: 'st: Install BLD or add more of it. Checks prerequisites, lists every tool with its source, installs only what the user picks, resumes if interrupted. Use for "set up BLD", "install the BLD toolkit", "what else can I install".'
 ---
 
 # bld-setup

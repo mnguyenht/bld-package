@@ -217,8 +217,8 @@ si: a habit tracker for students ==> /bld-Sprint-Init a habit tracker for studen
 | **runtime** | `rm:` activate-mcps · `ra:` agents · `rt:` tokens |
 | **orchestrator** | `of:` fable · `oo:` opus |
 | **util** | `uc:` copywriting · `us:` customize-component · `ud:` deploy · `um:` documentation · `uh:` handoff |
-| **settings** | `gi:` block-image-generation · `gm:` mcp · `gp:` professional |
-| **special** | `bs:` setup · `qz:` quiz |
+| **Settings (Config)** | `ci:` block-image-generation · `cm:` mcp · `cp:` professional |
+| **special** | `st:` setup · `qz:` quiz |
 
 
 &nbsp;

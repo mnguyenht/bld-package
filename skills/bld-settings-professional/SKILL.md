@@ -1,6 +1,6 @@
 ---
 name: bld-settings-professional
-description: 'gp: Switch BLD command names between friendly and pro mode (which word comes first). Use for "pro mode", "shorter commands", "go back to the long names", or which naming mode is on.'
+description: 'cp: Switch BLD command names between friendly and pro mode (which word comes first). Use for "pro mode", "shorter commands", "go back to the long names", or which naming mode is on.'
 ---
 
 # bld-settings-professional — two orders for the same name
