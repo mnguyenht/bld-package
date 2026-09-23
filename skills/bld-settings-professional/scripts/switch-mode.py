@@ -188,7 +188,12 @@ def key_for(declared, folder):
             return key
     if declared in LEGACY:
         return LEGACY[declared]
-    # last resort: match on folder, tolerating any word order
+    # last resort: match on folder, tolerating any word order. Only bld-* folders
+    # reach the word-subset test: this dir also holds third-party skills, and a
+    # single-word key would wrongly claim one (a standalone `copywriting` skill
+    # matching the `copywriting` key), colliding with the real bld skill's target.
+    if not folder.startswith("bld-"):
+        return None
     parts = set(folder.replace("bld-", "").split("-"))
     for key in SKILLS:
         if set(key.split("-")) <= parts:
