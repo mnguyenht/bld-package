@@ -1,6 +1,6 @@
 ---
 name: bld-settings-block-image-generation
-description: 'ci: The one switch for BLD''s AI image-generation block, which is on by default. Use it to turn the block off, put it back, or check where it stands. Also for "allow image generation", "no AI images", "is the image hook on".'
+description: 'confi: The one switch for BLD''s AI image-generation block, which is on by default. Use it to turn the block off, put it back, or check where it stands. Also for "allow image generation", "no AI images", "is the image hook on".'
 ---
 
 # bld-settings-block-image-generation
