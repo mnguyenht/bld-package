@@ -108,6 +108,8 @@ Run these over the app and reconcile their findings:
    check to the applicable layer per `references/13-layers.md`. Cover every
    *applies* layer 1–13; skip N/A ones explicitly. Always run this one — it's the
    whole-repo pass that doesn't depend on there being a diff.
+   **Then walk the "Pre-launch must-checks (20)" table** in `13-layers.md` item by
+   item, and give each one a pass / finding / N/A line in the report.
 
 ## Phase 3 — Code review of the diff
 
