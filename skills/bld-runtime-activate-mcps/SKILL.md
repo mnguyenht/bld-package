@@ -97,6 +97,28 @@ Its tools: `search_items_in_registries`, `list_items_in_registries`,
 `get_add_command_for_items`, `get_audit_checklist`, `get_project_registries`.
 Pairs naturally with the `ui-styling` skill.
 
+### Codex can use a server too (one run, nothing written)
+
+`codex exec` takes one-off config overrides with `-c`, so a single run can attach
+an MCP server without touching `~/.codex/config.toml`:
+
+```bash
+codex exec -s read-only \
+  -c 'mcp_servers.jcodemunch.command="<full path to jcodemunch-mcp>"' \
+  -c 'mcp_servers.jcodemunch.args=["serve"]' \
+  -c 'mcp_servers.jcodemunch.startup_timeout_sec=60' \
+  "<prompt>"
+```
+
+- Find the path with `where jcodemunch-mcp` (Windows) or `which jcodemunch-mcp`,
+  and write it with forward slashes inside the quotes.
+- Index the project first (step 1 of the sprint flow): Codex only sees repos
+  that are already in jcodemunch's index.
+- The run log shows `mcp: jcodemunch/<tool> (completed)` for each call.
+  Verified 2026-09-28 with one `list_repos` call: the whole run cost ~16k
+  tokens, which is Codex's normal per-run floor, so attaching the server costs
+  almost nothing extra. Only jcodemunch has been tried this way.
+
 ## Why this is safe-ish
 
 Nothing is persistent: no live MCP connection, no background watcher, no auto-hook.
