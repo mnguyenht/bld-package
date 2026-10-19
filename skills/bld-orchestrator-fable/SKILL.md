@@ -32,6 +32,9 @@ frontmatter as a hint, never a guarantee.
 | Codex | `codex exec` — locked, see Step 4 | bulky, repetitive, low-judgment, long generation |
 | Gemini | fallback only, 20 req/day | Codex down |
 
+Every Claude row also takes an `effort` (low → max) and every Codex run a model and a
+reasoning effort. The ladder in Step 4 sets both per workstream.
+
 `bld-executor` lives in `.claude/agents/bld-executor.md`. It already carries the handoff
 format and the workspace hard stops — don't restate either in a spec.
 
@@ -74,15 +77,84 @@ serial run saved.
 
 ## Step 4 — Route, then execute
 
-Route by what the workstream actually demands, not by its size:
+Route by what the workstream actually demands, not by its size. **The boss is the
+router:** for every workstream it picks a rung, an effort and a verify depth, and writes
+all three at the top of that spec. Rules, not an extra model call: the boss has already
+read the stream, so a separate routing call costs more than it saves.
 
-| The workstream is | Send it to |
+### The ladder — cheapest rung that can pass, effort before model
+
+One ladder per quota. Climb **effort before model**: a cheaper model thinking longer
+often passes where the bigger model would have been bought, and the bigger model is the
+expensive step.
+
+| Rung | Claude window — `bld-executor` | ChatGPT quota — Codex, once unlocked |
+|---|---|---|
+| 1 | `model: 'haiku'`, `effort: 'low'` | cheapest listed model, `low` |
+| 2 | `model: 'sonnet'`, `effort: 'medium'` | middle model, `medium` |
+| 3 | `model: 'sonnet'`, `effort: 'high'` | middle model, `xhigh` |
+| 4 | `model: 'opus'`, `effort: 'high'` — at most one per plan | top model, `high` |
+
+**This skill explicitly asks for a per-spawn effort:** pass `effort` on every executor
+spawn, from the rung. Codex takes both per run:
+`codex exec -m <model> -c model_reasoning_effort=<level> ...`. Codex model ids change
+with every release, so read them instead of hard-coding them: the entries marked
+`"visibility": "list"` in `~/.codex/models_cache.json` are what the installed CLI
+accepts, and OpenAI's pricing page orders them. A model missing from that file needs a
+CLI upgrade first.
+
+### Pick the starting rung and the verify depth
+
+| The workstream is | Starts at |
 |---|---|
-| a judgment call, security-touching, or something the boss would re-derive to review | keep it — tighten the spec or escalate |
-| the single hardest build stream, where a weak first pass costs a full re-spec | `bld-executor` @ opus — explicit `model: 'opus'`, at most one per plan |
-| ordinary build work — a screen, a hook, a route, a fix | `bld-executor` @ sonnet |
-| mechanical and diff-checkable — a rename across files, deleting dead files, moving a util | `bld-executor` @ haiku |
-| bulky, repetitive, low-judgment, long generation — fixtures, boilerplate, per-file conversions, long copy | Codex, once unlocked |
+| a judgment call, security-touching, or something the boss would re-derive to review | off the ladder — keep it, tighten the spec or escalate |
+| mechanical and diff-checkable — a rename across files, deleting dead files, moving a util | rung 1 |
+| ordinary build work — a screen, a hook, a route, a fix | rung 2 |
+| the single hardest build stream, where a weak first pass costs a full re-spec | rung 3, or rung 4 on the boss's explicit call |
+| bulky, repetitive, low-judgment, long generation — fixtures, boilerplate, per-file conversions, long copy | Codex ladder, rung 1 or 2 |
+
+A tight spec is what lets a stream start low: every question the worker has to guess at
+is effort it burns, or a rung it climbs.
+
+**Verify depth scales with risk:**
+
+- **light** — the diff stays inside the spec's file list, and the spec's verify command
+  passes when the boss re-runs it. For rung-1 mechanical streams.
+- **full** — all of Step 5. Mandatory for anything a user sees, logic touching money,
+  auth or stored data, a file another stream also needs, and any stream on its second
+  attempt.
+
+Why a ladder: on a simulated six-task coding workload, routing model and effort per task
+and verifying by risk cost 36× less per solved task than sending everything to the top
+model at max effort. The hard task never reached the top model; the middle one thinking
+longer passed it. (Creator's figures, "AI Levels" reel by @donimas, Oct 2026; a
+simulation, not a benchmark. The price ratios behind it match OpenAI's pricing page,
+checked 2026-10-18.) On a subscription the saving is quota: every rung not climbed is
+window left.
+
+### The advisor — optional, beside the ladder, not on it
+
+Claude Code's advisor lets an agent consult a stronger model at decision points: before
+committing to an approach, when an error keeps recurring, before declaring done. The
+advisor reads the agent's whole transcript and returns guidance; it never edits.
+Subagents inherit the session's advisor. An advisor that ranks below the main model is
+not attached to the main model, but subagents it outranks may still use it — so with a
+Fable boss, turning on an Opus advisor gives every Sonnet and Haiku worker Opus at its
+decision points while the boss runs without one. With an Opus boss, the boss gets it
+too: Opus reviewing Opus, at Opus cost. Turn it on per orchestrator session, not as a
+global default, since a saved default reaches every session.
+
+- **It is not a rung.** Claude decides when to call it and nothing forces a call, so a
+  failed check still climbs the ladder.
+- **When it is on, every spec says:** "if the same failure happens twice, consult the
+  advisor before a third attempt." Asking in instructions is the only lever there is.
+- **It costs per call:** each call re-reads the worker's full transcript at the
+  advisor's rate, uncached, against the same plan limits.
+- **It can be off without saying so.** It needs the Anthropic API directly (or a gateway
+  that forwards requests intact) and feature-flag fetching, which telemetry-disabling
+  variables turn off. If no `Advising` line ever shows up, check those two first.
+
+(Advisor behaviour checked 2026-10-18 against code.claude.com/docs/en/advisor.)
 
 Architecture and design decisions, the YAGNI call on whether code should exist at all,
 and security-sensitive code never leave Claude at any size — they are the reason the
@@ -146,9 +218,16 @@ Read every report as a skeptic, not to rubber-stamp it.
   pane and several of them. For a UI stream, verify it in the preview after accepting
   the code. That is judging, not building.
 
+Judge at the depth the spec's header names: light or full (Step 4).
+
 Verdict per workstream: **accept** (met the spec, verified for real), **revise**
 (re-spawn with a corrected spec naming exactly what fell short — never "make it
 better"), or **escalate** (the spec was wrong, not the work — stop and ask the user).
+
+**A revise goes one rung up the ladder** — effort first, then model. The exception is a
+report showing the spec itself was unclear: fix the spec and stay on the rung, since a
+bigger model on a muddy spec only fails at a higher price. Crossing ladders is allowed:
+a Codex stream that fails twice can go to `bld-executor` at rung 3.
 
 Loop Steps 4–5 until every workstream is accepted or escalated.
 
@@ -161,6 +240,12 @@ which. A third re-spec costs more than the edit and usually means the plan is wr
 Terse, no victory lap: what shipped and the observation that verified it, what was
 rejected and why, what is escalated, and anything a worker flagged that Claude chose to
 leave alone. If nothing was actually verified, say that plainly.
+
+End with one routing line per workstream: `kind · started at · passed at · revises`
+(`ordinary build · sonnet/medium · sonnet/high · 1`), plus `· advisor` when the worker
+consulted one. That log is the router's memory:
+a later stream of the same kind **in this session** starts at the rung that passed, not
+the one that failed. Nothing carries across sessions yet.
 
 ## Hard rules
 
