@@ -62,7 +62,7 @@ STATE = os.path.join(CLAUDE, ".bld-setup.json")
 CORE_SKILLS = [
     "emil-design-eng", "animation-vocabulary", "review-animations",
     "karpathy-guidelines", "find-skills", "copywriting", "a11y-audit",
-    "framer-motion", "webapp-testing", "terms-of-service", "privacy-policy",
+    "framer-motion", "webapp-testing",
 ]
 PLUGINS = ["ponytail", "ui-ux-pro-max", "claude-code-setup"]
 

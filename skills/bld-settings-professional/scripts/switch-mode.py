@@ -56,6 +56,7 @@ SKILLS = {
     "documentation":       ("util",         "bld-util-documentation",         "bld-documentation-util"),
     "customize-component": ("util",         "bld-util-customize-component",   "bld-customize-component-util"),
     "copywriting":         ("util",         "bld-util-copywriting",           "bld-copywriting-util"),
+    "legal-policies":      ("util",         "bld-util-legal-policies",        "bld-legal-policies-util"),
 
     # specials — identical in both modes
     "setup":               (None,           "bld-setup",                      "bld-setup"),

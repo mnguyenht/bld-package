@@ -1,4 +1,4 @@
-# The 24 BLD commands, and what each one needs
+# The 25 BLD commands, and what each one needs
 
 **Phase 2 prints this table verbatim before asking which skills to install.**
 Nobody can choose from a list they have not seen, and "do you want react-doctor?"
@@ -62,6 +62,7 @@ installs.
 | `/bld-util-documentation` | Writes a docs page inside the app, in Simplified Technical English. | — |
 | `/bld-util-customize-component` | Real sliders in the browser so you tune an effect by hand, then commit the values. | — |
 | `/bld-util-handoff` | Snapshots the session so a fresh one can continue it. | — |
+| `/bld-util-legal-policies` | US pre-launch legal check, plus a privacy policy and terms drafted from what the app really does. | — |
 
 ## settings and special
 
@@ -75,13 +76,13 @@ installs.
 
 ## The two bundles Phase 2 offers
 
-- **All 24.** Every command above.
-- **Only the self-contained ones (16).** Every row whose Needs column is a dash:
+- **All 25.** Every command above.
+- **Only the self-contained ones (17).** Every row whose Needs column is a dash:
   `/bld-sprint-planning`, `/bld-optimize-app`, `/bld-optimize-security`,
   `/bld-optimize-seo-indexing`, `/bld-find-21st`, `/bld-find-spline`,
   `/bld-orchestrator-fable`, `/bld-orchestrator-opus`,
   `/bld-util-documentation`, `/bld-util-customize-component`,
-  `/bld-util-handoff`, `/bld-settings-mcp`, `/bld-settings-professional`,
+  `/bld-util-handoff`, `/bld-util-legal-policies`, `/bld-settings-mcp`, `/bld-settings-professional`,
   `/bld-quiz`, `/bld-settings-block-image-generation` and `/bld-setup`. Nothing
   else to install, nothing half-working.
 
@@ -90,13 +91,13 @@ The other eight each need one thing, named in their row: `/bld-sprint-init` and
 `/bld-util-deploy`, `/bld-runtime-agents`, `/bld-runtime-tokens` and
 `/bld-runtime-activate-mcps`.
 
-`/bld-optimize-security` is in that sixteen on purpose: it runs its whole pass
+`/bld-optimize-security` is in that seventeen on purpose: it runs its whole pass
 without gstack, using the built-in review and BLD's own vendored checklists.
 gstack adds four more passes to it.
 
 **Every installed skill costs context in every session.** Claude Code loads each
 skill's one-line description at startup, and that listing is capped at about 1%
 of the model's context window, shared with every other skill on the machine. All
-24 of BLD's descriptions together run about 5,200 characters. That is the honest
+25 of BLD's descriptions together run about 5,400 characters. That is the honest
 argument for taking fewer: it is not disk space, it is the budget the listing
 competes for.

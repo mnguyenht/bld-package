@@ -199,7 +199,7 @@ their machine.
 
 ## Phase 2 — what BLD is, and which commands they want
 
-Print `references/skills.md` **verbatim**: all 24 commands grouped by type, each
+Print `references/skills.md` **verbatim**: all 25 commands grouped by type, each
 with one line on what it does and a **Needs** column. Nobody can choose from a
 list they have not read, and this is the only table that makes the question below
 answerable.
@@ -219,7 +219,7 @@ One `AskUserQuestion`, single select:
 
 | Option | Installs |
 |---|---|
-| **All 24 commands** | The whole set. Phase 3 then asks which supporting tools to add. |
+| **All 25 commands** | The whole set. Phase 3 then asks which supporting tools to add. |
 | **Only the self-contained 16** | Every command whose Needs column is a dash. Nothing else to install, nothing half-working. |
 | **Let me pick** | They write in the ones they want. `AskUserQuestion` always renders a write-in box, so this is that box - do not build a fourth option for it. |
 
@@ -339,7 +339,7 @@ not just a category.
 
 | Tool | What you get |
 |---|---|
-| **Core skills** (11) | Design taste from a working design engineer, animation craft, marketing copy, WCAG accessibility audits, and draft terms/privacy pages. **9 are markdown and can only suggest. Two ship scripts that execute:** `a11y-audit` and `webapp-testing`, the latter driving a real browser through Playwright. |
+| **Core skills** (9) | Design taste from a working design engineer, animation craft, marketing copy, and WCAG accessibility audits. **7 are markdown and can only suggest. Two ship scripts that execute:** `a11y-audit` and `webapp-testing`, the latter driving a real browser through Playwright. |
 | **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Those two run code, and ui-ux-pro-max also ships image generation, which BLD's hook blocks by default. **claude-code-setup** is Anthropic's official setup advisor: it reads a repo and suggests hooks, agents and skills. Markdown, so it can only suggest. |
 | **React tools** (2 CLIs) | react-doctor and react-scan find real bugs, hook misuse, and needless re-renders. They power `/bld-optimize-react`. Adds two commands you can run from anywhere. |
 | **Token monitor** | `/bld-runtime-tokens` shows how much Claude usage is left before a long session. Needs `uv` or `pipx`, one more installer. |
@@ -409,10 +409,7 @@ npx -y skills add vercel-labs/skills --skill find-skills          -g -a claude-c
 npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy -y
 npx -y skills add alirezarezvani/claude-skills@a11y-audit         -g -a claude-code --copy -y
 npx -y skills add dylantarre/animation-principles --skill framer-motion -g -a claude-code --copy -y
-npx -y skills add anthropics/skills@webapp-testing                -g -a claude-code --copy -y
-npx -y skills add shawnpang/startup-founder-skills@terms-of-service -g -a claude-code --copy -y
-npx -y skills add shawnpang/startup-founder-skills@privacy-policy   -g -a claude-code --copy -y
-```
+npx -y skills add anthropics/skills@webapp-testing                -g -a claude-code --copy -y```
 
 Flags that matter:
 
@@ -429,7 +426,7 @@ Flags that matter:
   normally**. So the flag is load-bearing on Linux, presumably on macOS (untested),
   and harmless on Windows. Pass it everywhere rather than reasoning about which
   box you are on. Either way, verify by count and not by exit code:
-  `ls ~/.claude/skills` should gain 11 entries.
+  `ls ~/.claude/skills` should gain 9 entries.
 
 Run them one at a time. Chaining with `&&` lets one dead repo kill the batch.
 
@@ -491,7 +488,7 @@ If it is absent, create it with just the keys below.
 again. If it said global, run the block below; if it said project, skip to
 "Project-scoped instead". Global is the recommendation and the common case.
 
-**On a re-run, check the naming mode FIRST.** Phase 1c prints it: `24 of 24
+**On a re-run, check the naming mode FIRST.** Phase 1c prints it: `25 of 25
 (global, pro mode)`. The package ships friendly names, so copying it over a pro
 mode install adds a second full set beside the renamed one - measured, 42 folders
 and nineteen commands answering to two names each, at twice the context cost.
@@ -509,7 +506,7 @@ list, plus `bld-setup` and the agent, which always go.
 
 **On a resume, Phase 2 was skipped, so read the list back from the state file's
 `skills` array** rather than inventing one. If that array is missing or empty on
-a resume, ask which commands they want instead of guessing: copying all 24 over a
+a resume, ask which commands they want instead of guessing: copying all 25 over a
 deliberate subset is the one outcome the subset was chosen to avoid.
 
 ```bash
@@ -608,7 +605,7 @@ machine-wide and has no per-project form:
 | Group | Where it actually goes |
 |---|---|
 | BLD skills + `bld-executor` | the project, if scoped |
-| Core skills (11) | global - `npx skills add` is run with `-g` |
+| Core skills (9) | global - `npx skills add` is run with `-g` |
 | Plugins (3) | global - Claude Code installs plugins per machine |
 | React tools | global - `npm install -g` |
 | gstack, impeccable | global - both clone into `~/.claude/skills/` |

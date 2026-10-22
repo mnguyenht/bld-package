@@ -65,7 +65,7 @@ Read it before installing anything you have not vetted.
 |---|---|---|
 | **BLD** | The 23 `/bld-*` commands and the executor agent | Yes |
 | **Plugins** | ponytail, ui-ux-pro-max, claude-code-setup | Yes |
-| **Core skills** | 11 standalone skills: design, animation, copy, a11y, legal | Yes |
+| **Core skills** | 9 standalone skills: design, animation, copy, a11y | Yes |
 | **React tools** | react-doctor and react-scan, for `/bld-optimize-react` | Yes |
 | **Deploy** | `gh` + `vercel`, for `/bld-util-deploy` | If you plan to ship |
 | **Code search** | jcodemunch, for cheaper exploration of large codebases | Later |
@@ -119,7 +119,7 @@ Confirm all three say `enabled`. Two notes:
 
 ## 3. Core skills
 
-Eleven standalone skills. Run them one at a time — chaining with `&&` lets one
+Nine standalone skills. Run them one at a time — chaining with `&&` lets one
 dead repo kill the batch.
 
 ```bash
@@ -131,10 +131,7 @@ npx -y skills add vercel-labs/skills --skill find-skills           -g -a claude-
 npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy -y
 npx -y skills add alirezarezvani/claude-skills@a11y-audit          -g -a claude-code --copy -y
 npx -y skills add dylantarre/animation-principles --skill framer-motion -g -a claude-code --copy -y
-npx -y skills add anthropics/skills@webapp-testing                 -g -a claude-code --copy -y
-npx -y skills add shawnpang/startup-founder-skills@terms-of-service -g -a claude-code --copy -y
-npx -y skills add shawnpang/startup-founder-skills@privacy-policy   -g -a claude-code --copy -y
-```
+npx -y skills add anthropics/skills@webapp-testing                 -g -a claude-code --copy -y```
 
 **The trailing `-y` is a different flag from the leading one**, and on Linux it
 is load-bearing. `npx -y` auto-confirms npx's own download; the `skills` CLI then
@@ -145,7 +142,7 @@ exits 0 having installed nothing. Verify by count, never by exit code:
 ls ~/.claude/skills | wc -l
 ```
 
-That should have gained 11 entries.
+That should have gained 9 entries.
 
 ---
 

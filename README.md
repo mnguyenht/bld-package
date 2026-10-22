@@ -7,7 +7,7 @@
 # Background
 Many skillsets nowadays ship with excessive amounts of skills, subagents, etc. Some clogging up to ***80% of your context*** every session, for skills you'll probably never use.
 
-***BLD is the simplest skillset you'll ever need***. Providing 24 skills for every part of the ```web-development``` process. 
+***BLD is the simplest skillset you'll ever need***. Providing 25 skills for every part of the ```web-development``` process. 
 
 From planning to deployment, it has it all. Including many utility commands ***saving up to 75% of your tokens***. 
 
@@ -175,6 +175,7 @@ From a development and UI/UX standpoint, these are the universal guardrails bld 
 | `/bld-util-documentation` | Writes a `/docs` page for your app, in Simplified Technical English. Half-built features go under Known limits. |
 | `/bld-util-customize-component` | Builds a customization menu in the browser, to help fine-tune a real component. Then simply let Claude know what you chose. |
 | `/bld-util-copywriting` | Humanizes and makes sure any writing drives the value of your app. Eliminating litotes, irony, or any phrasing that sounds machine-written. |
+| `/bld-util-legal-policies` | Checks your app against 16 US legal items before launch, then writes a privacy policy and terms of service from what the app actually does. US law only. |
 
 ### -settings
 
@@ -229,7 +230,7 @@ si: a habit tracker for students ==> /bld-Sprint-Init a habit tracker for studen
 bld-package/
 ├── README.md
 ├── MANUAL-INSTALL.md               the install written out by hand
-├── skills/                         24 commands, one folder each
+├── skills/                         25 commands, one folder each
 │   ├── bld-setup/
 │   │   ├── SKILL.md
 │   │   ├── references/manifest.md  every tool, with source links
@@ -292,8 +293,7 @@ every one is worth a look on its own terms. (This table is shown during `/bld-se
 | a11y-audit | WCAG 2.2 A and AA scan, fix, verify. | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) |
 | framer-motion | Disney's 12 animation principles in Framer Motion. | [dylantarre/animation-principles](https://github.com/dylantarre/animation-principles) |
 | webapp-testing | Drives a local app with Playwright. | [anthropics/skills](https://github.com/anthropics/skills) |
-| terms-of-service | Drafts and reviews SaaS terms. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
-| privacy-policy | Drafts and reviews privacy policies. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
+| privacy-policy, terms-of-service | The privacy policy and terms structure inside `/bld-util-legal-policies`. Adapted into that skill, not installed. | [shawnpang/startup-founder-skills](https://github.com/shawnpang/startup-founder-skills) |
 | ECC checklists | Parts of the security checklists behind `/bld-optimize-security`. Vendored into the skill rather than installed separately, under MIT, with the source commit pinned in `references/ecc/SOURCES.md`. | [affaan-m/ECC](https://github.com/affaan-m/ECC) |
 | agent-skills | The practices behind the "Test-first" rules in `templates/CLAUDE.global.md` and the docs-first section of `/bld-sprint-init`. Adapted into those files, not installed. | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) |
 

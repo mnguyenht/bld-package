@@ -1,7 +1,7 @@
 # bld-package — the BLD skillset, packaged for other people
 
 This repo is **not an app.** It is the distributable copy of the `bld-*` skillset:
-24 skills, one agent, two CLAUDE.md templates. Almost all of it is
+25 skills, one agent, two CLAUDE.md templates. Almost all of it is
 markdown read by Claude Code on someone else's machine. The exceptions are the
 six helper scripts below, which do execute, and the manifest lists them as such
 because that column is the one users decide on.
@@ -43,14 +43,14 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 | `README.md` | Public front door: positioning, skills by phase, credits table |
 | `skills/bld-*/SKILL.md` | One skill each. Frontmatter `name` + `description` drives invocation |
 | `skills/bld-setup/references/manifest.md` | The operational install table, with the trust column |
-| `skills/bld-setup/references/skills.md` | The 24 commands with a **Needs** column. Phase 2 prints it and picks from it |
+| `skills/bld-setup/references/skills.md` | The 25 commands with a **Needs** column. Phase 2 prints it and picks from it |
 | `agents/bld-executor.md` | The worker the orchestrator skills fan out to |
 | `templates/CLAUDE.*.md` | The global + workspace rule layers, sanitised |
 
 ## Conventions
 
 - **Folder name and frontmatter `name` must match.** They drifted apart
-  historically and the frontmatter won, but every one of the 24 now agrees, and
+  historically and the frontmatter won, but every one of the 25 now agrees, and
   `switch-mode.py` relies on that: `detect_mode` treats a BLD skill whose folder
   and declared name disagree as evidence of an interrupted rename, and refuses to
   toggle. Renaming a folder by hand without its frontmatter now jams the mode
@@ -118,7 +118,7 @@ grep -rniE '<your-name>|<your-handle>|<your-email>|C:.Users|/home/[a-z]' . --inc
 
 ## Status
 
-24 skills. **There are exactly two naming conventions and no third:**
+25 skills. **There are exactly two naming conventions and no third:**
 prefix-type-skill (default) and prefix-skill-type (pro). Pro reorders; it never
 drops a segment. A name missing its type belongs to neither convention — pro mode
 shipped that way once, and every one of those names is now in `LEGACY`.
