@@ -12,7 +12,7 @@
     {
       "name": "bld",
       "source": "./",
-      "description": "23 skills for taking a small web app from idea to shipped: sprint planning, scaffolding, refinement, React and Lighthouse optimization, a static security pass, SEO indexing, on-demand MCP, delegation to external coding agents, token-budget checks, deploy, handoff, copywriting and documentation. Ships the bld-executor subagent and a PreToolUse hook that blocks AI image generation.",
+      "description": "25 skills for taking a small web app from idea to shipped: sprint planning, scaffolding, refinement, React and Lighthouse optimization, a static security pass, SEO indexing, on-demand MCP, delegation to external coding agents, token-budget checks, deploy, handoff, copywriting, documentation, and a US legal check that drafts the privacy policy and terms of service. Ships the bld-executor subagent and a PreToolUse hook that blocks AI image generation.",
       "version": "0.1.0",
       "author": {
         "name": "mnguyenht",
