@@ -60,7 +60,7 @@ STATE = os.path.join(CLAUDE, ".bld-setup.json")
 
 # skill-group key -> the skills it installs, for inventory purposes
 CORE_SKILLS = [
-    "emil-design-eng", "animation-vocabulary", "review-animations",
+    "emil-design-eng", "animation-vocabulary", "review-animations", "apple-design",
     "karpathy-guidelines", "find-skills", "copywriting", "a11y-audit",
     "framer-motion", "webapp-testing",
 ]

@@ -26,6 +26,29 @@ plain. Don't repeat that.
 
 Announce the screen you're refining, then work the phases.
 
+## The bar: bold, not plain (user's standing feedback, 2026-10-18)
+
+"Everything looks way too plain" was the verdict on a pass that ran every phase below. Running the
+phases is necessary, not sufficient. On every screen:
+
+- **Emphasize and de-emphasize by context.** Pick the one thing the screen is about and make it
+  unmistakable (weight 700, size, the brand color). Everything secondary becomes its own quieter
+  entity, not just smaller text: fade it (60–75% opacity), set it in italic, soften its color, or
+  give it a pill. Example: a big bold time with the day under it in faded italic; a date picker
+  where the chosen date is bold and the month/year is small and muted.
+- **Vary the composition.** Don't stack every element left-aligned in identical rows. Mix
+  alignments (a right-aligned status pill, a two-tile row, a centered quiet action), group related
+  controls, and give the screen one focal block.
+- **Color is a signal, not decoration.** The accent marks the one main action. A ring, a fill or a
+  tint must mean something the user could name; if it can't, remove it. Prefer semantic color
+  (green = live/online) over brand color for states.
+- **Cut text.** Hints and captions that repeat the title go. If a setting needs a paragraph, the
+  setting is designed wrong.
+- **Motion is part of the build, not a garnish.** Every screen gets purposeful motion: list
+  entrances, state changes, press feedback, one moment of delight where it's rare. The
+  review-animations gate in Phase 4 still decides what stays.
+- **Voice:** clear and casual for the audience. Slang that tries too hard reads worse than plain.
+
 ## Phase 1 — ui-ux-pro-max (the deeper steps bld-init skipped)
 
 **Invoke `ui-ux-pro-max`** against `design-system/MASTER.md` as baseline:
@@ -42,6 +65,18 @@ Announce the screen you're refining, then work the phases.
 6. **Invoke `emil-design-eng`** and apply it — component details, sensible defaults,
    easing curves, micro-interactions, the invisible things that make software feel great.
    Use **`animation-vocabulary`** when you need the name for an effect.
+
+   **6b. Only if the screen has gesture-driven UI or glass surfaces** (drag, swipe,
+   sheets and drawers, carousels, flick-to-dismiss, translucent toolbars): **invoke
+   `apple-design`** and apply it. It covers what emil-design-eng doesn't: velocity
+   handoff, momentum projection, rubber-banding, translucent materials. A static screen
+   skips it and the checklist says so. Three guards, every time:
+   - **Ask it a concrete question** about the element ("how should this bottom sheet track
+     the drag and settle?"). Invoked bare, it only replies with a greeting and waits.
+   - **`design-system/MASTER.md` wins.** Ignore its system-font default and translucent
+     chrome unless MASTER.md already chose them.
+   - **Never on page scroll.** Springs, momentum and rubber-banding go on elements the
+     user drags, never on the page's own scrolling, which stays exactly native.
 
 ## Phase 3 — impeccable (craft + audit)
 
@@ -71,8 +106,10 @@ Fill this in for the screen, with a concrete one-liner of what each pass changed
 Screen: <name>
 - [ ] ui-ux-pro-max   — <what the UX/stack/dials pass changed>
 - [ ] emil-design-eng — <micro-interactions / feel changes applied>
+- [ ] apple-design    — <gesture/material changes, or "skipped: no gestures or glass">
 - [ ] impeccable      — <audit/critique findings applied>
 - [ ] review-animations — <passed? what was fixed to pass>
+- [ ] bold bar      — <what was emphasized, what was quieted, what color/ring was removed>
 - [ ] enrichment asked (spline/21st) — <user's decision>
 ```
 

@@ -26,7 +26,7 @@ PRE = os.path.join(HERE, "preflight.py")
 PKG = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 WIN = sys.platform == "win32"
 
-CORE = ["emil-design-eng", "animation-vocabulary", "review-animations",
+CORE = ["emil-design-eng", "animation-vocabulary", "review-animations", "apple-design",
         "karpathy-guidelines", "find-skills", "copywriting", "a11y-audit",
         "framer-motion", "webapp-testing"]
 PLUGINS = ["ponytail", "ui-ux-pro-max", "claude-code-setup"]
@@ -218,7 +218,7 @@ CASES = [
  ({"id": "C01", "desc": "fresh machine"}, ["FIRST RUN"], 0),
 
  ({"id": "C02", "desc": "hand install, state file deleted",
-   "global_bld": 1, "core": 9, "plugins": "ok"},
+   "global_bld": 1, "core": 10, "plugins": "ok"},
   ["NO STATE FILE, but BLD is already", "!FIRST RUN"], 0),
 
  ({"id": "C03", "desc": "state truncated mid-write",
@@ -232,7 +232,7 @@ CASES = [
    "global_bld": 1, "state": {}}, ["STATE FILE IS EMPTY", "!NO STATE FILE"], 0),
 
  ({"id": "C06", "desc": "scoped install remembered from the state file",
-   "project_bld": 1, "core": 9, "plugins": "ok", "state": scoped()},
+   "project_bld": 1, "core": 10, "plugins": "ok", "state": scoped()},
   ["(remembered from your last setup)", "(project,", "!MISSING NOW : bld"], 0),
 
  ({"id": "C07", "desc": "remembered project has since been deleted",
@@ -240,7 +240,7 @@ CASES = [
   ["does not exist", "moved or", "unproven until that path is fixed"], 0),
 
  ({"id": "C08", "desc": "resume: disk ahead of state (crash before recording)",
-   "global_bld": 1, "core": 9,
+   "global_bld": 1, "core": 10,
    "state": {"chose": ["core-skills", "bld", "plugins"], "declined": [],
              "done": ["prereqs", "core-skills"], "completed": False}},
   ["RESUMING", "ALREADY DONE: bld"], 0),
@@ -273,7 +273,7 @@ CASES = [
   ["INSTALLED BUT NOT SIGNED IN"], 0),
 
  ({"id": "C17", "desc": "scoped install whose state omits the project path",
-   "project_bld": 1, "core": 9, "plugins": "ok", "state": dict(DONE)},
+   "project_bld": 1, "core": 10, "plugins": "ok", "state": dict(DONE)},
   ["MISSING NOW"], 0),
 
  ({"id": "C18", "desc": "installed both globally and in the project",
@@ -370,7 +370,7 @@ CASES = [
   ["gh                  not installed"], 0),
 
  ({"id": "C37", "desc": "resume names deploy, whose step is in phase 2",
-   "core": 9, "plugins": "ok",
+   "core": 10, "plugins": "ok",
    "state": {"chose": ["deploy", "core-skills", "bld", "plugins"], "declined": [],
              "done": ["prereqs", "core-skills", "plugins"], "completed": False}},
   ["Still to do : deploy (gh + vercel), bld",
@@ -384,7 +384,7 @@ CASES = [
   ["Skip Phase 7 as well", "!their step is Phase 7"], 0),
 
  ({"id": "C46", "desc": "returning: never-answered split from actually-gone",
-   "global_bld": 1, "core": 9, "plugins": "ok",
+   "global_bld": 1, "core": 10, "plugins": "ok",
    "state": {"chose": ["core-skills", "bld", "plugins", "react-tools"],
              "declined": ["gstack", "impeccable", "mcp", "token-monitor", "agents"],
              "done": ["prereqs", "core-skills", "plugins", "bld", "react-tools"],
@@ -393,7 +393,7 @@ CASES = [
    "deploy (gh + vercel)"], 0),
 
  ({"id": "C47", "desc": "returning with nothing absent says neither line",
-   "global_bld": 1, "core": 9, "plugins": "ok", "claudemd": 1, "hook_file": 1,
+   "global_bld": 1, "core": 10, "plugins": "ok", "claudemd": 1, "hook_file": 1,
    "hook_reg": 1, "bin": ["node", "npm", "git", "react-doctor", "react-scan",
                           "jcodemunch-mcp", "claude-monitor", "codex", "vercel",
                           "gstack-not-real"],

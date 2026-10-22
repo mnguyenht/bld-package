@@ -65,7 +65,7 @@ Read it before installing anything you have not vetted.
 |---|---|---|
 | **BLD** | The 23 `/bld-*` commands and the executor agent | Yes |
 | **Plugins** | ponytail, ui-ux-pro-max, claude-code-setup | Yes |
-| **Core skills** | 9 standalone skills: design, animation, copy, a11y | Yes |
+| **Core skills** | 10 standalone skills: design, animation, copy, a11y | Yes |
 | **React tools** | react-doctor and react-scan, for `/bld-optimize-react` | Yes |
 | **Deploy** | `gh` + `vercel`, for `/bld-util-deploy` | If you plan to ship |
 | **Code search** | jcodemunch, for cheaper exploration of large codebases | Later |
@@ -119,13 +119,14 @@ Confirm all three say `enabled`. Two notes:
 
 ## 3. Core skills
 
-Nine standalone skills. Run them one at a time — chaining with `&&` lets one
+Ten standalone skills. Run them one at a time — chaining with `&&` lets one
 dead repo kill the batch.
 
 ```bash
 npx -y skills add emilkowalski/skills --skill emil-design-eng      -g -a claude-code --copy -y
 npx -y skills add emilkowalski/skills --skill animation-vocabulary -g -a claude-code --copy -y
 npx -y skills add emilkowalski/skills --skill review-animations    -g -a claude-code --copy -y
+npx -y skills add emilkowalski/skills --skill apple-design         -g -a claude-code --copy -y
 npx -y skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines -g -a claude-code --copy -y
 npx -y skills add vercel-labs/skills --skill find-skills           -g -a claude-code --copy -y
 npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy -y
@@ -142,7 +143,7 @@ exits 0 having installed nothing. Verify by count, never by exit code:
 ls ~/.claude/skills | wc -l
 ```
 
-That should have gained 9 entries.
+That should have gained 10 entries.
 
 ---
 

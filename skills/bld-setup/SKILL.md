@@ -339,7 +339,7 @@ not just a category.
 
 | Tool | What you get |
 |---|---|
-| **Core skills** (9) | Design taste from a working design engineer, animation craft, marketing copy, and WCAG accessibility audits. **7 are markdown and can only suggest. Two ship scripts that execute:** `a11y-audit` and `webapp-testing`, the latter driving a real browser through Playwright. |
+| **Core skills** (10) | Design taste from a working design engineer, animation craft, Apple-style gesture physics, marketing copy, and WCAG accessibility audits. **8 are markdown and can only suggest. Two ship scripts that execute:** `a11y-audit` and `webapp-testing`, the latter driving a real browser through Playwright. |
 | **Plugins** (3) | **ponytail** stops Claude over-building things you did not ask for. **ui-ux-pro-max** is the design engine `/bld-sprint-init` uses for palettes and type. Those two run code, and ui-ux-pro-max also ships image generation, which BLD's hook blocks by default. **claude-code-setup** is Anthropic's official setup advisor: it reads a repo and suggests hooks, agents and skills. Markdown, so it can only suggest. |
 | **React tools** (2 CLIs) | react-doctor and react-scan find real bugs, hook misuse, and needless re-renders. They power `/bld-optimize-react`. Adds two commands you can run from anywhere. |
 | **Token monitor** | `/bld-runtime-tokens` shows how much Claude usage is left before a long session. Needs `uv` or `pipx`, one more installer. |
@@ -404,6 +404,7 @@ window, translate before handing them over - the `cp` / `mkdir` forms are under
 npx -y skills add emilkowalski/skills --skill emil-design-eng      -g -a claude-code --copy -y
 npx -y skills add emilkowalski/skills --skill animation-vocabulary -g -a claude-code --copy -y
 npx -y skills add emilkowalski/skills --skill review-animations    -g -a claude-code --copy -y
+npx -y skills add emilkowalski/skills --skill apple-design         -g -a claude-code --copy -y
 npx -y skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines -g -a claude-code --copy -y
 npx -y skills add vercel-labs/skills --skill find-skills          -g -a claude-code --copy -y
 npx -y skills add coreyhaines31/marketingskills --skill copywriting -g -a claude-code --copy -y
@@ -426,7 +427,7 @@ Flags that matter:
   normally**. So the flag is load-bearing on Linux, presumably on macOS (untested),
   and harmless on Windows. Pass it everywhere rather than reasoning about which
   box you are on. Either way, verify by count and not by exit code:
-  `ls ~/.claude/skills` should gain 9 entries.
+  `ls ~/.claude/skills` should gain 10 entries.
 
 Run them one at a time. Chaining with `&&` lets one dead repo kill the batch.
 
@@ -605,7 +606,7 @@ machine-wide and has no per-project form:
 | Group | Where it actually goes |
 |---|---|
 | BLD skills + `bld-executor` | the project, if scoped |
-| Core skills (9) | global - `npx skills add` is run with `-g` |
+| Core skills (10) | global - `npx skills add` is run with `-g` |
 | Plugins (3) | global - Claude Code installs plugins per machine |
 | React tools | global - `npm install -g` |
 | gstack, impeccable | global - both clone into `~/.claude/skills/` |
