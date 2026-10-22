@@ -14,3 +14,6 @@ node_modules/
 # for everyone else, and this package is meant to be cloned and read.
 __pycache__/
 *.pyc
+
+# the maintainer's own backlog, not part of the package
+planning.md
