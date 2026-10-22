@@ -1,0 +1,36 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "bld",
+  "owner": {
+    "name": "mnguyenht",
+    "url": "https://github.com/mnguyenht"
+  },
+  "metadata": {
+    "description": "BLD — a build-and-ship toolkit for small web apps: sprint planning through deploy, plus optimizers, runtime helpers and utilities."
+  },
+  "plugins": [
+    {
+      "name": "bld",
+      "source": "./",
+      "description": "23 skills for taking a small web app from idea to shipped: sprint planning, scaffolding, refinement, React and Lighthouse optimization, a static security pass, SEO indexing, on-demand MCP, delegation to external coding agents, token-budget checks, deploy, handoff, copywriting and documentation. Ships the bld-executor subagent and a PreToolUse hook that blocks AI image generation.",
+      "version": "0.1.0",
+      "author": {
+        "name": "mnguyenht",
+        "url": "https://github.com/mnguyenht"
+      },
+      "license": "MIT",
+      "keywords": [
+        "workflow",
+        "scaffolding",
+        "deployment",
+        "code-review",
+        "performance",
+        "security",
+        "seo",
+        "design-system",
+        "productivity"
+      ],
+      "category": "productivity"
+    }
+  ]
+}
