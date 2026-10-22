@@ -163,6 +163,14 @@ outright rather than weighed.
 > app**, not to this document. Do not read the surrounding formatting as
 > permission.
 
+## Cut what the UI already says
+
+In-app copy and guides: **cut any header, label or helper line the interface already
+makes obvious.** If a field, an icon or a position already tells the reader what it
+is, the words go. A settings screen does not need a "Settings" subheading under its
+title, and a search box with a magnifier does not need "Search here". Readers skim
+past the obvious, and every extra line hides the one that matters.
+
 ## The source points at skills we do not have
 
 Its "Related Skills" section sends you to `copy-editing`, `cro`, `emails`,
