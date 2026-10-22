@@ -1,7 +1,7 @@
 {
   "name": "bld",
   "version": "0.1.0",
-  "description": "BLD — a build-and-ship toolkit for small web apps. Sprint skills (planning, init, refine), optimizers (React, Lighthouse, security, SEO), runtime helpers (on-demand MCP, external coding agents, token budget), and utilities (deploy, handoff, copywriting, documentation, US legal check with privacy policy and terms). Includes a PreToolUse hook that blocks AI image generation.",
+  "description": "BLD — a build-and-ship toolkit for small web apps. Sprint skills (planning, init, refine), optimizers (React, Lighthouse, security, SEO), runtime helpers (on-demand MCP, external coding agents, token budget), and utilities (deploy, handoff, copywriting, documentation and legal policies). Includes a PreToolUse hook that blocks AI image generation.",
   "author": {
     "name": "mnguyenht",
     "url": "https://github.com/mnguyenht"
