@@ -28,7 +28,7 @@ installs.
 |---|---|---|
 | `/bld-optimize-app` | Lighthouse over the live app, three runs and a median, then triage. | — (Lighthouse runs through `npx`) |
 | `/bld-optimize-react` | Static scan of your source for real defects: bugs, hooks, re-renders, a11y. | **React tools** |
-| `/bld-optimize-security` | A static security pass, 13 layers deep. Reports, never auto-fixes. | — *(4 more passes with **gstack**)* |
+| `/bld-optimize-security` | A security pass, 13 layers deep, plus two harmless probes of your app on localhost. Reports, never auto-fixes. | — *(4 more passes with **gstack**)* |
 | `/bld-optimize-seo-indexing` | Gets an app found on Google. Audits the live site rather than the source. | — |
 
 ## find — locate a ready-made asset
