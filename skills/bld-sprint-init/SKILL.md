@@ -38,6 +38,23 @@ regardless of tier.
 2. **Ask the user for design direction FIRST** — do not guess it (this is the step
    that's easy to skip and shouldn't be): vibe/mood (playful · serious · minimal ·
    bold), light/dark/both, any brand colors or reference apps, audience.
+
+   **Landing page? Ask for the hero layout by name too.** Otherwise Claude picks
+   one silently, and every app gets the same centred headline over a button.
+
+   | Layout | What it is | Fits |
+   |---|---|---|
+   | Cinematic Product | Product or subject on a dark background, soft light, text floating over it | Premium physical products, devices |
+   | Gallery | A row or arc of images under the headline, an instant preview of the work | Portfolios, studios, travel, collections |
+   | Bento | The hero split into cards: headline, image, product, each in its own tile | Products with several selling points |
+   | Interface Product | The headline beside or above a real screenshot of the app | SaaS, tools, dashboards |
+   | Masthead | The brand name in oversized type at the top, images arranged below like a newspaper | Fashion, editorial, brands |
+
+   AskUserQuestion takes four options at most, so offer the four that fit this
+   product best; the user can still name the fifth. Each layout needs real
+   assets (Gallery needs real photos, Interface Product a real screenshot). If
+   they don't exist yet, say so rather than filling the hero with stock or
+   generated images.
 3. **Then run the engine with those answers** and persist a source of truth:
    ```bash
    cd <app-folder>
@@ -135,3 +152,11 @@ pattern in the base becomes the template for everything after it.
 - MCP tools default to on-demand via `/bld-runtime-activate-mcps`. Always-on is
   a deliberate opt-in through `/bld-settings-mcp`, never a hand-edited `.mcp.json`.
 - Explain approval-required commands in beginner terms before running them.
+
+## Sources
+
+- Hero layout names and descriptions: @zachex's reel "5 hero sections you
+  should know" (instagram.com/reel/DZbBRAvsO8t). The **Fits** column is
+  partly BLD's: the reel ties Interface Product to SaaS and Gallery to
+  portfolios and collections; the rest is ours. Checked 2026-11-08: opinion
+  (design vocabulary), nothing to run.
