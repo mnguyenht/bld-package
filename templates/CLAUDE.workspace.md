@@ -58,7 +58,7 @@ file holds only what's specific to this workspace.
 | Screen done, or "what's wrong with this app?" | `/bld-optimize-react` — react-doctor scan → triage → fix errors first |
 | "Why is my site slow?" / pre-ship perf check | `/bld-optimize-app` — Lighthouse against the **shipped** app, 3 runs, median, then triage |
 | App is live but invisible on Google | `/bld-optimize-seo-indexing` — audit the LIVE site with curl, add the crawl plumbing, hand over the account steps |
-| Securing an app before shipping something serious | `/bld-optimize-security` — final-boss STATIC pass over all 13 layers. Free + local |
+| Securing an app before shipping something serious | `/bld-optimize-security` — final-boss pass over all 13 layers, plus two probes of the app on localhost. Free + local |
 | App needs a user guide / docs / help page | `/bld-util-documentation` — survey the app → write a `/docs` subpage in Simplified Technical English |
 | App's words are placeholders, or the copy reads as AI-written | `/bld-util-copywriting` — rewrite through the copywriting skill, then apply the workspace's proof and voice constraints |
 | App about to take accounts or payments, or "how do I not get sued?" | `/bld-util-legal-policies` — US legal check, then a privacy policy and terms drafted from the real data. US only, not GDPR |
