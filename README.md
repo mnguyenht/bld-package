@@ -133,7 +133,7 @@ From a development and UI/UX standpoint, these are the universal guardrails bld 
 |---|---|
 | `/bld-optimize-app` | Lighthouse against the shipped app, three runs and a median, because one run is a sample and not a measurement. |
 | `/bld-optimize-react` | Static scan of your source with react-doctor and your own eslint. Findings are hypotheses, so it triages before it fixes. |
-| `/bld-optimize-security` | A static security pass, 13 layers deep. Free, local, and it reports rather than auto-fixing. |
+| `/bld-optimize-security` | A security pass, 13 layers deep, plus two harmless probes of your app on localhost. Free, local, and it reports rather than auto-fixing. |
 | `/bld-optimize-seo-indexing` | Gets an app found on Google. Audits the live site with curl instead of trusting the source. |
 
 ### -find
