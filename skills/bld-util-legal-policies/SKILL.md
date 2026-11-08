@@ -7,7 +7,7 @@ description: 'ul: US legal check, plus a privacy policy and terms of service dra
 
 Three jobs, one survey:
 
-- **check**: walk the app against 16 US legal items and report what's
+- **check**: walk the app against 18 US legal items and report what's
   covered, partial, missing or N/A.
 - **privacy**: draft the app's privacy policy from what the code actually
   does.
@@ -48,7 +48,7 @@ Never invent the operator's details. Legal name, postal address and contact
 email come from the user; until they do, write `[ASK: legal name]` and keep
 going.
 
-## Step 2 — The check (16 items)
+## Step 2 — The check (18 items)
 
 Each item: the rule, whether this app needs it, and what "covered" looks
 like. An item that doesn't apply gets **N/A** with the reason (no payments →
@@ -80,6 +80,9 @@ item 9 N/A).
    account deletion for any app that lets users create an account. Covered =
    a working "Delete account" that actually removes the rows. Follow the
    code path; a button that only signs the user out is the common miss.
+   The second miss is files: deleting the rows leaves the user's uploads
+   (avatars, photos, documents) sitting in the storage bucket. If the policy
+   or the UI promises deletion, the files go too.
 6. **Data retention.** No single US law sets a period for small apps, but the
    policy must say how long data is kept, and the app shouldn't keep what it
    doesn't use. Flag tables or logs that hold personal data forever for no
@@ -111,8 +114,10 @@ item 9 N/A).
     terms (most have a DPA page); no custom contract at this size.
 11. **Data security.** FTC Section 5 treats unreasonable security as unfair.
     Covered = HTTPS, passwords hashed or handled by a managed auth provider,
-    secrets out of the repo, row-level security on every Supabase table. For
-    the full pass, `/bld-optimize-security`.
+    secrets out of the repo, row-level security on every Supabase table, and
+    no storage bucket set to public unless everything in it is meant to be
+    (a public bucket of user uploads is a data leak with a URL). For the full
+    pass, `/bld-optimize-security`.
 12. **Breach plan.** All 50 states have breach-notification laws. Covered = a
     few lines in the app's `planning.md`: who notices, who gets told, how to
     reach users fast.
@@ -130,6 +135,31 @@ item 9 N/A).
 16. **Accessibility.** Web-accessibility lawsuits under the ADA are common in
     the US. Not a checkbox law for a small app, but an `a11y-audit` pass
     before launch lowers the risk.
+17. **Reviews and testimonials.** The FTC's Consumer Reviews and
+    Testimonials Rule (16 CFR Part 465) bans fake reviews and testimonials,
+    including AI-written ones, ones from people who never used the product,
+    and paying for positive ones. Civil penalties run up to $53,088 per
+    violation (the 2025 figure, inflation-adjusted yearly), and the FTC
+    started sending warning letters in December 2025. Unlike CCPA there is no
+    size threshold: it applies to a one-person app. Covered = every quote,
+    star rating, customer logo and user count on the site traces to a real
+    person or a real number the user can name. Template placeholder quotes
+    left in the hero are the common miss. Flag each one and ask; never
+    invent a replacement (`/bld-util-copywriting` refuses to as well).
+18. **AI chatbots.** Applies only if users can chat with an AI that could
+    meet their social needs: a companion, a character, a coach. California
+    SB 243 (in force 2026-01-01) requires the operator to keep a protocol
+    that stops the bot producing suicidal or self-harm content and points
+    users who raise it to a crisis line (988 in the US), and to publish that
+    protocol on the site. A user harmed by a violation can sue for the
+    greater of actual damages or $1,000 per violation, plus attorney's fees.
+    Annual reports to California's Office of Suicide Prevention start
+    2027-07-01. A bot used only for customer service is excluded. Covered =
+    the system prompt or a filter answers self-harm messages with a
+    crisis-line reply, checked with one test message, plus a short page
+    describing it. Give any AI chat feature that reply even when it's out of
+    scope: it's a few lines. The prompt-injection side of AI features is
+    `/bld-optimize-security`'s job.
 
 ## Step 3 — The privacy policy
 
@@ -257,6 +287,17 @@ For **privacy** and **terms**, show the draft and list every `[ASK: ...]` and
 - FTC click-to-cancel status: Jones Day, May 2026. CCPA threshold: Feroot
   (Feb 2026) and Jackson Lewis CCPA FAQ. Amended COPPA rule: Federal Register
   2025-05904. California ARL / AB 2863: Barnes & Thornburg, 2025.
+- Items 17 and 18, the storage-file line in item 5 and the public-bucket
+  line in item 11: from @murphmaxxing's reel "10 ways your vibecoded app is
+  getting sued" (instagram.com/reel/Db9Br3XBTPj). Its dollar figures for the
+  privacy items are CCPA fines, which only apply above item 3's thresholds,
+  so they're left out here. Review rule penalty and warning letters: Benesch
+  and the National Law Review, 2025-26. SB 243 duties, damages and the
+  customer-service exclusion: Skadden (Oct 2025), the National Law Review,
+  and the California Assembly's bill analysis.
 
 Checked 2026-10-22 against those sources (law-firm summaries and the Federal
-Register, not statute text). Not yet run end to end on a real app.
+Register, not statute text). Items 17 and 18 checked 2026-11-08, docs-match
+against law-firm summaries and the Assembly analysis; the SB 243 statute text
+itself could not be fetched, so read it before relying on the exact wording.
+Not yet run end to end on a real app.

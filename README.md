@@ -175,7 +175,7 @@ From a development and UI/UX standpoint, these are the universal guardrails bld 
 | `/bld-util-documentation` | Writes a `/docs` page for your app, in Simplified Technical English. Half-built features go under Known limits. |
 | `/bld-util-customize-component` | Builds a customization menu in the browser, to help fine-tune a real component. Then simply let Claude know what you chose. |
 | `/bld-util-copywriting` | Humanizes and makes sure any writing drives the value of your app. Eliminating litotes, irony, or any phrasing that sounds machine-written. |
-| `/bld-util-legal-policies` | Checks your app against 16 US legal items before launch, then writes a privacy policy and terms of service from what the app actually does. US law only. |
+| `/bld-util-legal-policies` | Checks your app against 18 US legal items before launch, then writes a privacy policy and terms of service from what the app actually does. US law only. |
 
 ### -settings
 
